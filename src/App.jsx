@@ -3,7 +3,7 @@ import { usePulse } from './hooks/usePulse.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield,
+  IconChevronL, IconChevronR, IconShield, IconInsight,
 } from './components/Icons.jsx';
 
 import WellnessRing from './components/WellnessRing.jsx';
@@ -15,6 +15,8 @@ import MoodCard from './components/MoodCard.jsx';
 import StepsCard from './components/StepsCard.jsx';
 import StreakCard from './components/StreakCard.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
+import Insights from './components/Insights.jsx';
+import SmartNudge from './components/SmartNudge.jsx';
 import DataVault from './components/DataVault.jsx';
 import Settings from './components/Settings.jsx';
 
@@ -52,6 +54,7 @@ export default function App() {
           <nav className="toptabs">
             <button className={`tab ${tab==='today'?'active':''}`} onClick={() => setTab('today')}><IconHome size={17} /> Today</button>
             <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}><IconTrends size={17} /> Trends</button>
+            <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}><IconInsight size={17} /> Insights</button>
             <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}><IconShield size={17} /> Data</button>
             <button className={`tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}><IconGear size={17} /> Settings</button>
           </nav>
@@ -64,6 +67,8 @@ export default function App() {
       {tab === 'today' && (
         <div className="tab-pane" key="today">
           <DaySwitcher activeDay={p.activeDay} setActiveDay={p.setActiveDay} />
+
+          {isToday(p.activeDay) && <SmartNudge state={p.state} units={settings.units} />}
 
           <div className="grid dash stagger" style={{ marginTop: 'var(--s-5)' }}>
             <WellnessRing day={p.day} dayKey={p.activeDay} goals={p.state.goals} notify={notify} />
@@ -86,6 +91,13 @@ export default function App() {
         <div className="tab-pane" key="trends">
           <div className="section-head"><h2>Your trends</h2><span className="faint">last days at a glance</span></div>
           <TrendCharts state={p.state} units={settings.units} />
+        </div>
+      )}
+
+      {tab === 'insights' && (
+        <div className="tab-pane" key="insights">
+          <div className="section-head"><h2>Insights</h2><span className="faint">patterns from your own days</span></div>
+          <Insights state={p.state} units={settings.units} />
         </div>
       )}
 
@@ -115,6 +127,9 @@ export default function App() {
         </button>
         <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}>
           <span className="tab-icon"><IconTrends size={22} /></span> Trends
+        </button>
+        <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}>
+          <span className="tab-icon"><IconInsight size={22} /></span> Insights
         </button>
         <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}>
           <span className="tab-icon"><IconShield size={22} /></span> Data

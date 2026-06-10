@@ -3,6 +3,7 @@ import { lastNDays, weekdayShort, dayNum, isToday } from '../lib/dates.js';
 import { getDay } from '../lib/storage.js';
 import { dayScore } from '../lib/score.js';
 import { mlToDisplay } from '../lib/units.js';
+import { movingAverage } from '../lib/insights.js';
 
 const RANGES = [7, 14, 30];
 
@@ -38,6 +39,11 @@ export default function TrendCharts({ state, units }) {
   const linePath = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
   const areaPath = `${linePath} L${pts[pts.length-1]?.x || PAD},${H-PAD} L${PAD},${H-PAD} Z`;
 
+  // 7-day moving average — a smoothed trend line, shown on the longer ranges.
+  const showMA = range >= 14;
+  const maVals = useMemo(() => movingAverage(values, 7), [values]);
+  const maLinePath = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x},${H - PAD - (maVals[i] / peak) * (H - PAD * 2)}`).join(' ');
+
   return (
     <div className="card trends">
       <div className="trend-head">
@@ -69,6 +75,7 @@ export default function TrendCharts({ state, units }) {
           </defs>
           {[0.25,0.5,0.75].map((g)=>(<line key={g} x1={PAD} x2={W-PAD} y1={PAD+(H-PAD*2)*g} y2={PAD+(H-PAD*2)*g} stroke="var(--border)" strokeWidth="1" strokeDasharray="4 6"/>))}
           <path d={areaPath} fill="url(#area)" />
+          {showMA && <path d={maLinePath} fill="none" stroke="var(--amber-700)" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" opacity="0.7" />}
           <path d={linePath} fill="none" stroke="var(--amber-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
             style={{ strokeDasharray: 2000, strokeDashoffset: 0, animation: 'dash 1.1s var(--ease-out)' }} />
           {pts.map((p) => (
@@ -89,8 +96,17 @@ export default function TrendCharts({ state, units }) {
               </div>
             );
           })}
+          {showMA && (
+            <svg className="ma-overlay" viewBox={`0 0 ${series.length} 100`} preserveAspectRatio="none">
+              <polyline points={maVals.map((v, i) => `${i + 0.5},${100 - (Math.min(v, peak) / peak) * 100}`).join(' ')}
+                fill="none" stroke="var(--amber-700)" strokeWidth="2" strokeDasharray="3 3" strokeLinecap="round"
+                vectorEffect="non-scaling-stroke" opacity="0.75" />
+            </svg>
+          )}
         </div>
       )}
+
+      {showMA && <div className="ma-key"><span className="ma-dash" /> 7-day average</div>}
 
       <div className="x-axis">
         {series.map((s) => (
@@ -107,7 +123,10 @@ export default function TrendCharts({ state, units }) {
         .ts-num { font-family: var(--font-display); font-weight: 600; font-size: 1.6rem; line-height: 1; }
         .ts-unit { font-size: 0.8rem; color: var(--text-soft); margin-left: 2px; font-family: var(--font-sans); }
         .chart { width: 100%; height: 200px; overflow: visible; }
-        .bars { display: flex; align-items: flex-end; gap: 4px; height: 178px; padding-top: 18px; }
+        .bars { position: relative; display: flex; align-items: flex-end; gap: 4px; height: 178px; padding-top: 18px; }
+        .ma-overlay { position: absolute; left: 0; bottom: 0; width: 100%; height: 150px; pointer-events: none; overflow: visible; }
+        .ma-key { display: flex; align-items: center; gap: 7px; margin-top: 10px; font-size: var(--t-xs); color: var(--text-soft); font-weight: 600; }
+        .ma-key .ma-dash { width: 22px; height: 0; border-top: 2px dashed var(--amber-700); display: inline-block; }
         .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
         .bar { width: 100%; max-width: 34px; border-radius: 8px 8px 4px 4px; transition: height .6s var(--ease-out);
           animation: growBar .6s var(--ease-out) both; }

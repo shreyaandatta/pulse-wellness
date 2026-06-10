@@ -26,7 +26,9 @@ A **daily wellness score** (0–100) blends five pillars — hydration, sleep, m
 
 **Streaks** reward genuinely healthy days: any day scoring 50+ keeps the flame lit, with a 7-day flame strip and your all-time best. The in-progress day gets grace so you're never punished mid-morning.
 
-**Trends** let you flip between Wellness, Water, Sleep, Active minutes, Mood and Steps across 7 / 14 / 30 days, with a drawn line chart for score and animated bars for the rest, plus average / best / days-logged stats.
+**Trends** let you flip between Wellness, Water, Sleep, Active minutes, Mood and Steps across 7 / 14 / 30 days, with a drawn line chart for score and animated bars for the rest, plus average / best / days-logged stats and a **7-day moving-average** trend line on the longer ranges.
+
+**Insights** turns your own history into understanding — entirely from statistics, no AI and no APIs. A **weekly recap** is written from your numbers ("up 3 to 65, lifted most by movement, strongest day usually Friday"). **This week / this month** show deltas against the previous period. **What's linked** computes **Pearson correlations** between your behaviours and surfaces the strong ones in plain language ("on days you sleep more, your mood tends to be higher") — honestly hedged, never claiming cause. A **weekday rhythm** chart finds your best day, and **personal records** track your all-time bests. On **Today**, gentle **rule-based nudges** notice the time of day and what's still unlogged.
 
 **Logging** is built for speed: quick-add water chips with an animated bottle, one-tap workout types with intensity, meal quality dots, a sleep slider with quality faces, a five-face mood picker with an optional note, and a steps slider. Every action gives a little toast + pop animation.
 
@@ -55,7 +57,10 @@ src/
     units.js              metric / imperial conversion
     celebrate.js          dependency-free confetti burst (Web Animations API)
     backup.js             JSON/CSV export + validated restore
+    insights.js           pure statistics: correlations, summaries, records, nudges
   components/             one card per pillar + ring, streak, trends, data vault, settings
+    Insights.jsx          weekly recap, correlations, weekday rhythm, records
+    SmartNudge.jsx        time-aware, rule-based suggestions on Today
     DataVault.jsx         backup / restore / install, with the history heatmap
     HistoryHeatmap.jsx    score-coloured calendar of every logged day
   styles/                 design tokens + global styles

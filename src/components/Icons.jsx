@@ -25,3 +25,4 @@ export const IconCheck = (p) => <I {...p} d="M20 6 9 17l-5-5" />;
 export const IconShield = (p) => <I {...p}><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></I>;
 export const IconDownload = (p) => <I {...p}><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></I>;
 export const IconUpload = (p) => <I {...p}><path d="M12 21V9"/><path d="M7 13l5-5 5 5"/><path d="M5 3h14"/></I>;
+export const IconInsight = (p) => <I {...p}><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.2 1 2.5h6c0-1.3.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></I>;

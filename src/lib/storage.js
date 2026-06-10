@@ -1,6 +1,14 @@
-// Single source of truth for persistence. Everything lives under one key.
+// Single source of truth for persistence. Everything lives under one key —
+// which account is active decides *which* key. The original 'pulse.v1' is the
+// guest space, so any data logged before accounts existed is preserved.
 
-const KEY = 'pulse.v1';
+let activeKey = 'pulse.v1';
+
+// Point persistence at a given account's data. null/'guest' → the shared guest
+// space ('pulse.v1'); a real account → its own private 'pulse.user.<id>.v1'.
+export function setActiveUser(id) {
+  activeKey = (!id || id === 'guest') ? 'pulse.v1' : `pulse.user.${id}.v1`;
+}
 
 // Bump this whenever the saved shape changes, and add a step to migrate().
 export const SCHEMA_VERSION = 1;
@@ -49,7 +57,7 @@ export function migrate(parsed) {
 
 export function loadState() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(activeKey);
     if (!raw) return migrate(null);
     return migrate(JSON.parse(raw));
   } catch {
@@ -58,7 +66,7 @@ export function loadState() {
 }
 
 export function saveState(state) {
-  try { localStorage.setItem(KEY, JSON.stringify({ ...state, version: SCHEMA_VERSION })); } catch {}
+  try { localStorage.setItem(activeKey, JSON.stringify({ ...state, version: SCHEMA_VERSION })); } catch {}
 }
 
 export function getDay(state, key) {

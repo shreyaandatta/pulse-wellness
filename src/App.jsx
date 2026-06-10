@@ -1,11 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
 import { usePulse } from './hooks/usePulse.js';
+import { useAuth } from './hooks/useAuth.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
   IconChevronL, IconChevronR, IconShield, IconInsight,
 } from './components/Icons.jsx';
 
+import AuthGate from './components/AuthGate.jsx';
+import Onboarding from './components/Onboarding.jsx';
 import WellnessRing from './components/WellnessRing.jsx';
 import WaterCard from './components/WaterCard.jsx';
 import WorkoutCard from './components/WorkoutCard.jsx';
@@ -21,6 +24,15 @@ import DataVault from './components/DataVault.jsx';
 import Settings from './components/Settings.jsx';
 
 export default function App() {
+  const auth = useAuth();
+  if (!auth.user) {
+    return <AuthGate onSignup={auth.signup} onLogin={auth.login} onGuest={auth.guest} />;
+  }
+  // Remount per account so the wellness store reloads that user's data.
+  return <PulseApp key={auth.user.id} auth={auth} />;
+}
+
+function PulseApp({ auth }) {
   const p = usePulse();
   const [tab, setTab] = useState('today');
   const [toasts, setToasts] = useState([]);
@@ -34,6 +46,18 @@ export default function App() {
 
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
+
+  // A freshly created account hasn't been set up yet — greet it.
+  if (auth.user.isNew && !settings.onboarded) {
+    return (
+      <Onboarding
+        name={auth.user.name}
+        goals={p.state.goals}
+        settings={settings}
+        onFinish={(goals, patch) => { p.setGoals(goals); p.setSettings(patch); auth.clearNew(); }}
+      />
+    );
+  }
 
   return (
     <div className="app">
@@ -116,6 +140,7 @@ export default function App() {
             setGoals={p.setGoals} setSettings={p.setSettings}
             toggleTheme={p.toggleTheme} toggleUnits={p.toggleUnits}
             resetAll={p.resetAll} notify={notify}
+            user={auth.user} onLogout={auth.logout}
           />
         </div>
       )}

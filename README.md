@@ -4,7 +4,9 @@
 
 A warm, minimal daily wellness dashboard. Log **water, workouts, meals, sleep, mood & steps**, watch your **daily wellness score**, keep a **streak alive**, and see **weekly trend charts** — all in one calm, premium interface.
 
-Everything is stored privately in your browser via `localStorage`. **No accounts, no cloud, no AI, no APIs.** Just fast and genuinely useful.
+Everything is stored privately in your browser via `localStorage`. **No cloud, no AI, no APIs.** Just fast and genuinely useful.
+
+New visitors get a gentle, animated **onboarding** (name, goals, units) and can either **create an on-device account** or **explore as a guest** in one tap. Accounts are real — passwords are hashed with **PBKDF2 (Web Crypto)** and never stored in the clear — but, true to the local-first design, they live on the device and don't sync across machines. Each account gets its own private wellness data.
 
 ## Run it
 
@@ -49,8 +51,10 @@ src/
     usePulse.js           central store + all mutations (localStorage)
     useGoalCelebration.js fires confetti when a goal flips to "reached"
     usePWA.js             install prompt + offline status
+    useAuth.js            session state; points storage at the active account
   lib/
-    storage.js            persistence, defaults + schema migrations
+    auth.js               on-device accounts: PBKDF2 hashing, sign-in, session
+    storage.js            account-scoped persistence, defaults + schema migrations
     score.js              wellness scoring (transparent, weighted)
     streak.js             streak calculation
     dates.js              local-time date helpers
@@ -59,6 +63,8 @@ src/
     backup.js             JSON/CSV export + validated restore
     insights.js           pure statistics: correlations, summaries, records, nudges
   components/             one card per pillar + ring, streak, trends, data vault, settings
+    AuthGate.jsx          welcome / sign in / sign up / guest
+    Onboarding.jsx        animated first-run setup
     Insights.jsx          weekly recap, correlations, weekday rhythm, records
     SmartNudge.jsx        time-aware, rule-based suggestions on Today
     DataVault.jsx         backup / restore / install, with the history heatmap
@@ -69,4 +75,4 @@ scripts/gen-icons.mjs     generates the PWA icon set from the brand mark
 
 ## Privacy
 
-All data stays on your device under the `pulse.v1` key in `localStorage`. Clearing your browser data (or the in-app **Reset all data**) wipes it. Nothing ever leaves the machine.
+All data stays on your device in `localStorage` — the guest space under `pulse.v1`, and each account under its own `pulse.user.<id>.v1` key. Account passwords are stored only as PBKDF2 hashes (with a per-account salt), never in plain text. Clearing your browser data (or the in-app **Reset all data**) wipes it. Nothing ever leaves the machine — which also means accounts are device-local and don't sync.

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { waterGoalLabel } from '../lib/units.js';
 
-export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify }) {
+export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout }) {
   const { goals, settings } = state;
   const [confirm, setConfirm] = useState(false);
   const metric = settings.units === 'metric';
+  const isGuest = user?.guest;
 
   const Row = ({ label, children }) => (
     <div className="set-row"><span>{label}</span><div className="set-control">{children}</div></div>
@@ -20,6 +21,20 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
 
   return (
     <div className="grid cols-2 stagger">
+      <div className="card account-card">
+        <div className="card-title"><span className="dot" style={{ background: 'var(--good)' }} /> Account</div>
+        <div className="acct">
+          <div className="acct-avatar">{(user?.name || 'G').trim().charAt(0).toUpperCase()}</div>
+          <div className="acct-body">
+            <div className="acct-name">{isGuest ? 'Exploring as guest' : user?.name}</div>
+            <div className="faint">{isGuest ? 'Create an account to keep your space private' : `@${user?.id}`}</div>
+          </div>
+        </div>
+        <button className="btn btn-sm btn-block" style={{ marginTop: 14 }} onClick={onLogout}>
+          {isGuest ? 'Sign in or create an account' : 'Sign out'}
+        </button>
+      </div>
+
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--amber-500)' }} /> Profile & Look</div>
         <div className="field">
@@ -48,7 +63,7 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
 
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--clay)' }} /> Data</div>
-        <p className="faint" style={{ marginBottom: 14 }}>Everything is stored privately on this device. No account, no cloud, no tracking. To back up, restore, or see your full history, open the <b>Data</b> tab.</p>
+        <p className="faint" style={{ marginBottom: 14 }}>Everything is stored privately on this device — no cloud, no tracking. To back up, restore, or see your full history, open the <b>Data</b> tab.</p>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {!confirm ? (
             <button className="btn btn-sm" style={{ color: 'var(--bad)' }} onClick={() => setConfirm(true)}>Reset all data</button>
@@ -71,6 +86,11 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         .mini-step { display: flex; align-items: center; gap: 10px; }
         .mini-val { min-width: 64px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
         .field { margin-bottom: 12px; }
+        .acct { display: flex; align-items: center; gap: 14px; }
+        .acct-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+          font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; color: #fff;
+          background: linear-gradient(135deg, var(--amber-400), var(--amber-600)); box-shadow: var(--shadow-glow); }
+        .acct-name { font-weight: 700; }
       `}</style>
     </div>
   );

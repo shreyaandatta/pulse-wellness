@@ -1,0 +1,66 @@
+// Wellness score — a transparent 0..100 blend of the day's five pillars.
+// Each pillar contributes a weighted, capped sub-score so a balanced day
+// always beats a lopsided one.
+
+import { getDay } from './storage.js';
+
+const WEIGHTS = { water: 20, sleep: 25, movement: 25, nutrition: 15, mood: 15 };
+
+export function pillarScores(day, goals) {
+  // Water: ratio to goal, capped at 1.
+  const water = clamp01(day.water / Math.max(1, goals.water));
+
+  // Sleep: best near goal; penalise both too little and too much.
+  let sleep = 0;
+  if (day.sleep != null) {
+    const diff = Math.abs(day.sleep - goals.sleep);
+    sleep = clamp01(1 - diff / 4); // 4h off goal => 0
+  }
+
+  // Movement: total active minutes vs goal.
+  const activeMin = (day.workouts || []).reduce((s, w) => s + (w.minutes || 0), 0);
+  const movement = clamp01(activeMin / Math.max(1, goals.activeMinutes));
+
+  // Nutrition: meals logged vs goal, gently weighted by avg quality.
+  const meals = day.meals || [];
+  const mealRatio = clamp01(meals.length / Math.max(1, goals.meals));
+  const avgQ = meals.length ? meals.reduce((s, m) => s + (m.quality || 3), 0) / meals.length : 3;
+  const nutrition = clamp01(mealRatio * (0.7 + 0.3 * (avgQ / 5)));
+
+  // Mood: 1..5 → 0..1.
+  const mood = day.mood != null ? (day.mood - 1) / 4 : 0;
+
+  return { water, sleep, movement, nutrition, mood };
+}
+
+export function dayScore(day, goals) {
+  const p = pillarScores(day, goals);
+  const total =
+    p.water * WEIGHTS.water +
+    p.sleep * WEIGHTS.sleep +
+    p.movement * WEIGHTS.movement +
+    p.nutrition * WEIGHTS.nutrition +
+    p.mood * WEIGHTS.mood;
+  return Math.round(total);
+}
+
+export function scoreFor(state, key) {
+  return dayScore(getDay(state, key), state.goals);
+}
+
+export function scoreBand(score) {
+  if (score >= 80) return { label: 'Thriving', color: 'var(--good)', emoji: '🌟' };
+  if (score >= 60) return { label: 'Steady', color: 'var(--amber-500)', emoji: '✨' };
+  if (score >= 35) return { label: 'Building', color: 'var(--warn)', emoji: '🌱' };
+  return { label: 'Resting', color: 'var(--text-faint)', emoji: '🌙' };
+}
+
+export const PILLAR_META = {
+  water:     { label: 'Hydration', color: 'var(--water)', icon: '💧' },
+  sleep:     { label: 'Sleep',     color: 'var(--plum)',  icon: '🌙' },
+  movement:  { label: 'Movement',  color: 'var(--clay)',  icon: '🔥' },
+  nutrition: { label: 'Nutrition', color: 'var(--sage)',  icon: '🥗' },
+  mood:      { label: 'Mood',      color: 'var(--rose)',  icon: '🌤️' },
+};
+
+function clamp01(n) { return Math.max(0, Math.min(1, n || 0)); }

@@ -6,7 +6,9 @@ A warm, minimal daily wellness dashboard. Log **water, workouts, meals, sleep, m
 
 Everything is stored privately in your browser via `localStorage`. **No cloud, no AI, no APIs.** Just fast and genuinely useful.
 
-New visitors get a gentle, animated **onboarding** (name, goals, units) and can either **create an on-device account** or **explore as a guest** in one tap. Accounts are real — passwords are hashed with **PBKDF2 (Web Crypto)** and never stored in the clear — but, true to the local-first design, they live on the device and don't sync across machines. Each account gets its own private wellness data.
+New visitors get a gentle, animated **onboarding** (name, goals, units) and can either **create an account** or **explore as a guest** in one tap. Accounts are real — passwords are hashed with **PBKDF2 (Web Crypto)** and never stored in the clear. By default they're **on-device** (private to the browser, no sync), staying true to the local-first design.
+
+**Optional cloud sync:** add two Supabase keys and Pulse upgrades itself to **real email-and-password accounts that sync across every device**, with server-side **Row Level Security** so each user can only touch their own data. No keys → it stays fully local; guest mode is always instant and local. See **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)** for a click-by-click guide.
 
 ## Run it
 
@@ -51,9 +53,12 @@ src/
     usePulse.js           central store + all mutations (localStorage)
     useGoalCelebration.js fires confetti when a goal flips to "reached"
     usePWA.js             install prompt + offline status
-    useAuth.js            session state; points storage at the active account
+    useAuth.js            session state; on-device or cloud, points storage at the active account
+    useCloudSync.js       pulls/pushes the active account's data to Supabase (when configured)
   lib/
     auth.js               on-device accounts: PBKDF2 hashing, sign-in, session
+    supabase.js           optional Supabase client (off unless two env keys are set)
+    cloud.js              cloud auth + per-user JSONB state, layered over Supabase
     storage.js            account-scoped persistence, defaults + schema migrations
     score.js              wellness scoring (transparent, weighted)
     streak.js             streak calculation

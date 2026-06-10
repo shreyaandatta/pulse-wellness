@@ -27,7 +27,9 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
           <div className="acct-avatar">{(user?.name || 'G').trim().charAt(0).toUpperCase()}</div>
           <div className="acct-body">
             <div className="acct-name">{isGuest ? 'Exploring as guest' : user?.name}</div>
-            <div className="faint">{isGuest ? 'Create an account to keep your space private' : `@${user?.id}`}</div>
+            <div className="faint">{isGuest
+              ? 'Create an account to keep your space private'
+              : (user?.cloud ? user.email : `@${user?.id}`)}</div>
           </div>
         </div>
         <button className="btn btn-sm btn-block" style={{ marginTop: 14 }} onClick={onLogout}>

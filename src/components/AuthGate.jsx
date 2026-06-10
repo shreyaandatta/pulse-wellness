@@ -2,23 +2,33 @@ import { useState } from 'react';
 
 // The doorway. Accounts are optional — "Explore as guest" is always one tap
 // away so anyone (a recruiter, a friend) can be inside the app instantly.
-export default function AuthGate({ onSignup, onLogin, onGuest }) {
+export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
   const [mode, setMode] = useState('welcome'); // welcome | signin | signup
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // email when cloud, username otherwise
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
-  const reset = (m) => { setError(''); setPassword(''); setMode(m); };
+  const reset = (m) => { setError(''); setNotice(''); setPassword(''); setMode(m); };
 
   const submit = async (e) => {
     e.preventDefault();
-    setError(''); setBusy(true);
+    setError(''); setNotice(''); setBusy(true);
     try {
-      if (mode === 'signup') await onSignup(name, username, password);
-      else await onLogin(username, password);
+      if (mode === 'signup') {
+        const res = await onSignup(name, username, password);
+        if (res?.needsConfirm) {
+          reset('signin');
+          setNotice('Account created! Check your email to confirm, then sign in.');
+          setBusy(false);
+          return;
+        }
+      } else {
+        await onLogin(username, password);
+      }
     } catch (err) {
       setError(err.message || 'Something went wrong.');
       setBusy(false);
@@ -43,7 +53,10 @@ export default function AuthGate({ onSignup, onLogin, onGuest }) {
               <button className="btn btn-block" onClick={() => reset('signin')}>I already have one</button>
               <button className="btn-ghost btn-block gate-guest" onClick={onGuest}>Explore as guest →</button>
             </div>
-            <p className="gate-foot">Accounts are saved privately on this device — no cloud, no tracking.</p>
+            {notice && <div className="gate-notice">{notice}</div>}
+            <p className="gate-foot">{cloud
+              ? 'Your account syncs securely across your devices.'
+              : 'Accounts are saved privately on this device — no cloud, no tracking.'}</p>
           </>
         )}
 
@@ -59,9 +72,11 @@ export default function AuthGate({ onSignup, onLogin, onGuest }) {
                 </div>
               )}
               <div className="field">
-                <label>Username</label>
+                <label>{cloud ? 'Email' : 'Username'}</label>
                 <input className="input" value={username} onChange={(e) => setUsername(e.target.value)}
-                  placeholder="e.g. shreyaan" autoComplete="username" autoCapitalize="none" autoFocus={mode === 'signin'} />
+                  type={cloud ? 'email' : 'text'}
+                  placeholder={cloud ? 'you@example.com' : 'e.g. shreyaan'}
+                  autoComplete={cloud ? 'email' : 'username'} autoCapitalize="none" autoFocus={mode === 'signin'} />
               </div>
               <div className="field">
                 <label>Password</label>
@@ -75,6 +90,7 @@ export default function AuthGate({ onSignup, onLogin, onGuest }) {
                 </div>
               </div>
 
+              {notice && <div className="gate-notice">{notice}</div>}
               {error && <div className="gate-error">{error}</div>}
 
               <button className="btn btn-primary btn-block" type="submit" disabled={busy} style={{ marginTop: 6 }}>
@@ -125,6 +141,9 @@ export default function AuthGate({ onSignup, onLogin, onGuest }) {
         .gate-error { background: color-mix(in srgb, var(--bad) 12%, var(--surface)); color: var(--bad);
           border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--border)); border-radius: var(--r-md);
           padding: 10px 12px; font-size: var(--t-sm); font-weight: 500; animation: popIn .3s var(--ease-spring); }
+        .gate-notice { background: color-mix(in srgb, var(--good) 12%, var(--surface)); color: var(--good);
+          border: 1px solid color-mix(in srgb, var(--good) 35%, var(--border)); border-radius: var(--r-md);
+          padding: 10px 12px; font-size: var(--t-sm); font-weight: 500; margin-top: 12px; animation: popIn .3s var(--ease-spring); }
         .gate-switch { margin-top: var(--s-5); font-size: var(--t-sm); color: var(--text-soft); }
         .gate-switch button { color: var(--amber-600); font-weight: 700; }
         .gate-switch button:hover { text-decoration: underline; }

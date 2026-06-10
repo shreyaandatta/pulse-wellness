@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
+import { useCloudSync } from './hooks/useCloudSync.js';
+import { hasSupabase } from './lib/supabase.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
@@ -25,15 +27,38 @@ import Settings from './components/Settings.jsx';
 
 export default function App() {
   const auth = useAuth();
+  if (auth.loading) return <Splash />;
   if (!auth.user) {
-    return <AuthGate onSignup={auth.signup} onLogin={auth.login} onGuest={auth.guest} />;
+    return <AuthGate cloud={hasSupabase} onSignup={auth.signup} onLogin={auth.login} onGuest={auth.guest} />;
   }
   // Remount per account so the wellness store reloads that user's data.
   return <PulseApp key={auth.user.id} auth={auth} />;
 }
 
+// Brief splash while a cloud session is restored on first load.
+function Splash() {
+  return (
+    <div className="splash">
+      <div className="splash-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FFFBF5" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 13h4l2-5 3 9 2-6 1.5 2H21" />
+        </svg>
+      </div>
+      <style>{`
+        .splash { min-height: 100dvh; display: grid; place-items: center; }
+        .splash-mark { width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center;
+          background: linear-gradient(140deg, var(--amber-400), var(--amber-600)); box-shadow: var(--shadow-glow);
+          animation: pulseGlow 1.6s var(--ease-out) infinite; }
+        .splash-mark svg { width: 34px; height: 34px; }
+      `}</style>
+    </div>
+  );
+}
+
 function PulseApp({ auth }) {
   const p = usePulse();
+  // Sync this account's data with the cloud (no-op for guests / on-device accounts).
+  useCloudSync({ cloudUserId: auth.user.cloud ? auth.user.id : null, state: p.state, replaceAll: p.replaceAll });
   const [tab, setTab] = useState('today');
   const [toasts, setToasts] = useState([]);
   const tid = useRef(0);

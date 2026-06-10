@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { loadState, saveState, getDay, DEFAULT_GOALS } from '../lib/storage.js';
+import { loadState, saveState, getDay, migrate, DEFAULT_GOALS } from '../lib/storage.js';
 import { todayKey } from '../lib/dates.js';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -61,6 +61,11 @@ export function usePulse() {
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
     resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings } })),
+
+    // Replace the entire store from a restored backup (already migrated/validated).
+    replaceAll: (incoming) => setState(() => migrate(incoming)),
+    // Remember the moment of the last export, to nudge stale backups.
+    markBackup: () => setState((s) => ({ ...s, settings: { ...s.settings, lastBackupAt: Date.now() } })),
   }), [activeDay, mutateDay]);
 
   return { state, setState, activeDay, setActiveDay, day, ...api };

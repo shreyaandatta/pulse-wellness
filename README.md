@@ -32,6 +32,8 @@ A **daily wellness score** (0–100) blends five pillars — hydration, sleep, m
 
 You can browse **past days** with the date switcher, set your own **goals**, switch **metric/imperial units**, and toggle a **warm dark mode**. Hitting a goal sets off a little **confetti celebration** on the card that earned it.
 
+**Your data** is its own place. A **history heatmap** lights up every day you've logged — coloured by that day's wellness score, like a calendar made of warm light. From there you can **save a full backup** (`.json`), **export a spreadsheet** (`.csv`), and **restore** from a backup on any device — with a clear confirmation before anything is replaced. Pulse is also an **installable PWA**: add it to your home screen and it runs full-screen and **fully offline**.
+
 ## Design
 
 The visual system lives in `src/styles/tokens.css` — an **Amber & Honey** accent family over warm cream neutrals, soft shadows, `Fraunces` display + `Inter` body type, and spring-eased motion. Edit the tokens to retheme the whole app.
@@ -44,15 +46,20 @@ src/
   hooks/
     usePulse.js           central store + all mutations (localStorage)
     useGoalCelebration.js fires confetti when a goal flips to "reached"
+    usePWA.js             install prompt + offline status
   lib/
-    storage.js            persistence + defaults
+    storage.js            persistence, defaults + schema migrations
     score.js              wellness scoring (transparent, weighted)
     streak.js             streak calculation
     dates.js              local-time date helpers
     units.js              metric / imperial conversion
     celebrate.js          dependency-free confetti burst (Web Animations API)
-  components/             one card per pillar + ring, streak, trends, settings
+    backup.js             JSON/CSV export + validated restore
+  components/             one card per pillar + ring, streak, trends, data vault, settings
+    DataVault.jsx         backup / restore / install, with the history heatmap
+    HistoryHeatmap.jsx    score-coloured calendar of every logged day
   styles/                 design tokens + global styles
+scripts/gen-icons.mjs     generates the PWA icon set from the brand mark
 ```
 
 ## Privacy

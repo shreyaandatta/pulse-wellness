@@ -2,6 +2,9 @@
 
 const KEY = 'pulse.v1';
 
+// Bump this whenever the saved shape changes, and add a step to migrate().
+export const SCHEMA_VERSION = 1;
+
 export const DEFAULT_GOALS = {
   water: 2000,      // ml (metric base unit)
   sleep: 8,         // hours
@@ -29,23 +32,33 @@ function freshDay() {
   };
 }
 
+// Bring any saved or imported blob up to the current schema. Data only ever
+// moves forward; older shapes (or a missing version) are normalised here, so a
+// backup exported by an old build still restores cleanly into a newer one.
+export function migrate(parsed) {
+  const data = parsed && typeof parsed === 'object' ? parsed : {};
+  // No destructive steps yet — v0 (pre-versioning) and v1 share a shape.
+  // Future bumps add: if ((data.version || 0) < 2) { ...transform... }
+  return {
+    version: SCHEMA_VERSION,
+    days: data.days || {},
+    goals: { ...DEFAULT_GOALS, ...(data.goals || {}) },
+    settings: { ...DEFAULT_SETTINGS, ...(data.settings || {}) },
+  };
+}
+
 export function loadState() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return { days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...DEFAULT_SETTINGS } };
-    const parsed = JSON.parse(raw);
-    return {
-      days: parsed.days || {},
-      goals: { ...DEFAULT_GOALS, ...(parsed.goals || {}) },
-      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) },
-    };
+    if (!raw) return migrate(null);
+    return migrate(JSON.parse(raw));
   } catch {
-    return { days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...DEFAULT_SETTINGS } };
+    return migrate(null);
   }
 }
 
 export function saveState(state) {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  try { localStorage.setItem(KEY, JSON.stringify({ ...state, version: SCHEMA_VERSION })); } catch {}
 }
 
 export function getDay(state, key) {

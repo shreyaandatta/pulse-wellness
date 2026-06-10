@@ -1,5 +1,7 @@
 # Pulse — Personal Wellness Tracker
 
+**🔗 Live demo: [pulse-by-shreyaan.vercel.app](https://pulse-by-shreyaan.vercel.app/)** — no install, no sign-up, just open and start logging.
+
 A warm, minimal daily wellness dashboard. Log **water, workouts, meals, sleep, mood & steps**, watch your **daily wellness score**, keep a **streak alive**, and see **weekly trend charts** — all in one calm, premium interface.
 
 Everything is stored privately in your browser via `localStorage`. **No accounts, no cloud, no AI, no APIs.** Just fast and genuinely useful.

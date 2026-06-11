@@ -7,7 +7,8 @@ export const FREE_HISTORY_DAYS = 21;   // free plan sees this many days back
 export const FREE_CONNECTIONS = 4;     // free plan's friends/family cap
 export const MAX_TRACKERS = 6;         // custom trackers per account (Plus)
 
-export const PLUS_PRICE = { monthly: '$4.99', yearly: '$29.99' };
+// Pricing is in INR (Razorpay). Yearly ≈ 8 months' worth, so it saves ~33%.
+export const PLUS_PRICE = { monthly: '₹99', yearly: '₹799', yearlySave: '33%' };
 
 export function isPlus(settings) {
   return settings?.plan === 'plus';

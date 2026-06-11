@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { waterGoalLabel } from '../lib/units.js';
+import { prettyDate } from '../lib/dates.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
 import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
 import { IconSparkle, IconLock, IconTrash } from './Icons.jsx';
 
-export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker }) {
+export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker, plus: plusProp, billing, managePlan }) {
   const { goals, settings } = state;
   const [confirm, setConfirm] = useState(false);
   const metric = settings.units === 'metric';
   const isGuest = user?.guest;
-  const plus = isPlus(settings);
+  // Prefer the server-verified status when billing is live; else the local flag.
+  const plus = plusProp ?? isPlus(settings);
+  const live = !!billing?.enabled;
 
   const order = resolveOrder(settings.pillarOrder);
   const hiddenSet = new Set(settings.hiddenPillars || []);
@@ -68,11 +71,16 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
               You're on <b>Pulse Plus</b> — all-time history, year in review, custom trackers,
               unlimited friends and spreadsheet export are yours. ✨
             </p>
-            <button className="btn btn-sm" onClick={() => { setSettings({ plan: 'free' }); notify('Switched back to Free', '🌿'); }}>
-              Switch back to Free
-            </button>
+            {live && billing?.plusUntil && (
+              <p className="faint" style={{ fontSize: 'var(--t-xs)', marginBottom: 10 }}>
+                {billing.cancelling ? 'Plus ends' : 'Renews'} on <b>{prettyDate(billing.plusUntil.slice(0, 10))}</b>.
+              </p>
+            )}
+            <PlanManageButton live={live} cancelling={billing?.cancelling} managePlan={managePlan} notify={notify} />
             <p className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 8 }}>
-              Switching keeps every bit of your data — Plus features just lock again.
+              {live
+                ? 'Cancelling keeps Plus until your billing date — and all your data, always.'
+                : 'Switching keeps every bit of your data — Plus features just lock again.'}
             </p>
           </>
         ) : (
@@ -228,6 +236,31 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         .ct-del:hover { color: var(--bad); border-color: var(--bad); }
       `}</style>
     </div>
+  );
+}
+
+// Cancel (live) or switch back to free (demo), with a one-tap confirm so it's
+// never accidental.
+function PlanManageButton({ live, cancelling, managePlan, notify }) {
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  if (live && cancelling) {
+    return <p className="faint" style={{ fontSize: 'var(--t-sm)', fontWeight: 600 }}>Your subscription is set to end — thanks for trying Plus. 🌿</p>;
+  }
+  const label = live ? 'Cancel subscription' : 'Switch back to Free';
+  if (!confirm) {
+    return <button className="btn btn-sm" onClick={() => setConfirm(true)}>{label}</button>;
+  }
+  return (
+    <button className="btn btn-sm" style={{ color: 'var(--bad)' }} disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try { await managePlan(); }
+        catch (e) { notify(e?.message || 'Could not update your plan', '⚠️'); }
+        finally { setBusy(false); setConfirm(false); }
+      }}>
+      {busy ? 'Working…' : (live ? 'Confirm cancel?' : 'Confirm?')}
+    </button>
   );
 }
 

@@ -3,9 +3,11 @@ import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
 import { useSocial } from './hooks/useSocial.js';
+import { useEntitlement } from './hooks/useEntitlement.js';
 import { hasSupabase } from './lib/supabase.js';
 import { resolveOrder } from './lib/pillars.js';
 import { isPlus } from './lib/plan.js';
+import { startSubscription, cancelSubscription } from './lib/billing.js';
 import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
@@ -85,15 +87,39 @@ function PulseApp({ auth }) {
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
 
-  // Pulse Plus: the plan flag + one shared paywall sheet any feature can open.
-  const plus = isPlus(settings);
+  // Pulse Plus. With real billing configured (Razorpay + cloud account) the
+  // server's entitlement is the source of truth; otherwise we fall back to the
+  // local demo flag so the app still demonstrates the full experience.
+  const entitlement = useEntitlement({ user: auth.user });
+  const plus = entitlement.enabled ? entitlement.plus : isPlus(settings);
   const [plusOpen, setPlusOpen] = useState(false);
   const openPlus = useCallback(() => setPlusOpen(true), []);
-  const startPlus = useCallback(() => {
-    p.setSettings({ plan: 'plus', plusSince: Date.now() });
-    setPlusOpen(false);
-    notify('Welcome to Pulse Plus', '✨');
-  }, [p.setSettings, notify]);
+
+  // The upgrade action: real Razorpay checkout when live, else the demo flip.
+  const startPlus = useCallback(async (cycle) => {
+    if (entitlement.enabled) {
+      await startSubscription(cycle, { email: auth.user.email, name: settings.name || auth.user.name });
+      setPlusOpen(false);
+      notify('Payment received — unlocking Plus…', '✨');
+      entitlement.pollUntilActive();
+    } else {
+      p.setSettings({ plan: 'plus', plusSince: Date.now() });
+      setPlusOpen(false);
+      notify('Welcome to Pulse Plus', '✨');
+    }
+  }, [entitlement, auth.user, settings.name, p.setSettings, notify]);
+
+  // Cancel a live subscription (at cycle end) or drop the demo flag.
+  const managePlan = useCallback(async () => {
+    if (entitlement.enabled) {
+      await cancelSubscription();
+      await entitlement.refresh();
+      notify('Subscription will end at your billing date', '🌿');
+    } else {
+      p.setSettings({ plan: 'free' });
+      notify('Switched back to Free', '🌿');
+    }
+  }, [entitlement, p.setSettings, notify]);
 
   // Keep haptics/sound feedback in sync with the user's preferences.
   useEffect(() => {
@@ -228,6 +254,7 @@ function PulseApp({ auth }) {
             resetAll={p.resetAll} notify={notify}
             user={auth.user} onLogout={auth.logout}
             openPlus={openPlus} addTracker={p.addTracker} removeTracker={p.removeTracker}
+            plus={plus} billing={entitlement} managePlan={managePlan}
           />
         </div>
       )}
@@ -254,7 +281,7 @@ function PulseApp({ auth }) {
         </button>
       </nav>
 
-      <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} />
+      <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
 
       <div className="toast-wrap">
         {toasts.map((t) => (

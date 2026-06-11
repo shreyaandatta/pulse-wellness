@@ -2,15 +2,27 @@ import { useState } from 'react';
 import { IconSparkle } from './Icons.jsx';
 import { PLUS_PERKS, PLUS_PRICE } from '../lib/plan.js';
 
-// The Pulse Plus paywall. One honest sheet: what you get, what it costs, one
-// button. There's no payment processor in this build, so "Start Plus" activates
-// the plan directly — and says so, right on the sheet.
-export default function PlusModal({ open, onClose, onUpgrade }) {
+// The Pulse Plus paywall. With real billing configured it opens Razorpay
+// Checkout; otherwise it's an honest demo that activates Plus directly and says
+// so. `onUpgrade(cycle)` returns a promise either way.
+export default function PlusModal({ open, onClose, onUpgrade, live }) {
   const [cycle, setCycle] = useState('yearly');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   if (!open) return null;
 
+  const go = async () => {
+    setError(''); setBusy(true);
+    try {
+      await onUpgrade(cycle);
+    } catch (e) {
+      if (e?.message !== 'cancelled') setError(e?.message || 'Could not complete checkout.');
+      setBusy(false);
+    }
+  };
+
   return (
-    <div className="plus-modal" onClick={onClose}>
+    <div className="plus-modal" onClick={busy ? undefined : onClose}>
       <div className="plus-sheet pop" onClick={(e) => e.stopPropagation()}>
         <div className="ps-mark"><IconSparkle size={26} /></div>
         <h3 className="ps-title">Pulse <span className="ps-grad">Plus</span></h3>
@@ -34,17 +46,21 @@ export default function PlusModal({ open, onClose, onUpgrade }) {
           </button>
           <button className={`ps-price ${cycle === 'yearly' ? 'on' : ''}`} onClick={() => setCycle('yearly')}>
             <span className="ps-amt">{PLUS_PRICE.yearly}</span><span className="faint">/ year</span>
-            <span className="ps-save">save 50%</span>
+            <span className="ps-save">save {PLUS_PRICE.yearlySave}</span>
           </button>
         </div>
 
-        <button className="btn btn-primary btn-block" onClick={() => onUpgrade(cycle)}>
-          <IconSparkle size={17} /> Start Plus
+        {error && <div className="ps-error">{error}</div>}
+
+        <button className="btn btn-primary btn-block" onClick={go} disabled={busy}>
+          <IconSparkle size={17} /> {busy ? (live ? 'Opening checkout…' : 'Activating…') : 'Start Plus'}
         </button>
-        <button className="btn-ghost btn-block ps-later" onClick={onClose}>Maybe later</button>
+        <button className="btn-ghost btn-block ps-later" onClick={onClose} disabled={busy}>Maybe later</button>
 
         <p className="ps-demo faint">
-          Demo checkout — this portfolio build activates Plus instantly, nothing is charged.
+          {live
+            ? <>Secure payment via <b>Razorpay</b> · auto-renews {cycle} · cancel anytime in Settings.</>
+            : <>Demo checkout — this build activates Plus instantly, nothing is charged.</>}
         </p>
       </div>
 
@@ -80,6 +96,9 @@ export default function PlusModal({ open, onClose, onUpgrade }) {
           text-transform: uppercase; color: #fff; padding: 2px 7px; border-radius: var(--r-pill);
           background: linear-gradient(135deg, var(--good), #3E9C6B); }
 
+        .ps-error { background: color-mix(in srgb, var(--bad) 12%, var(--surface)); color: var(--bad);
+          border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--border)); border-radius: var(--r-md);
+          padding: 9px 12px; font-size: var(--t-sm); font-weight: 500; margin-bottom: 10px; }
         .ps-later { margin-top: 8px; color: var(--text-soft); }
         .ps-demo { font-size: var(--t-xs); margin-top: var(--s-4); line-height: 1.45; }
       `}</style>

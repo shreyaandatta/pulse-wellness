@@ -4,7 +4,9 @@
 
 A warm, minimal daily wellness dashboard. Log **water, workouts, meals, sleep, mood & steps**, watch your **daily wellness score**, keep a **streak alive**, and see **weekly trend charts** — all in one calm, premium interface.
 
-Everything is stored privately in your browser via `localStorage`. **No cloud, no AI, no APIs.** Just fast and genuinely useful.
+By default everything is stored privately in your browser via `localStorage` — and with one optional step you can turn on **cloud sync** for a real account that follows you across devices. Either way, **insights stay statistics-only — no AI**. Just fast and genuinely useful.
+
+Days roll over automatically at midnight in your device's local time (e.g. India Standard Time): today's entries stay stamped to today's date, and once the clock passes midnight you're on a fresh day with yesterday a tap away on the date switcher — nothing is lost or shifted. The "a line about today" journal prompt also rotates on its own, offering a different gentle question each day.
 
 New visitors get a gentle, animated **onboarding** (name, goals, units) and can either **create an account** or **explore as a guest** in one tap. Accounts are real — passwords are hashed with **PBKDF2 (Web Crypto)** and never stored in the clear. By default they're **on-device** (private to the browser, no sync), staying true to the local-first design.
 

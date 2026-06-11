@@ -104,7 +104,7 @@ function PulseApp({ auth }) {
     workout: <WorkoutCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addWorkout} onRemove={p.removeWorkout} notify={notify} />,
     meal: <MealCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} foods={p.state.foods} onAdd={p.addMeal} onAddFood={p.addFood} onRemove={p.removeMeal} notify={notify} />,
     sleep: <SleepCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onSet={p.setSleep} notify={notify} />,
-    mood: <MoodCard day={p.day} onSet={p.setMood} notify={notify} />,
+    mood: <MoodCard day={p.day} dayKey={p.activeDay} onSet={p.setMood} notify={notify} />,
   };
   const visiblePillars = resolveOrder(settings.pillarOrder).filter((id) => !(settings.hiddenPillars || []).includes(id));
 

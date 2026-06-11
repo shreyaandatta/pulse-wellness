@@ -21,6 +21,25 @@ export function usePulse() {
     document.documentElement.setAttribute('data-theme', state.settings.theme);
   }, [state.settings.theme]);
 
+  // If midnight passes while the app is open, roll the view onto the new day —
+  // but only when the user was sitting on what *had* been today, so we never
+  // yank them away from a past day they're reviewing. Days are keyed by the
+  // device's local date (so, India time on your phone).
+  const lastToday = useRef(todayKey());
+  useEffect(() => {
+    const check = () => {
+      const t = todayKey();
+      if (t !== lastToday.current) {
+        setActiveDay((cur) => (cur === lastToday.current ? t : cur));
+        lastToday.current = t;
+      }
+    };
+    const id = setInterval(check, 60000);
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('focus', check);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', check); window.removeEventListener('focus', check); };
+  }, []);
+
   const mutateDay = useCallback((key, fn) => {
     setState((s) => {
       const day = getDay(s, key);

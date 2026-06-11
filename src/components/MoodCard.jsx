@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { IconHeart } from './Icons.jsx';
+import { promptForDay } from '../lib/prompts.js';
 
 const MOODS = [
   { v: 1, e: '😔', label: 'Low' },
@@ -9,9 +10,10 @@ const MOODS = [
   { v: 5, e: '🤩', label: 'Great' },
 ];
 
-export default function MoodCard({ day, onSet, notify }) {
+export default function MoodCard({ day, dayKey, onSet, notify }) {
   const [note, setNote] = useState(day.moodNote || '');
   useEffect(() => { setNote(day.moodNote || ''); }, [day.moodNote]);
+  const placeholder = promptForDay(dayKey);
 
   const pick = (v) => {
     onSet(v, note);
@@ -34,7 +36,7 @@ export default function MoodCard({ day, onSet, notify }) {
       <textarea
         className="input mood-note"
         rows="2"
-        placeholder="A line about today… (optional)"
+        placeholder={placeholder}
         value={note}
         onChange={(e) => setNote(e.target.value)}
         onBlur={() => onSet(day.mood, note)}

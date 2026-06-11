@@ -2,6 +2,8 @@
 // which account is active decides *which* key. The original 'pulse.v1' is the
 // guest space, so any data logged before accounts existed is preserved.
 
+import { DEFAULT_PILLAR_ORDER } from './pillars.js';
+
 let activeKey = 'pulse.v1';
 
 // Point persistence at a given account's data. null/'guest' → the shared guest
@@ -25,6 +27,10 @@ export const DEFAULT_SETTINGS = {
   units: 'metric',  // 'metric' | 'imperial'
   theme: 'light',   // 'light' | 'dark'
   name: '',
+  haptics: true,    // vibrate on taps (where supported)
+  sounds: true,     // soft chime on goal celebrations
+  pillarOrder: [...DEFAULT_PILLAR_ORDER], // order of the Today tracker cards
+  hiddenPillars: [],                       // pillar ids to hide
 };
 
 function freshDay() {
@@ -52,6 +58,7 @@ export function migrate(parsed) {
     days: data.days || {},
     goals: { ...DEFAULT_GOALS, ...(data.goals || {}) },
     settings: { ...DEFAULT_SETTINGS, ...(data.settings || {}) },
+    foods: Array.isArray(data.foods) ? data.foods : [],  // user's custom foods
   };
 }
 

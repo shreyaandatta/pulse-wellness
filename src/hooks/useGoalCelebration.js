@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { celebrate } from '../lib/celebrate.js';
+import { celebrateFeedback } from '../lib/feedback.js';
 
 // Fires confetti + a glow on the card the moment `reached` flips false -> true.
 // Switching days only re-baselines, so browsing to an already-completed day
@@ -15,6 +16,7 @@ export function useGoalCelebration(reached, dayKey, cardRef, onCelebrate) {
     if (reached && !last.reached) {
       const el = cardRef.current;
       celebrate(el);
+      celebrateFeedback();
       el?.classList.add('goal-glow');
       const t = setTimeout(() => el?.classList.remove('goal-glow'), 1300);
       onCelebrate?.();

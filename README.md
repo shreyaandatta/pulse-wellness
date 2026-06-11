@@ -34,7 +34,11 @@ A **daily wellness score** (0–100) blends five pillars — hydration, sleep, m
 
 **Insights** turns your own history into understanding — entirely from statistics, no AI and no APIs. A **weekly recap** is written from your numbers ("up 3 to 65, lifted most by movement, strongest day usually Friday"). **This week / this month** show deltas against the previous period. **What's linked** computes **Pearson correlations** between your behaviours and surfaces the strong ones in plain language ("on days you sleep more, your mood tends to be higher") — honestly hedged, never claiming cause. A **weekday rhythm** chart finds your best day, and **personal records** track your all-time bests. On **Today**, gentle **rule-based nudges** notice the time of day and what's still unlogged.
 
-**Logging** is built for speed: quick-add water chips with an animated bottle, one-tap workout types with intensity, meal quality dots, a sleep slider with quality faces, a five-face mood picker with an optional note, and a steps slider. Every action gives a little toast + pop animation.
+**Logging** is built for speed: quick-add water chips with an animated bottle, one-tap workout types with intensity, a **searchable food database** for meals, a sleep slider with quality faces, a five-face mood picker with an optional note, and a steps slider. Every action gives a little toast + pop animation, plus optional **haptic feedback** on taps and a soft **celebration chime** when you hit a goal.
+
+**Meals** are powered by a built-in **food library** with rough nutrition (calories + macros) for ~30 everyday foods. Search and tap to log; can't find it? Create a custom food with your own numbers and it's **saved for next time**. Your day shows a running calorie estimate, and you can **download the whole food database as a file** (or import one) from the Data tab.
+
+The **streak card** also shows **how many of your five daily goals you've hit today** (e.g. 3 / 5), and you can **reorder or hide** any tracker on the Today screen from **Settings → Dashboard layout** — so Pulse fits how *you* think about your day.
 
 You can browse **past days** with the date switcher, set your own **goals**, switch **metric/imperial units**, and toggle a **warm dark mode**. Hitting a goal sets off a little **confetti celebration** on the card that earned it.
 

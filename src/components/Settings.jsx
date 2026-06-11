@@ -1,11 +1,28 @@
 import { useState } from 'react';
 import { waterGoalLabel } from '../lib/units.js';
+import { PILLARS, resolveOrder } from '../lib/pillars.js';
 
 export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout }) {
   const { goals, settings } = state;
   const [confirm, setConfirm] = useState(false);
   const metric = settings.units === 'metric';
   const isGuest = user?.guest;
+
+  const order = resolveOrder(settings.pillarOrder);
+  const hiddenSet = new Set(settings.hiddenPillars || []);
+  const movePillar = (id, dir) => {
+    const arr = [...order];
+    const i = arr.indexOf(id);
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    setSettings({ pillarOrder: arr });
+  };
+  const toggleHide = (id) => {
+    const next = new Set(hiddenSet);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSettings({ hiddenPillars: [...next] });
+  };
 
   const Row = ({ label, children }) => (
     <div className="set-row"><span>{label}</span><div className="set-control">{children}</div></div>
@@ -49,6 +66,35 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         <Row label="Units">
           <button className="btn btn-sm" onClick={toggleUnits}>{metric ? 'Metric (ml, km)' : 'Imperial (oz, mi)'}</button>
         </Row>
+        <Row label="Haptic feedback">
+          <button className={`toggle ${settings.haptics ? 'on' : ''}`} onClick={() => setSettings({ haptics: !settings.haptics })} aria-label="Toggle haptics"><span className="knob" /></button>
+        </Row>
+        <Row label="Celebration sound">
+          <button className={`toggle ${settings.sounds ? 'on' : ''}`} onClick={() => setSettings({ sounds: !settings.sounds })} aria-label="Toggle sound"><span className="knob" /></button>
+        </Row>
+        <div className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 6 }}>Haptics buzz on taps where your device supports it (most Android phones; iPhone web doesn't allow it).</div>
+      </div>
+
+      <div className="card">
+        <div className="card-title"><span className="dot" style={{ background: 'var(--plum)' }} /> Dashboard layout</div>
+        <p className="faint" style={{ marginBottom: 12 }}>Reorder or hide the trackers on your Today screen.</p>
+        <div className="pillar-list">
+          {order.map((id, i) => {
+            const meta = PILLARS.find((p) => p.id === id);
+            const hidden = hiddenSet.has(id);
+            return (
+              <div className={`pillar-row ${hidden ? 'off' : ''}`} key={id}>
+                <span className="pl-emoji">{meta.emoji}</span>
+                <span className="pl-name">{meta.label}</span>
+                <div className="pl-actions">
+                  <button className="ord-btn" disabled={i === 0} onClick={() => movePillar(id, -1)} aria-label="Move up">↑</button>
+                  <button className="ord-btn" disabled={i === order.length - 1} onClick={() => movePillar(id, 1)} aria-label="Move down">↓</button>
+                  <button className="btn btn-sm" onClick={() => toggleHide(id)}>{hidden ? 'Show' : 'Hide'}</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="card">
@@ -93,6 +139,25 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
           font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; color: #fff;
           background: linear-gradient(135deg, var(--amber-400), var(--amber-600)); box-shadow: var(--shadow-glow); }
         .acct-name { font-weight: 700; }
+
+        .toggle { width: 46px; height: 27px; border-radius: 99px; background: var(--surface-soft); border: 1px solid var(--border);
+          position: relative; transition: background var(--dur) var(--ease-spring); flex-shrink: 0; }
+        .toggle .knob { position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%;
+          background: #fff; box-shadow: var(--shadow-xs); transition: transform var(--dur) var(--ease-spring); }
+        .toggle.on { background: linear-gradient(135deg, var(--amber-400), var(--amber-600)); border-color: var(--amber-500); }
+        .toggle.on .knob { transform: translateX(19px); }
+
+        .pillar-list { display: flex; flex-direction: column; gap: 8px; }
+        .pillar-row { display: flex; align-items: center; gap: 12px; padding: 9px 11px; border-radius: var(--r-md);
+          background: var(--surface-soft); border: 1px solid var(--border); transition: opacity var(--dur); }
+        .pillar-row.off { opacity: 0.5; }
+        .pl-emoji { font-size: 1.25rem; }
+        .pl-name { font-weight: 600; flex: 1; }
+        .pl-actions { display: flex; align-items: center; gap: 6px; }
+        .ord-btn { width: 30px; height: 30px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border);
+          font-size: 1rem; font-weight: 700; color: var(--text-soft); transition: all var(--dur-fast) var(--ease-spring); }
+        .ord-btn:hover:not(:disabled) { border-color: var(--amber-400); color: var(--amber-600); }
+        .ord-btn:disabled { opacity: 0.3; cursor: not-allowed; }
       `}</style>
     </div>
   );

@@ -60,7 +60,12 @@ export function usePulse() {
     toggleTheme: () => setState((s) => ({ ...s, settings: { ...s.settings, theme: s.settings.theme === 'dark' ? 'light' : 'dark' } })),
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
-    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings } })),
+    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [] })),
+
+    // custom food library
+    addFood: (food) => setState((s) => ({ ...s, foods: [...(s.foods || []), food] })),
+    removeFood: (id) => setState((s) => ({ ...s, foods: (s.foods || []).filter((f) => f.id !== id) })),
+    setFoods: (foods) => setState((s) => ({ ...s, foods })),
 
     // Replace the entire store from a restored backup (already migrated/validated).
     replaceAll: (incoming) => setState(() => migrate(incoming)),

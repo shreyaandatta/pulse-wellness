@@ -48,6 +48,20 @@ export function scoreFor(state, key) {
   return dayScore(getDay(state, key), state.goals);
 }
 
+// How many of the day's five numeric goals are met right now (water, sleep,
+// movement, meals, steps). Mood isn't goal-based so it's excluded.
+export function goalsHit(day, goals) {
+  const activeMin = (day.workouts || []).reduce((s, w) => s + (w.minutes || 0), 0);
+  const checks = [
+    { id: 'water',   met: (day.water || 0) >= goals.water },
+    { id: 'sleep',   met: day.sleep != null && day.sleep >= goals.sleep },
+    { id: 'movement',met: activeMin >= goals.activeMinutes },
+    { id: 'meals',   met: (day.meals || []).length >= goals.meals },
+    { id: 'steps',   met: (day.steps || 0) >= goals.steps },
+  ];
+  return { hit: checks.filter((c) => c.met).length, total: checks.length, checks };
+}
+
 export function scoreBand(score) {
   if (score >= 80) return { label: 'Thriving', color: 'var(--good)', emoji: '🌟' };
   if (score >= 60) return { label: 'Steady', color: 'var(--amber-500)', emoji: '✨' };

@@ -2,8 +2,9 @@ import { useRef, useState } from 'react';
 import HistoryHeatmap from './HistoryHeatmap.jsx';
 import { usePWA } from '../hooks/usePWA.js';
 import { exportJSON, exportCSV, parseBackup, dataStats, formatBytes } from '../lib/backup.js';
+import { exportFoods, parseFoods, mergeFoods, allFoods } from '../lib/foods.js';
 import { prettyDate, todayKey } from '../lib/dates.js';
-import { IconDownload, IconUpload, IconShield, IconCheck } from './Icons.jsx';
+import { IconDownload, IconUpload, IconShield, IconCheck, IconLeaf } from './Icons.jsx';
 
 function lastBackupLabel(ts) {
   if (!ts) return 'Never';
@@ -13,10 +14,13 @@ function lastBackupLabel(ts) {
   return `${days} days ago`;
 }
 
-export default function DataVault({ state, replaceAll, markBackup, notify }) {
+export default function DataVault({ state, replaceAll, markBackup, setFoods, notify }) {
   const stats = dataStats(state);
   const pwa = usePWA();
   const fileRef = useRef(null);
+  const foodFileRef = useRef(null);
+  const foodCount = allFoods(state.foods).length;
+  const customCount = (state.foods || []).length;
   const [pending, setPending] = useState(null); // parsed backup awaiting confirm
   const lastTs = state.settings.lastBackupAt;
   const stale = stats.dayCount > 0 && (!lastTs || Date.now() - lastTs > 7 * 86400000);
@@ -43,6 +47,21 @@ export default function DataVault({ state, replaceAll, markBackup, notify }) {
     replaceAll(pending.data);
     notify(`Restored ${pending.count} ${pending.count === 1 ? 'day' : 'days'}`, '✅');
     setPending(null);
+  };
+
+  const saveFoods = () => { exportFoods(state.foods); notify('Food library saved to downloads', '🥗'); };
+  const onFoodFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const incoming = parseFoods(await file.text());
+      const merged = mergeFoods(state.foods, incoming);
+      setFoods(merged);
+      notify(`Imported foods — ${merged.length} in your library`, '✅');
+    } catch (err) {
+      notify(err.message, '⚠️');
+    }
   };
 
   return (
@@ -86,6 +105,20 @@ export default function DataVault({ state, replaceAll, markBackup, notify }) {
           <button className="btn" onClick={saveCSV}><IconDownload size={18} /> Export spreadsheet</button>
           <button className="btn" onClick={() => fileRef.current?.click()}><IconUpload size={18} /> Restore from a backup</button>
           <input ref={fileRef} type="file" accept="application/json,.json" onChange={onFile} hidden />
+        </div>
+      </div>
+
+      {/* Food library */}
+      <div className="card">
+        <div className="card-title"><span className="dot" style={{ background: 'var(--sage)' }} /><IconLeaf size={15} /> Food library</div>
+        <p className="faint" style={{ marginBottom: 16 }}>
+          <b>{foodCount}</b> foods to pick from when logging meals{customCount > 0 ? <> — including <b>{customCount}</b> you added</> : ''}.
+          Save the whole database as a file, or import one to carry your foods to another device.
+        </p>
+        <div className="vault-actions">
+          <button className="btn btn-primary" onClick={saveFoods}><IconDownload size={18} /> Save food database</button>
+          <button className="btn" onClick={() => foodFileRef.current?.click()}><IconUpload size={18} /> Import foods</button>
+          <input ref={foodFileRef} type="file" accept="application/json,.json" onChange={onFoodFile} hidden />
         </div>
       </div>
 

@@ -1,8 +1,10 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect, cloneElement } from 'react';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
 import { hasSupabase } from './lib/supabase.js';
+import { resolveOrder } from './lib/pillars.js';
+import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
@@ -72,6 +74,18 @@ function PulseApp({ auth }) {
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
 
+  // Keep haptics/sound feedback in sync with the user's preferences.
+  useEffect(() => {
+    setFeedbackConfig({ haptics: settings.haptics, sounds: settings.sounds });
+  }, [settings.haptics, settings.sounds]);
+
+  // A light buzz on any control tap (no-op where unsupported / disabled).
+  useEffect(() => {
+    const onTap = (e) => { if (e.target.closest('button, .chip, .food-row, .q-dot')) haptic(6); };
+    window.addEventListener('pointerdown', onTap);
+    return () => window.removeEventListener('pointerdown', onTap);
+  }, []);
+
   // A freshly created account hasn't been set up yet — greet it.
   if (auth.user.isNew && !settings.onboarded) {
     return (
@@ -83,6 +97,16 @@ function PulseApp({ auth }) {
       />
     );
   }
+
+  // Today's tracker cards, keyed by pillar id so layout settings can reorder/hide them.
+  const pillarCards = {
+    water: <WaterCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} units={settings.units} onAdd={p.addWater} notify={notify} />,
+    workout: <WorkoutCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addWorkout} onRemove={p.removeWorkout} notify={notify} />,
+    meal: <MealCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} foods={p.state.foods} onAdd={p.addMeal} onAddFood={p.addFood} onRemove={p.removeMeal} notify={notify} />,
+    sleep: <SleepCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onSet={p.setSleep} notify={notify} />,
+    mood: <MoodCard day={p.day} onSet={p.setMood} notify={notify} />,
+  };
+  const visiblePillars = resolveOrder(settings.pillarOrder).filter((id) => !(settings.hiddenPillars || []).includes(id));
 
   return (
     <div className="app">
@@ -126,13 +150,15 @@ function PulseApp({ auth }) {
           </div>
 
           <div className="section-head"><h2>Log your day</h2></div>
-          <div className="grid trackers stagger">
-            <WaterCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} units={settings.units} onAdd={p.addWater} notify={notify} />
-            <WorkoutCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addWorkout} onRemove={p.removeWorkout} notify={notify} />
-            <MealCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addMeal} onRemove={p.removeMeal} notify={notify} />
-            <SleepCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onSet={p.setSleep} notify={notify} />
-            <MoodCard day={p.day} onSet={p.setMood} notify={notify} />
-          </div>
+          {visiblePillars.length > 0 ? (
+            <div className="grid trackers stagger">
+              {visiblePillars.map((id) => cloneElement(pillarCards[id], { key: id }))}
+            </div>
+          ) : (
+            <p className="faint" style={{ textAlign: 'center', padding: 'var(--s-6)' }}>
+              All trackers are hidden. Re-enable them in <b>Settings → Dashboard layout</b>.
+            </p>
+          )}
         </div>
       )}
 
@@ -153,7 +179,7 @@ function PulseApp({ auth }) {
       {tab === 'data' && (
         <div className="tab-pane" key="data">
           <div className="section-head"><h2>Your data</h2><span className="faint">private · portable · yours</span></div>
-          <DataVault state={p.state} replaceAll={p.replaceAll} markBackup={p.markBackup} notify={notify} />
+          <DataVault state={p.state} replaceAll={p.replaceAll} markBackup={p.markBackup} setFoods={p.setFoods} notify={notify} />
         </div>
       )}
 

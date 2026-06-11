@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { IconLeaf, IconPlus, IconTrash } from './Icons.jsx';
 import { useGoalCelebration } from '../hooks/useGoalCelebration.js';
-import { searchFoods, makeFood, foodToMeal, dayCalories } from '../lib/foods.js';
+import { searchFoods, makeFood, foodToMeal, dayCalories, fmtQty } from '../lib/foods.js';
 
 const MEAL_TYPES = [
   { t: 'Breakfast', e: '🍳' }, { t: 'Lunch', e: '🥗' },
@@ -13,6 +13,8 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
   const [type, setType] = useState('Breakfast');
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false); // custom-food form open?
+  const [picked, setPicked] = useState(null);      // food chosen, awaiting quantity
+  const [qty, setQty] = useState(1);
   const cardRef = useRef(null);
 
   const count = day.meals.length;
@@ -24,11 +26,14 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
 
   const results = searchFoods(query, foods).slice(0, 8);
 
-  const reset = () => { setOpen(false); setCreating(false); setQuery(''); };
+  const reset = () => { setOpen(false); setCreating(false); setQuery(''); setPicked(null); setQty(1); };
 
-  const logFood = (food) => {
-    onAdd(foodToMeal(food, type));
-    notify(`${food.emoji} ${food.name} · ${type}`, '🥗');
+  const choose = (food) => { setPicked(food); setQty(1); };
+
+  const logFood = (food, amount) => {
+    const q = amount ?? 1;
+    onAdd(foodToMeal(food, type, q));
+    notify(`${food.emoji} ${food.name}${q !== 1 ? ` ×${fmtQty(q)}` : ''} · ${type}`, '🥗');
     reset();
   };
 
@@ -57,7 +62,10 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
             ))}
           </div>
 
-          {!creating ? (
+          {picked ? (
+            <QuantityPanel food={picked} qty={qty} setQty={setQty}
+              onBack={() => setPicked(null)} onConfirm={() => logFood(picked, qty)} />
+          ) : !creating ? (
             <>
               <div className="field" style={{ marginTop: 12 }}>
                 <label>Find a food</label>
@@ -67,7 +75,7 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
 
               <div className="food-results">
                 {results.map((f) => (
-                  <button key={f.id} className="food-row" onClick={() => logFood(f)}>
+                  <button key={f.id} className="food-row" onClick={() => choose(f)}>
                     <span className="fr-emoji">{f.emoji}</span>
                     <span className="fr-body">
                       <span className="fr-name">{f.name}{f.custom && <span className="fr-tag">yours</span>}</span>
@@ -104,7 +112,7 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
         <div className="log-list">
           {day.meals.map((m) => (
             <div className="log-item pop" key={m.id}>
-              <span>{m.emoji || MEAL_TYPES.find((t) => t.t === m.type)?.e || '🍽️'} {m.label}</span>
+              <span>{m.emoji || MEAL_TYPES.find((t) => t.t === m.type)?.e || '🍽️'} {m.label}{m.qty && m.qty !== 1 ? ` ×${fmtQty(m.qty)}` : ''}</span>
               <span className="faint mi-kcal">{m.calories ? `${m.calories} kcal` : '●'.repeat(m.quality || 0)}</span>
               <button className="del" onClick={() => onRemove(m.id)} aria-label="Remove"><IconTrash size={15} /></button>
             </div>
@@ -131,7 +139,56 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
           border: 1px solid var(--border); transition: all var(--dur) var(--ease-spring); }
         .q-dot.on { background: linear-gradient(135deg, var(--sage), #9CC299); border-color: var(--sage); transform: scale(1.05); }
         .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .qp { margin-top: 14px; }
+        .qp-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .qp-emoji { font-size: 1.8rem; }
+        .qp-name { font-weight: 700; }
+        .qty-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        .qty-stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px;
+          background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px 12px; }
+        .qp-amount { text-align: center; }
+        .qp-amount b { font-family: var(--font-display); font-size: 1.5rem; line-height: 1; }
+        .qp-kcal { display: block; font-size: var(--t-xs); color: var(--sage); font-weight: 600; margin-top: 3px; }
       `}</style>
+    </div>
+  );
+}
+
+// Choose how much of a food to log — preset chips plus a ¼-step stepper. All
+// nutrition scales live so you see the real calories before adding.
+function QuantityPanel({ food, qty, setQty, onBack, onConfirm }) {
+  const step = (d) => setQty((q) => Math.max(0.25, +(q + d).toFixed(2)));
+  const kcal = Math.round(food.calories * qty);
+  return (
+    <div className="qp pop">
+      <div className="qp-head">
+        <span className="qp-emoji">{food.emoji}</span>
+        <div>
+          <div className="qp-name">{food.name}</div>
+          <div className="fr-sub">{food.serving} · {food.calories} kcal each</div>
+        </div>
+      </div>
+
+      <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>How much?</label>
+      <div className="qty-chips" style={{ marginTop: 8 }}>
+        {[0.5, 1, 1.5, 2, 3].map((m) => (
+          <button key={m} className={`chip ${qty === m ? 'active' : ''}`} onClick={() => setQty(m)}>{fmtQty(m)}×</button>
+        ))}
+      </div>
+
+      <div className="qty-stepper">
+        <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => step(-0.25)} aria-label="Less">−</button>
+        <div className="qp-amount">
+          <b>{fmtQty(qty)}×</b>
+          <span className="qp-kcal">{kcal} kcal · {food.serving}</span>
+        </div>
+        <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => step(0.25)} aria-label="More">+</button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+        <button className="btn" style={{ flex: 1 }} onClick={onBack}>Back</button>
+        <button className="btn btn-primary" style={{ flex: 2 }} onClick={onConfirm}>Add {fmtQty(qty)}× · {kcal} kcal</button>
+      </div>
     </div>
   );
 }

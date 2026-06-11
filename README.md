@@ -36,7 +36,7 @@ A **daily wellness score** (0–100) blends five pillars — hydration, sleep, m
 
 **Logging** is built for speed: quick-add water chips with an animated bottle, one-tap workout types with intensity, a **searchable food database** for meals, a sleep slider with quality faces, a five-face mood picker with an optional note, and a steps slider. Every action gives a little toast + pop animation, plus optional **haptic feedback** on taps and a soft **celebration chime** when you hit a goal.
 
-**Meals** are powered by a built-in **food library** with rough nutrition (calories + macros) for ~30 everyday foods. Search and tap to log; can't find it? Create a custom food with your own numbers and it's **saved for next time**. Your day shows a running calorie estimate, and you can **download the whole food database as a file** (or import one) from the Data tab.
+**Meals** are powered by a built-in **food library** of ~180 foods — Indian staples (roti, naan, dal, biryani, dosa, paneer dishes, street food, sweets) plus global everyday foods — each with rough nutrition (calories + macros). Search and tap to log, then pick a **quantity** (½×, 2×, or any ¼-step) so the portion fits you and the calories scale live. Can't find a food? Create a custom one with your own numbers and it's **saved for next time**. Your day shows a running calorie estimate, and you can **download the whole food database as a file** (or import one) from the Data tab.
 
 The **streak card** also shows **how many of your five daily goals you've hit today** (e.g. 3 / 5), and you can **reorder or hide** any tracker on the Today screen from **Settings → Dashboard layout** — so Pulse fits how *you* think about your day.
 

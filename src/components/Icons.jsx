@@ -26,3 +26,4 @@ export const IconShield = (p) => <I {...p}><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-
 export const IconDownload = (p) => <I {...p}><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></I>;
 export const IconUpload = (p) => <I {...p}><path d="M12 21V9"/><path d="M7 13l5-5 5 5"/><path d="M5 3h14"/></I>;
 export const IconInsight = (p) => <I {...p}><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.2 1 2.5h6c0-1.3.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></I>;
+export const IconUsers = (p) => <I {...p}><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1"/><circle cx="9" cy="7" r="3.2"/><path d="M22 19v-1a4 4 0 0 0-3-3.85"/><path d="M16 3.15A4 4 0 0 1 16 11"/></I>;

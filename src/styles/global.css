@@ -236,8 +236,12 @@ body::before {
 }
 .tab.active { color: var(--amber-600); }
 .tab:active { transform: scale(0.9); }
-.tab .tab-icon { display: inline-flex; transition: transform var(--dur) var(--ease-spring); }
+.tab .tab-icon { display: inline-flex; position: relative; transition: transform var(--dur) var(--ease-spring); }
 .tab.active .tab-icon { transform: translateY(-2px) scale(1.12); }
+.tab-badge-wrap { position: relative; display: inline-flex; }
+.tab-badge { position: absolute; top: -6px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 99px; background: var(--rose); color: #fff; font-size: 0.6rem; font-weight: 700;
+  display: grid; place-items: center; line-height: 1; box-shadow: var(--shadow-xs); }
 @media (min-width: 760px) { .tabbar { display: none; } }
 
 /* desktop top tabs */

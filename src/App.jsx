@@ -2,13 +2,14 @@ import { useState, useCallback, useRef, useEffect, cloneElement } from 'react';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
+import { useSocial } from './hooks/useSocial.js';
 import { hasSupabase } from './lib/supabase.js';
 import { resolveOrder } from './lib/pillars.js';
 import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield, IconInsight,
+  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers,
 } from './components/Icons.jsx';
 
 import AuthGate from './components/AuthGate.jsx';
@@ -25,6 +26,7 @@ import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
 import SmartNudge from './components/SmartNudge.jsx';
 import DataVault from './components/DataVault.jsx';
+import Friends from './components/Friends.jsx';
 import Settings from './components/Settings.jsx';
 
 export default function App() {
@@ -61,6 +63,8 @@ function PulseApp({ auth }) {
   const p = usePulse();
   // Sync this account's data with the cloud (no-op for guests / on-device accounts).
   useCloudSync({ cloudUserId: auth.user.cloud ? auth.user.id : null, state: p.state, replaceAll: p.replaceAll });
+  // Friends / connections (cloud accounts only; inert otherwise).
+  const social = useSocial({ user: auth.user, state: p.state });
   const [tab, setTab] = useState('today');
   const [toasts, setToasts] = useState([]);
   const tid = useRef(0);
@@ -128,6 +132,7 @@ function PulseApp({ auth }) {
             <button className={`tab ${tab==='today'?'active':''}`} onClick={() => setTab('today')}><IconHome size={17} /> Today</button>
             <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}><IconTrends size={17} /> Trends</button>
             <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}><IconInsight size={17} /> Insights</button>
+            <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}><span className="tab-badge-wrap"><IconUsers size={17} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends</button>
             <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}><IconShield size={17} /> Data</button>
             <button className={`tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}><IconGear size={17} /> Settings</button>
           </nav>
@@ -176,6 +181,13 @@ function PulseApp({ auth }) {
         </div>
       )}
 
+      {tab === 'friends' && (
+        <div className="tab-pane" key="friends">
+          <div className="section-head"><h2>Friends</h2><span className="faint">share check-ins · cheer each other on</span></div>
+          <Friends social={social} user={auth.user} notify={notify} onLogout={auth.logout} />
+        </div>
+      )}
+
       {tab === 'data' && (
         <div className="tab-pane" key="data">
           <div className="section-head"><h2>Your data</h2><span className="faint">private · portable · yours</span></div>
@@ -206,6 +218,9 @@ function PulseApp({ auth }) {
         </button>
         <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}>
           <span className="tab-icon"><IconInsight size={22} /></span> Insights
+        </button>
+        <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}>
+          <span className="tab-icon"><IconUsers size={22} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends
         </button>
         <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}>
           <span className="tab-icon"><IconShield size={22} /></span> Data

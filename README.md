@@ -1,6 +1,6 @@
 # Pulse — Personal Wellness Tracker
 
-**🔗 Live demo: [pulse-by-shreyaan.vercel.app](https://pulse-by-shreyaan.vercel.app/)** — no install, no sign-up, just open and start logging.
+**🔗 Live demo: [pulsebysd.vercel.app](https://pulsebysd.vercel.app/)** — no install, no sign-up, just open and start logging.
 
 A warm, minimal daily wellness dashboard. Log **water, workouts, meals, sleep, mood & steps**, watch your **daily wellness score**, keep a **streak alive**, and see **weekly trend charts** — all in one calm, premium interface.
 
@@ -11,6 +11,8 @@ Days roll over automatically at midnight in your device's local time (e.g. India
 New visitors get a gentle, animated **onboarding** (name, goals, units) and can either **create an account** or **explore as a guest** in one tap. Accounts are real — passwords are hashed with **PBKDF2 (Web Crypto)** and never stored in the clear. By default they're **on-device** (private to the browser, no sync), staying true to the local-first design.
 
 **Optional cloud sync:** add two Supabase keys and Pulse upgrades itself to **real email-and-password accounts that sync across every device**, with server-side **Row Level Security** so each user can only touch their own data. No keys → it stays fully local; guest mode is always instant and local. See **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)** for a click-by-click guide.
+
+**Friends & family:** with cloud accounts on, the **Friends** tab lets people connect by **@handle**. Send a request, and once it's accepted you can see each other's daily check-in — current **wellness score, streak and goals hit**. Sharing is **per person and you control it**: each connection is set to *Summary* or *Detail* (detail adds your per-pillar numbers — water, sleep, active minutes, meals, steps, mood), and your written **journal notes are never shared with anyone**. It's built for cases like a parent keeping an eye on a child's wellbeing, or friends gently keeping each other accountable. The gating is enforced in the database itself (security-definer functions over RLS), so a connection literally cannot read more than you've granted — not even by querying directly.
 
 ## Run it
 
@@ -86,4 +88,6 @@ scripts/gen-icons.mjs     generates the PWA icon set from the brand mark
 
 ## Privacy
 
-All data stays on your device in `localStorage` — the guest space under `pulse.v1`, and each account under its own `pulse.user.<id>.v1` key. Account passwords are stored only as PBKDF2 hashes (with a per-account salt), never in plain text. Clearing your browser data (or the in-app **Reset all data**) wipes it. Nothing ever leaves the machine — which also means accounts are device-local and don't sync.
+**Guest & on-device mode:** all data stays on your device in `localStorage` — the guest space under `pulse.v1`, and each on-device account under its own `pulse.user.<id>.v1` key. On-device passwords are stored only as PBKDF2 hashes (with a per-account salt), never in plain text. Clearing your browser data (or the in-app **Reset all data**) wipes it.
+
+**Cloud mode:** when Supabase is configured, your wellness data lives in your own private row and is protected by server-side **Row Level Security** — you can only ever read or write your own. Passwords are handled and hashed by Supabase Auth; the app never sees them. Connecting with friends shares **only** the curated snapshot you allow per person (score, streak, goals, and optionally per-pillar numbers) — your raw entries and **journal notes are never exposed**, and the limit is enforced by the database, not just the UI.

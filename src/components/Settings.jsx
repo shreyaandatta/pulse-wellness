@@ -111,7 +111,9 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
 
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--clay)' }} /> Data</div>
-        <p className="faint" style={{ marginBottom: 14 }}>Everything is stored privately on this device — no cloud, no tracking. To back up, restore, or see your full history, open the <b>Data</b> tab.</p>
+        <p className="faint" style={{ marginBottom: 14 }}>{user?.cloud
+          ? <>Your data syncs privately to your own account and is protected by row-level security. To back up, restore, or see your full history, open the <b>Data</b> tab.</>
+          : <>Everything is stored privately on this device. To back up, restore, or see your full history, open the <b>Data</b> tab.</>}</p>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {!confirm ? (
             <button className="btn btn-sm" style={{ color: 'var(--bad)' }} onClick={() => setConfirm(true)}>Reset all data</button>

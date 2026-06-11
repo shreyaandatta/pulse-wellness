@@ -127,6 +127,10 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
       <div className="card about">
         <div className="card-title"><span className="dot" style={{ background: 'var(--rose)' }} /> About Pulse</div>
         <p className="faint">Pulse is your calm daily wellness companion — five pillars, one score, zero noise. Built to be fast, private, and genuinely useful.</p>
+        <p className="faint" style={{ marginTop: 10 }}>
+          Made by <strong style={{ color: 'var(--text)' }}>Shreyaan Datta</strong> ·{' '}
+          <a className="about-link" href="mailto:shreyaan.datta@gmail.com">shreyaan.datta@gmail.com</a>
+        </p>
         <p className="faint" style={{ marginTop: 8 }}>v1.0 · made with care</p>
       </div>
 
@@ -160,6 +164,8 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
           font-size: 1rem; font-weight: 700; color: var(--text-soft); transition: all var(--dur-fast) var(--ease-spring); }
         .ord-btn:hover:not(:disabled) { border-color: var(--amber-400); color: var(--amber-600); }
         .ord-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .about-link { color: var(--amber-600); font-weight: 600; text-decoration: none; }
+        .about-link:hover { text-decoration: underline; }
       `}</style>
     </div>
   );

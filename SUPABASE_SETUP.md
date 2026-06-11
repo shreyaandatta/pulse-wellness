@@ -63,6 +63,27 @@ Then restart `npm run dev`. The welcome screen will now ask for an **email**.
 
 That's it. Pulse is now backed by a real database. 🎉
 
+## 6. Make "Forgot password?" links work
+
+Pulse has a **Forgot password?** link on the sign-in screen. It emails the user a
+link that brings them back to the app to set a new password. For that link to
+point at *your* site, tell Supabase which URLs are allowed:
+
+1. Left sidebar → **Authentication** → **URL Configuration**.
+2. Set **Site URL** to your live address: `https://pulsebysd.vercel.app`
+3. Under **Redirect URLs**, click **Add URL** and add both:
+   - `https://pulsebysd.vercel.app/**`  (your live site)
+   - `http://localhost:5199/**`  (so it also works while developing on your Mac)
+4. Click **Save**.
+
+The reset email itself is already switched on — Supabase's built-in **"Reset
+Password"** email template sends automatically. (Supabase's free email is fine for
+personal use and a portfolio; if you ever send a lot, you can plug in your own
+email provider under **Authentication → Emails → SMTP**, but you don't need to.)
+
+> Tip: for privacy, the app always says *"if an account exists for that email, a
+> link is on its way"* — it never reveals whether an address is registered.
+
 ---
 
 ## What changed under the hood

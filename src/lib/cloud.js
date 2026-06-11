@@ -23,6 +23,8 @@ function friendly(error) {
   const m = (error?.message || '').toLowerCase();
   if (m.includes('invalid login')) return new Error("That email or password doesn't match.");
   if (m.includes('already registered') || m.includes('already exists')) return new Error('An account with that email already exists. Try signing in.');
+  if (m.includes('different from the old') || m.includes('should be different')) return new Error('Your new password must be different from your old one.');
+  if (m.includes('rate limit') || m.includes('too many') || m.includes('for security purposes')) return new Error('Too many attempts — please wait a minute and try again.');
   if (m.includes('password')) return new Error('Use a password of at least 6 characters.');
   if (m.includes('email')) return new Error('Please enter a valid email address.');
   if (m.includes('failed to fetch') || m.includes('network')) return new Error('Could not reach the server. Check your connection.');
@@ -47,6 +49,35 @@ export async function cloudSignIn(email, password) {
 
 export async function cloudSignOut() {
   await supabase.auth.signOut();
+}
+
+// Email the user a password-reset link. `redirectTo` is where the link lands
+// back in the app (must be allowed in the Supabase dashboard's URL config).
+// Note: Supabase returns success whether or not the email exists, so we never
+// reveal which addresses have accounts.
+export async function cloudResetPassword(email, redirectTo) {
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    email.trim(), redirectTo ? { redirectTo } : undefined,
+  );
+  if (error) throw friendly(error);
+}
+
+// Set a new password for the *currently authenticated* user. During a recovery
+// link visit Supabase establishes a temporary session, so this works there too.
+export async function cloudUpdatePassword(password) {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw friendly(error);
+  const { data } = await supabase.auth.getSession();
+  return data.session ? toSession(data.session.user, data.session) : null;
+}
+
+// Fire `cb` when the user arrives via a password-reset link. Returns an
+// unsubscribe function.
+export function onPasswordRecovery(cb) {
+  const { data } = supabase.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') cb();
+  });
+  return () => data.subscription.unsubscribe();
 }
 
 // Restore an existing session on page load (Supabase persists it for us).

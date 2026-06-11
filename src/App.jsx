@@ -13,6 +13,7 @@ import {
 } from './components/Icons.jsx';
 
 import AuthGate from './components/AuthGate.jsx';
+import ResetPassword from './components/ResetPassword.jsx';
 import Onboarding from './components/Onboarding.jsx';
 import WellnessRing from './components/WellnessRing.jsx';
 import WaterCard from './components/WaterCard.jsx';
@@ -31,9 +32,11 @@ import Settings from './components/Settings.jsx';
 
 export default function App() {
   const auth = useAuth();
+  // A password-reset link takes precedence over everything else.
+  if (auth.recovery) return <ResetPassword onSubmit={auth.completeRecovery} onCancel={auth.cancelRecovery} />;
   if (auth.loading) return <Splash />;
   if (!auth.user) {
-    return <AuthGate cloud={hasSupabase} onSignup={auth.signup} onLogin={auth.login} onGuest={auth.guest} />;
+    return <AuthGate cloud={hasSupabase} onSignup={auth.signup} onLogin={auth.login} onGuest={auth.guest} onReset={auth.resetPassword} />;
   }
   // Remount per account so the wellness store reloads that user's data.
   return <PulseApp key={auth.user.id} auth={auth} />;

@@ -19,6 +19,14 @@ export function useAuth() {
   // Only the cloud path needs an async restore, so only it starts "loading".
   const [loading, setLoading] = useState(hasSupabase);
 
+  // True when the user arrived via a password-reset link — the app then shows
+  // the "set a new password" screen instead of signing them straight in. We seed
+  // it synchronously from the URL hash to avoid a flash, and also listen for the
+  // PASSWORD_RECOVERY event as the reliable signal.
+  const [recovery, setRecovery] = useState(
+    () => hasSupabase && typeof window !== 'undefined' && /type=recovery/.test(window.location.hash)
+  );
+
   useEffect(() => {
     if (!hasSupabase) return;
     let cancelled = false;
@@ -31,6 +39,18 @@ export function useAuth() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!hasSupabase) return;
+    return cloud.onPasswordRecovery(() => setRecovery(true));
+  }, []);
+
+  // Strip the recovery token from the URL once we're done with it.
+  const cleanUrl = () => {
+    if (typeof window !== 'undefined' && window.history?.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  };
 
   const enter = useCallback((session, opts = {}) => {
     if (!hasSupabase) auth.setSession(session);   // cloud manages its own session token
@@ -71,5 +91,28 @@ export function useAuth() {
   // Clear the freshly-onboarded flag once setup finishes.
   const clearNew = useCallback(() => setUser((u) => (u ? { ...u, isNew: false } : u)), []);
 
-  return { user, loading, signup, login, guest, logout, clearNew };
+  // Email a reset link (cloud only). Lands back at this app's origin.
+  const resetPassword = useCallback(
+    (email) => cloud.cloudResetPassword(email, typeof window !== 'undefined' ? window.location.origin : undefined),
+    []
+  );
+
+  // Save the new password during a recovery visit, then drop the user into the app.
+  const completeRecovery = useCallback(async (password) => {
+    const session = await cloud.cloudUpdatePassword(password);
+    setRecovery(false);
+    cleanUrl();
+    if (session) { setActiveUser(session.id); setUser(session); }
+  }, []);
+
+  // Bail out of a recovery visit without changing anything.
+  const cancelRecovery = useCallback(async () => {
+    setRecovery(false);
+    cleanUrl();
+    try { await cloud.cloudSignOut(); } catch { /* ignore */ }
+    setActiveUser(null);
+    setUser(null);
+  }, []);
+
+  return { user, loading, recovery, signup, login, guest, logout, clearNew, resetPassword, completeRecovery, cancelRecovery };
 }

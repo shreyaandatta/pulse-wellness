@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 // The doorway. Accounts are optional — "Explore as guest" is always one tap
 // away so anyone (a recruiter, a friend) can be inside the app instantly.
-export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
-  const [mode, setMode] = useState('welcome'); // welcome | signin | signup
+export default function AuthGate({ cloud, onSignup, onLogin, onGuest, onReset }) {
+  const [mode, setMode] = useState('welcome'); // welcome | signin | signup | forgot
   const [name, setName] = useState('');
   const [username, setUsername] = useState(''); // email when cloud, username otherwise
   const [password, setPassword] = useState('');
@@ -35,6 +35,19 @@ export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
     }
   };
 
+  const sendReset = async (e) => {
+    e.preventDefault();
+    setError(''); setNotice(''); setBusy(true);
+    try {
+      await onReset(username);
+      setNotice("If an account exists for that email, a reset link is on its way. Check your inbox (and spam).");
+    } catch (err) {
+      setError(err.message || 'Could not send the reset email.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="gate">
       <div className="gate-card pop" key={mode}>
@@ -60,7 +73,29 @@ export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
           </>
         )}
 
-        {mode !== 'welcome' && (
+        {mode === 'forgot' && (
+          <>
+            <h2 className="gate-h2">Reset your password</h2>
+            <form className="gate-form" onSubmit={sendReset}>
+              <p className="gate-tag" style={{ margin: '0 0 4px' }}>Enter your account email and we'll send you a link to set a new password.</p>
+              <div className="field">
+                <label>Email</label>
+                <input className="input" type="email" value={username} onChange={(e) => setUsername(e.target.value)}
+                  placeholder="you@example.com" autoComplete="email" autoCapitalize="none" autoFocus />
+              </div>
+              {notice && <div className="gate-notice">{notice}</div>}
+              {error && <div className="gate-error">{error}</div>}
+              <button className="btn btn-primary btn-block" type="submit" disabled={busy} style={{ marginTop: 6 }}>
+                {busy ? 'Sending…' : 'Send reset link'}
+              </button>
+            </form>
+            <div className="gate-switch">
+              <button onClick={() => reset('signin')}>← Back to sign in</button>
+            </div>
+          </>
+        )}
+
+        {(mode === 'signin' || mode === 'signup') && (
           <>
             <h2 className="gate-h2">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
             <form className="gate-form" onSubmit={submit}>
@@ -89,6 +124,10 @@ export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
                   </button>
                 </div>
               </div>
+
+              {mode === 'signin' && cloud && (
+                <button type="button" className="gate-forgot" onClick={() => reset('forgot')}>Forgot password?</button>
+              )}
 
               {notice && <div className="gate-notice">{notice}</div>}
               {error && <div className="gate-error">{error}</div>}
@@ -148,6 +187,8 @@ export default function AuthGate({ cloud, onSignup, onLogin, onGuest }) {
         .gate-switch button { color: var(--amber-600); font-weight: 700; }
         .gate-switch button:hover { text-decoration: underline; }
         .gate-dot { margin: 0 8px; color: var(--text-faint); }
+        .gate-forgot { align-self: flex-end; margin-top: -8px; color: var(--amber-600); font-weight: 600; font-size: var(--t-xs); }
+        .gate-forgot:hover { text-decoration: underline; }
       `}</style>
     </div>
   );

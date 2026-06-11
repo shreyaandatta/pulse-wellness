@@ -79,7 +79,15 @@ export function usePulse() {
     toggleTheme: () => setState((s) => ({ ...s, settings: { ...s.settings, theme: s.settings.theme === 'dark' ? 'light' : 'dark' } })),
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
-    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [] })),
+    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [] })),
+
+    // custom trackers (Plus) — definitions live in state.trackers, the day's
+    // values in day.custom keyed by tracker id.
+    addTracker: (t) => setState((s) => ({ ...s, trackers: [...(s.trackers || []), { id: uid(), ...t }] })),
+    updateTracker: (id, patch) => setState((s) => ({ ...s, trackers: (s.trackers || []).map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
+    removeTracker: (id) => setState((s) => ({ ...s, trackers: (s.trackers || []).filter((t) => t.id !== id) })),
+    addCustom: (id, n) => mutateDay(activeDay, (d) => ({ ...d, custom: { ...(d.custom || {}), [id]: Math.max(0, (d.custom?.[id] || 0) + n) } })),
+    setCustom: (id, v) => mutateDay(activeDay, (d) => ({ ...d, custom: { ...(d.custom || {}), [id]: Math.max(0, v) } })),
 
     // custom food library
     addFood: (food) => setState((s) => ({ ...s, foods: [...(s.foods || []), food] })),

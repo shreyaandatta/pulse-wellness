@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { IconUsers, IconCheck, IconTrash, IconFire } from './Icons.jsx';
+import { IconUsers, IconCheck, IconTrash, IconFire, IconLock } from './Icons.jsx';
 import { handleError, normHandle } from '../lib/social.js';
+import { FREE_CONNECTIONS } from '../lib/plan.js';
 
 const MOOD_E = ['😔', '😕', '😊', '😄', '🤩'];
 
-export default function Friends({ social, user, notify, onLogout }) {
+export default function Friends({ social, user, notify, onLogout, plus, openPlus }) {
   if (!social.enabled) return <NeedsAccount user={user} onLogout={onLogout} />;
   if (social.loading && !social.profile) {
     return <div className="card"><p className="faint" style={{ textAlign: 'center', padding: 'var(--s-5)' }}>Loading your circle…</p></div>;
   }
   if (!social.profile) return <ClaimHandle social={social} notify={notify} />;
-  return <FriendsHome social={social} notify={notify} />;
+  return <FriendsHome social={social} notify={notify} plus={plus} openPlus={openPlus} />;
 }
 
 // ---- Guests / on-device: friends live in the cloud ----
@@ -79,8 +80,12 @@ function ClaimHandle({ social, notify }) {
 }
 
 // ---- The full experience ----
-function FriendsHome({ social, notify }) {
+function FriendsHome({ social, notify, plus, openPlus }) {
   const { profile, friends, incoming, outgoing, people } = social;
+  // Free plan: up to FREE_CONNECTIONS people (accepted + requests you've sent).
+  const activeCount = friends.length + outgoing.length;
+  const atLimit = !plus && activeCount >= FREE_CONNECTIONS;
+  const acceptBlocked = !plus && friends.length >= FREE_CONNECTIONS;
 
   return (
     <div className="grid cols-2 stagger friends-grid">
@@ -96,7 +101,7 @@ function FriendsHome({ social, notify }) {
         </p>
       </div>
 
-      <AddFriend social={social} notify={notify} />
+      <AddFriend social={social} notify={notify} atLimit={atLimit} openPlus={openPlus} />
 
       {incoming.length > 0 && (
         <div className="card span-2">
@@ -112,7 +117,10 @@ function FriendsHome({ social, notify }) {
                       {p?.username && <div className="faint">@{p.username}</div>}</div>
                   </div>
                   <div className="req-actions">
-                    <button className="btn btn-sm btn-primary" onClick={async () => { await social.accept(f.id); notify('Connected ✨'); }}><IconCheck size={15} /> Accept</button>
+                    <button className="btn btn-sm btn-primary" onClick={async () => {
+                      if (acceptBlocked) { openPlus(); return; }
+                      await social.accept(f.id); notify('Connected ✨');
+                    }}>{acceptBlocked ? <IconLock size={15} /> : <IconCheck size={15} />} Accept</button>
                     <button className="btn btn-sm" onClick={() => social.decline(f.id)}>Decline</button>
                   </div>
                 </div>
@@ -164,10 +172,23 @@ function FriendsHome({ social, notify }) {
   );
 }
 
-function AddFriend({ social, notify }) {
+function AddFriend({ social, notify, atLimit, openPlus }) {
   const [q, setQ] = useState('');
   const [result, setResult] = useState(undefined); // undefined=idle, null=not found, obj=found
   const [busy, setBusy] = useState(false);
+
+  if (atLimit) {
+    return (
+      <div className="card">
+        <div className="card-title"><span className="dot" style={{ background: 'var(--amber-500)' }} /> Add a friend</div>
+        <p className="faint" style={{ marginBottom: 12 }}>
+          You're connected with <b>{FREE_CONNECTIONS}</b> people — that's the free plan's circle.
+          Pulse Plus removes the limit so the whole family fits.
+        </p>
+        <button className="btn btn-sm btn-primary" onClick={openPlus}><IconLock size={14} /> Go unlimited with Plus</button>
+      </div>
+    );
+  }
 
   const run = async () => {
     if (handleError(q)) { setResult(null); return; }

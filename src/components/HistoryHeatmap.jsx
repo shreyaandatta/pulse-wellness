@@ -24,8 +24,10 @@ function levelFor(hasData, score) {
   return 1;
 }
 
-export default function HistoryHeatmap({ state }) {
-  const { weeks, monthLabels, firstDay } = useMemo(() => buildGrid(state), [state]);
+// `limitDays` (optional) clips the grid to the most recent N days — the free
+// plan's window. Older cells render as blank slots; the data itself is untouched.
+export default function HistoryHeatmap({ state, limitDays }) {
+  const { weeks, monthLabels, firstDay } = useMemo(() => buildGrid(state, limitDays), [state, limitDays]);
   const total = Object.keys(state.days).length;
 
   return (
@@ -108,12 +110,15 @@ export default function HistoryHeatmap({ state }) {
 
 // Build week-columns from the first logged day (or MIN_WEEKS back) up to today,
 // aligned so each column starts on Sunday.
-function buildGrid(state) {
+function buildGrid(state, limitDays) {
   const keys = Object.keys(state.days).sort();
   const today = todayKey();
   const baseline = addDays(today, -7 * MIN_WEEKS);
   const firstLogged = keys[0] || baseline;
   let start = firstLogged < baseline ? firstLogged : baseline;
+  // free window: never reach further back than the limit
+  const windowStart = limitDays ? addDays(today, -(limitDays - 1)) : null;
+  if (windowStart && start < windowStart) start = windowStart;
 
   // back up to the Sunday on/before start
   const startDow = keyToDate(start).getDay();
@@ -129,6 +134,7 @@ function buildGrid(state) {
     const week = [];
     for (let d = 0; d < 7; d++) {
       if (cursor > today) { week.push(null); continue; }
+      if (windowStart && cursor < windowStart) { week.push(null); cursor = addDays(cursor, 1); continue; }
       const date = keyToDate(cursor);
       const hasData = !!state.days[cursor];
       const score = hasData ? dayScore(getDay(state, cursor), state.goals) : 0;

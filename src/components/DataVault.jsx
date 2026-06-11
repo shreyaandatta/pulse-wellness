@@ -4,7 +4,8 @@ import { usePWA } from '../hooks/usePWA.js';
 import { exportJSON, exportCSV, parseBackup, dataStats, formatBytes } from '../lib/backup.js';
 import { exportFoods, parseFoods, mergeFoods, allFoods } from '../lib/foods.js';
 import { prettyDate, todayKey } from '../lib/dates.js';
-import { IconDownload, IconUpload, IconShield, IconCheck, IconLeaf } from './Icons.jsx';
+import { FREE_HISTORY_DAYS } from '../lib/plan.js';
+import { IconDownload, IconUpload, IconShield, IconCheck, IconLeaf, IconLock } from './Icons.jsx';
 
 function lastBackupLabel(ts) {
   if (!ts) return 'Never';
@@ -14,7 +15,7 @@ function lastBackupLabel(ts) {
   return `${days} days ago`;
 }
 
-export default function DataVault({ state, replaceAll, markBackup, setFoods, notify }) {
+export default function DataVault({ state, replaceAll, markBackup, setFoods, notify, plus, openPlus }) {
   const stats = dataStats(state);
   const pwa = usePWA();
   const fileRef = useRef(null);
@@ -27,6 +28,7 @@ export default function DataVault({ state, replaceAll, markBackup, setFoods, not
 
   const saveBackup = () => { exportJSON(state); markBackup(); notify('Backup saved to your downloads', '💾'); };
   const saveCSV = () => {
+    if (!plus) return openPlus();   // spreadsheet export is a Plus perk
     if (!stats.dayCount) return notify('Nothing logged yet to export', '📄');
     exportCSV(state); notify('Spreadsheet exported', '📊');
   };
@@ -80,7 +82,12 @@ export default function DataVault({ state, replaceAll, markBackup, setFoods, not
             <span className="faint">{stats.dayCount === 1 ? 'day logged' : 'days logged'}</span>
           </div>
         </div>
-        <HistoryHeatmap state={state} />
+        <HistoryHeatmap state={state} limitDays={plus ? undefined : FREE_HISTORY_DAYS} />
+        {!plus && stats.dayCount > 0 && (
+          <button className="vault-upsell" onClick={openPlus}>
+            <IconLock size={12} /> Free shows the last {FREE_HISTORY_DAYS} days — <b>Plus</b> lights up your whole history
+          </button>
+        )}
       </div>
 
       {/* At-a-glance stats */}
@@ -102,7 +109,10 @@ export default function DataVault({ state, replaceAll, markBackup, setFoods, not
         <p className="faint" style={{ marginBottom: 16 }}>Save a file you can stash in cloud storage or move to another device. Restoring replaces what's currently here.</p>
         <div className="vault-actions">
           <button className="btn btn-primary" onClick={saveBackup}><IconDownload size={18} /> Save a backup</button>
-          <button className="btn" onClick={saveCSV}><IconDownload size={18} /> Export spreadsheet</button>
+          <button className="btn" onClick={saveCSV}>
+            {plus ? <IconDownload size={18} /> : <IconLock size={16} />} Export spreadsheet
+            {!plus && <span className="plus-pill" style={{ marginLeft: 2 }}>Plus</span>}
+          </button>
           <button className="btn" onClick={() => fileRef.current?.click()}><IconUpload size={18} /> Restore from a backup</button>
           <input ref={fileRef} type="file" accept="application/json,.json" onChange={onFile} hidden />
         </div>
@@ -180,6 +190,12 @@ export default function DataVault({ state, replaceAll, markBackup, setFoods, not
           color: var(--text); border-radius: var(--r-md); padding: 12px 16px; font-size: var(--t-sm); font-weight: 500; }
 
         .vault-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .vault-upsell { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+          margin-top: 12px; padding: 9px 12px; border-radius: var(--r-md); font-size: var(--t-xs); font-weight: 600;
+          color: var(--text-soft); background: var(--surface-soft); border: 1px dashed var(--border);
+          transition: all var(--dur-fast); }
+        .vault-upsell b { color: var(--amber-600); }
+        .vault-upsell:hover { border-color: var(--amber-400); color: var(--text); }
         .install-hint { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .install-hint b { color: var(--text); }
 

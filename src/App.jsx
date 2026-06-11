@@ -5,6 +5,7 @@ import { useCloudSync } from './hooks/useCloudSync.js';
 import { useSocial } from './hooks/useSocial.js';
 import { hasSupabase } from './lib/supabase.js';
 import { resolveOrder } from './lib/pillars.js';
+import { isPlus } from './lib/plan.js';
 import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
@@ -29,6 +30,9 @@ import SmartNudge from './components/SmartNudge.jsx';
 import DataVault from './components/DataVault.jsx';
 import Friends from './components/Friends.jsx';
 import Settings from './components/Settings.jsx';
+import PlusModal from './components/PlusModal.jsx';
+import YearReview from './components/YearReview.jsx';
+import CustomCard from './components/CustomCard.jsx';
 
 export default function App() {
   const auth = useAuth();
@@ -80,6 +84,16 @@ function PulseApp({ auth }) {
 
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
+
+  // Pulse Plus: the plan flag + one shared paywall sheet any feature can open.
+  const plus = isPlus(settings);
+  const [plusOpen, setPlusOpen] = useState(false);
+  const openPlus = useCallback(() => setPlusOpen(true), []);
+  const startPlus = useCallback(() => {
+    p.setSettings({ plan: 'plus', plusSince: Date.now() });
+    setPlusOpen(false);
+    notify('Welcome to Pulse Plus', '✨');
+  }, [p.setSettings, notify]);
 
   // Keep haptics/sound feedback in sync with the user's preferences.
   useEffect(() => {
@@ -158,9 +172,12 @@ function PulseApp({ auth }) {
           </div>
 
           <div className="section-head"><h2>Log your day</h2></div>
-          {visiblePillars.length > 0 ? (
+          {(visiblePillars.length > 0 || (plus && (p.state.trackers || []).length > 0)) ? (
             <div className="grid trackers stagger">
               {visiblePillars.map((id) => cloneElement(pillarCards[id], { key: id }))}
+              {plus && (p.state.trackers || []).map((t) => (
+                <CustomCard key={t.id} tracker={t} day={p.day} dayKey={p.activeDay} onAdd={p.addCustom} notify={notify} />
+              ))}
             </div>
           ) : (
             <p className="faint" style={{ textAlign: 'center', padding: 'var(--s-6)' }}>
@@ -173,7 +190,10 @@ function PulseApp({ auth }) {
       {tab === 'trends' && (
         <div className="tab-pane" key="trends">
           <div className="section-head"><h2>Your trends</h2><span className="faint">last days at a glance</span></div>
-          <TrendCharts state={p.state} units={settings.units} />
+          <TrendCharts state={p.state} units={settings.units} plus={plus} openPlus={openPlus} />
+          <div style={{ marginTop: 'var(--s-5)' }}>
+            <YearReview state={p.state} plus={plus} openPlus={openPlus} />
+          </div>
         </div>
       )}
 
@@ -187,14 +207,14 @@ function PulseApp({ auth }) {
       {tab === 'friends' && (
         <div className="tab-pane" key="friends">
           <div className="section-head"><h2>Friends</h2><span className="faint">share check-ins · cheer each other on</span></div>
-          <Friends social={social} user={auth.user} notify={notify} onLogout={auth.logout} />
+          <Friends social={social} user={auth.user} notify={notify} onLogout={auth.logout} plus={plus} openPlus={openPlus} />
         </div>
       )}
 
       {tab === 'data' && (
         <div className="tab-pane" key="data">
           <div className="section-head"><h2>Your data</h2><span className="faint">private · portable · yours</span></div>
-          <DataVault state={p.state} replaceAll={p.replaceAll} markBackup={p.markBackup} setFoods={p.setFoods} notify={notify} />
+          <DataVault state={p.state} replaceAll={p.replaceAll} markBackup={p.markBackup} setFoods={p.setFoods} notify={notify} plus={plus} openPlus={openPlus} />
         </div>
       )}
 
@@ -207,6 +227,7 @@ function PulseApp({ auth }) {
             toggleTheme={p.toggleTheme} toggleUnits={p.toggleUnits}
             resetAll={p.resetAll} notify={notify}
             user={auth.user} onLogout={auth.logout}
+            openPlus={openPlus} addTracker={p.addTracker} removeTracker={p.removeTracker}
           />
         </div>
       )}
@@ -232,6 +253,8 @@ function PulseApp({ auth }) {
           <span className="tab-icon"><IconGear size={22} /></span> Settings
         </button>
       </nav>
+
+      <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} />
 
       <div className="toast-wrap">
         {toasts.map((t) => (

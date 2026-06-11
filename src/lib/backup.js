@@ -17,6 +17,7 @@ export function buildBackup(state) {
     goals: state.goals,
     settings: state.settings,
     foods: state.foods || [],
+    trackers: state.trackers || [],
   };
 }
 

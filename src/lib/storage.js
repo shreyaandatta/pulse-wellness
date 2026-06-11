@@ -31,6 +31,7 @@ export const DEFAULT_SETTINGS = {
   sounds: true,     // soft chime on goal celebrations
   pillarOrder: [...DEFAULT_PILLAR_ORDER], // order of the Today tracker cards
   hiddenPillars: [],                       // pillar ids to hide
+  plan: 'free',     // 'free' | 'plus' — see lib/plan.js
 };
 
 function freshDay() {
@@ -43,6 +44,7 @@ function freshDay() {
     mood: null,          // 1..5
     moodNote: '',
     steps: 0,
+    custom: {},          // custom tracker values: trackerId -> number
   };
 }
 
@@ -59,6 +61,7 @@ export function migrate(parsed) {
     goals: { ...DEFAULT_GOALS, ...(data.goals || {}) },
     settings: { ...DEFAULT_SETTINGS, ...(data.settings || {}) },
     foods: Array.isArray(data.foods) ? data.foods : [],  // user's custom foods
+    trackers: Array.isArray(data.trackers) ? data.trackers : [],  // custom trackers (Plus)
   };
 }
 

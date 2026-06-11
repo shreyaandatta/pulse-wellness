@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { waterGoalLabel } from '../lib/units.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
+import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
+import { IconSparkle, IconLock, IconTrash } from './Icons.jsx';
 
-export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout }) {
+export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker }) {
   const { goals, settings } = state;
   const [confirm, setConfirm] = useState(false);
   const metric = settings.units === 'metric';
   const isGuest = user?.guest;
+  const plus = isPlus(settings);
 
   const order = resolveOrder(settings.pillarOrder);
   const hiddenSet = new Set(settings.hiddenPillars || []);
@@ -53,6 +56,45 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
           {isGuest ? 'Sign in or create an account' : 'Sign out'}
         </button>
       </div>
+
+      <div className="card plan-card">
+        <div className="card-title">
+          <span className="dot" style={{ background: 'var(--amber-500)' }} /> Your plan
+          {plus && <span className="plus-pill"><IconSparkle size={10} /> Plus</span>}
+        </div>
+        {plus ? (
+          <>
+            <p className="faint" style={{ marginBottom: 12 }}>
+              You're on <b>Pulse Plus</b> — all-time history, year in review, custom trackers,
+              unlimited friends and spreadsheet export are yours. ✨
+            </p>
+            <button className="btn btn-sm" onClick={() => { setSettings({ plan: 'free' }); notify('Switched back to Free', '🌿'); }}>
+              Switch back to Free
+            </button>
+            <p className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 8 }}>
+              Switching keeps every bit of your data — Plus features just lock again.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="faint" style={{ marginBottom: 10 }}>You're on the free plan. Plus opens up:</p>
+            <ul className="plan-perks">
+              {PLUS_PERKS.slice(0, 4).map((perk) => (
+                <li key={perk.title}>{perk.emoji} {perk.title}</li>
+              ))}
+            </ul>
+            <button className="btn btn-sm btn-primary" style={{ marginTop: 12 }} onClick={openPlus}>
+              <IconSparkle size={14} /> See Pulse Plus · from {PLUS_PRICE.monthly}/mo
+            </button>
+          </>
+        )}
+      </div>
+
+      <CustomTrackers
+        trackers={state.trackers || []}
+        plus={plus} openPlus={openPlus}
+        addTracker={addTracker} removeTracker={removeTracker} notify={notify}
+      />
 
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--amber-500)' }} /> Profile & Look</div>
@@ -166,7 +208,123 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         .ord-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .about-link { color: var(--amber-600); font-weight: 600; text-decoration: none; }
         .about-link:hover { text-decoration: underline; }
+
+        .plan-card .card-title { gap: 8px; }
+        .plan-perks { list-style: none; display: flex; flex-direction: column; gap: 6px;
+          font-size: var(--t-sm); color: var(--text-soft); }
+
+        .ct-row { display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: var(--r-md);
+          background: var(--surface-soft); border: 1px solid var(--border); }
+        .ct-emoji { font-size: 1.2rem; }
+        .ct-name { font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ct-goal { font-size: var(--t-xs); color: var(--text-soft); font-weight: 600; white-space: nowrap; }
+        .ct-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+        .ct-form { display: grid; grid-template-columns: 56px 1fr; gap: 8px; }
+        .ct-form .full { grid-column: 1 / -1; }
+        .ct-two { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; grid-column: 1 / -1; }
+        .ct-lbl { font-size: var(--t-xs); font-weight: 600; color: var(--text-soft); margin-bottom: 4px; display: block; }
+        .ct-del { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0;
+          color: var(--text-faint); background: var(--surface); border: 1px solid var(--border); transition: all var(--dur-fast); }
+        .ct-del:hover { color: var(--bad); border-color: var(--bad); }
       `}</style>
+    </div>
+  );
+}
+
+// Custom trackers (Plus): define anything countable — meditation minutes,
+// pages read, screen-free hours — and it becomes a card on Today.
+function CustomTrackers({ trackers, plus, openPlus, addTracker, removeTracker, notify }) {
+  const [name, setName] = useState('');
+  const [emoji, setEmoji] = useState('');
+  const [unit, setUnit] = useState('');
+  const [goal, setGoal] = useState('');
+  const [step, setStep] = useState('');
+
+  const title = (
+    <div className="card-title">
+      <span className="dot" style={{ background: 'var(--clay)' }} /> Custom trackers <span className="plus-pill">Plus</span>
+    </div>
+  );
+
+  if (!plus) {
+    return (
+      <div className="card">
+        {title}
+        <p className="faint" style={{ marginBottom: 12 }}>
+          Track anything that matters to you — meditation, reading, screen-free time —
+          each one becomes its own card on Today, with a goal and confetti of its own.
+        </p>
+        <button className="btn btn-sm btn-primary" onClick={openPlus}><IconLock size={14} /> Unlock with Plus</button>
+      </div>
+    );
+  }
+
+  const submit = () => {
+    const n = name.trim();
+    const g = Math.max(1, Number(goal) || 1);
+    if (!n) { notify('Give your tracker a name', '✏️'); return; }
+    if (trackers.length >= MAX_TRACKERS) { notify(`Up to ${MAX_TRACKERS} trackers for now`, '🧩'); return; }
+    addTracker({
+      name: n.slice(0, 24),
+      emoji: (emoji.trim() || '⭐').slice(0, 4),
+      unit: unit.trim().slice(0, 10),
+      goal: g,
+      step: Math.max(1, Number(step) || 1),
+    });
+    setName(''); setEmoji(''); setUnit(''); setGoal(''); setStep('');
+    notify(`${n} added to Today`, '🧩');
+  };
+
+  return (
+    <div className="card">
+      {title}
+      {trackers.length > 0 && (
+        <div className="ct-list">
+          {trackers.map((t) => (
+            <div className="ct-row" key={t.id}>
+              <span className="ct-emoji">{t.emoji || '⭐'}</span>
+              <span className="ct-name">{t.name}</span>
+              <span className="ct-goal">goal {t.goal}{t.unit ? ` ${t.unit}` : ''} · +{t.step}</span>
+              <button className="ct-del" onClick={() => { removeTracker(t.id); notify(`${t.name} removed`, '🧹'); }} aria-label={`Remove ${t.name}`}>
+                <IconTrash size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {trackers.length === 0 && (
+        <p className="faint" style={{ marginBottom: 12 }}>Nothing yet — add your first tracker and it appears on Today.</p>
+      )}
+
+      {trackers.length < MAX_TRACKERS ? (
+        <div className="ct-form">
+          <div>
+            <span className="ct-lbl">Emoji</span>
+            <input className="input" value={emoji} placeholder="🧘" onChange={(e) => setEmoji(e.target.value)} />
+          </div>
+          <div>
+            <span className="ct-lbl">Name</span>
+            <input className="input" value={name} placeholder="e.g. Meditation" onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className="ct-two">
+            <div>
+              <span className="ct-lbl">Daily goal</span>
+              <input className="input" type="number" min="1" value={goal} placeholder="20" onChange={(e) => setGoal(e.target.value)} />
+            </div>
+            <div>
+              <span className="ct-lbl">Unit</span>
+              <input className="input" value={unit} placeholder="min" onChange={(e) => setUnit(e.target.value)} />
+            </div>
+            <div>
+              <span className="ct-lbl">Tap adds</span>
+              <input className="input" type="number" min="1" value={step} placeholder="5" onChange={(e) => setStep(e.target.value)} />
+            </div>
+          </div>
+          <button className="btn btn-sm btn-primary full" onClick={submit}>Add tracker</button>
+        </div>
+      ) : (
+        <p className="faint" style={{ fontSize: 'var(--t-xs)' }}>You've got {MAX_TRACKERS} trackers — remove one to add another.</p>
+      )}
     </div>
   );
 }

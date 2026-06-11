@@ -27,3 +27,5 @@ export const IconDownload = (p) => <I {...p}><path d="M12 3v12"/><path d="M7 11l
 export const IconUpload = (p) => <I {...p}><path d="M12 21V9"/><path d="M7 13l5-5 5 5"/><path d="M5 3h14"/></I>;
 export const IconInsight = (p) => <I {...p}><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.2 1 2.5h6c0-1.3.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></I>;
 export const IconUsers = (p) => <I {...p}><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1"/><circle cx="9" cy="7" r="3.2"/><path d="M22 19v-1a4 4 0 0 0-3-3.85"/><path d="M16 3.15A4 4 0 0 1 16 11"/></I>;
+export const IconLock = (p) => <I {...p}><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></I>;
+export const IconSparkle = (p) => <I {...p}><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></I>;

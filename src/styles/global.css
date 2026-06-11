@@ -244,6 +244,11 @@ body::before {
   display: grid; place-items: center; line-height: 1; box-shadow: var(--shadow-xs); }
 @media (min-width: 760px) { .tabbar { display: none; } }
 
+/* Pulse Plus badge — marks anything that belongs to the paid tier */
+.plus-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 0.58rem; font-weight: 800;
+  letter-spacing: 0.07em; text-transform: uppercase; color: #fff; padding: 3px 8px; border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--amber-400), var(--clay)); box-shadow: var(--shadow-xs); }
+
 /* desktop top tabs */
 .toptabs { display: none; gap: 6px; }
 @media (min-width: 760px) {

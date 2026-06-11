@@ -14,6 +14,8 @@ New visitors get a gentle, animated **onboarding** (name, goals, units) and can 
 
 **Friends & family:** with cloud accounts on, the **Friends** tab lets people connect by **@handle**. Send a request, and once it's accepted you can see each other's daily check-in — current **wellness score, streak and goals hit**. Sharing is **per person and you control it**: each connection is set to *Summary* or *Detail* (detail adds your per-pillar numbers — water, sleep, active minutes, meals, steps, mood), and your written **journal notes are never shared with anyone**. It's built for cases like a parent keeping an eye on a child's wellbeing, or friends gently keeping each other accountable. The gating is enforced in the database itself (security-definer functions over RLS), so a connection literally cannot read more than you've granted — not even by querying directly.
 
+**Pulse Plus (freemium model):** the app ships with a working two-tier plan. Free includes everything you need daily — tracking, the last **21 days** of trends and history, reminders, JSON backups, and up to **4 connections**. **Plus** unlocks **all-time charts**, a **Year in review**, **custom trackers** (define anything — meditation, reading, screen-free time — and it becomes a first-class card on Today with its own goal and confetti), **unlimited connections**, and **CSV export**. The paywall is an honest demo: no payment processor is wired up, so "Start Plus" activates the plan instantly and says so on the sheet — the point is to demonstrate real product gating, upgrade flows and plan-aware UI end to end.
+
 ## Run it
 
 ```bash

@@ -1,16 +1,37 @@
 import { useState, useMemo } from 'react';
-import { lastNDays, weekdayShort, dayNum, isToday } from '../lib/dates.js';
+import { lastNDays, weekdayShort, dayNum, isToday, todayKey, keyToDate } from '../lib/dates.js';
 import { getDay } from '../lib/storage.js';
 import { dayScore } from '../lib/score.js';
 import { mlToDisplay } from '../lib/units.js';
 import { movingAverage } from '../lib/insights.js';
+import { FREE_HISTORY_DAYS } from '../lib/plan.js';
+import { IconLock } from './Icons.jsx';
 
-const RANGES = [7, 14, 30];
+// Ranges, split by plan: free sees up to FREE_HISTORY_DAYS back, Plus gets the
+// long views (n: 0 means "everything since the first logged day").
+const FREE_RANGES = [
+  { n: 7, label: '7d' }, { n: 14, label: '14d' }, { n: FREE_HISTORY_DAYS, label: `${FREE_HISTORY_DAYS}d` },
+];
+const PLUS_RANGES = [
+  { n: 30, label: '30d' }, { n: 90, label: '90d' }, { n: 365, label: '1y' }, { n: 0, label: 'All' },
+];
 
-export default function TrendCharts({ state, units }) {
+const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+export default function TrendCharts({ state, units, plus, openPlus }) {
   const [metric, setMetric] = useState('score');
   const [range, setRange] = useState(7);
-  const days = useMemo(() => lastNDays(range), [range]);
+
+  // "All" spans from the first logged day to today (at least a month of canvas).
+  const allN = useMemo(() => {
+    const first = Object.keys(state.days).sort()[0];
+    if (!first) return 30;
+    const span = Math.round((keyToDate(todayKey()) - keyToDate(first)) / 86400000) + 1;
+    return Math.max(30, span);
+  }, [state.days]);
+
+  const effectiveN = range === 0 ? allN : range;
+  const days = useMemo(() => lastNDays(effectiveN), [effectiveN]);
 
   const metrics = {
     score:    { label: 'Wellness', color: 'var(--amber-500)', get: (d) => dayScore(d, state.goals), max: 100, fmt: (v) => v, unit: '' },
@@ -28,7 +49,11 @@ export default function TrendCharts({ state, units }) {
   const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
   const logged = values.filter((v) => v > 0).length;
 
-  // line chart geometry for score
+  // Bars stay readable up to about a month; longer ranges switch to a line.
+  const useLine = metric === 'score' || series.length > 31;
+  const dense = series.length > 45; // long view: thin the dots and x labels
+
+  // line chart geometry
   const W = 640, H = 200, PAD = 24;
   const stepX = (W - PAD * 2) / Math.max(1, series.length - 1);
   const pts = series.map((s, i) => {
@@ -40,9 +65,17 @@ export default function TrendCharts({ state, units }) {
   const areaPath = `${linePath} L${pts[pts.length-1]?.x || PAD},${H-PAD} L${PAD},${H-PAD} Z`;
 
   // 7-day moving average — a smoothed trend line, shown on the longer ranges.
-  const showMA = range >= 14;
+  const showMA = effectiveN >= 14;
   const maVals = useMemo(() => movingAverage(values, 7), [values]);
   const maLinePath = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x},${H - PAD - (maVals[i] / peak) * (H - PAD * 2)}`).join(' ');
+
+  // x-axis labels: weekday letters when short, sparse day numbers mid-range,
+  // month names on the long views.
+  const xLabel = (key) => {
+    if (dense) return dayNum(key) === 1 ? MONTHS_S[keyToDate(key).getMonth()] : '';
+    if (effectiveN <= 14) return weekdayShort(key)[0];
+    return dayNum(key) % 5 === 0 ? dayNum(key) : '·';
+  };
 
   return (
     <div className="card trends">
@@ -53,8 +86,17 @@ export default function TrendCharts({ state, units }) {
           ))}
         </div>
         <div className="range-tabs">
-          {RANGES.map((r) => (
-            <button key={r} className={`chip btn-sm ${range === r ? 'active' : ''}`} onClick={() => setRange(r)}>{r}d</button>
+          {FREE_RANGES.map((r) => (
+            <button key={r.n} className={`chip btn-sm ${range === r.n ? 'active' : ''}`} onClick={() => setRange(r.n)}>{r.label}</button>
+          ))}
+          {PLUS_RANGES.map((r) => (
+            plus ? (
+              <button key={r.label} className={`chip btn-sm ${range === r.n ? 'active' : ''}`} onClick={() => setRange(r.n)}>{r.label}</button>
+            ) : (
+              <button key={r.label} className="chip btn-sm chip-locked" onClick={openPlus} title="Pulse Plus unlocks your whole history">
+                <IconLock size={11} /> {r.label}
+              </button>
+            )
           ))}
         </div>
       </div>
@@ -62,10 +104,10 @@ export default function TrendCharts({ state, units }) {
       <div className="trend-stats">
         <div><div className="ts-num" style={{ color: m.color }}>{m.fmt(Math.round(avg))}<span className="ts-unit">{m.unit}</span></div><div className="faint">average</div></div>
         <div><div className="ts-num">{m.fmt(Math.round(Math.max(...values, 0)))}<span className="ts-unit">{m.unit}</span></div><div className="faint">best</div></div>
-        <div><div className="ts-num">{logged}<span className="ts-unit">/{range}</span></div><div className="faint">days logged</div></div>
+        <div><div className="ts-num">{logged}<span className="ts-unit">/{series.length}</span></div><div className="faint">days logged</div></div>
       </div>
 
-      {metric === 'score' ? (
+      {useLine ? (
         <svg viewBox={`0 0 ${W} ${H}`} className="chart" preserveAspectRatio="none">
           <defs>
             <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
@@ -74,13 +116,13 @@ export default function TrendCharts({ state, units }) {
             </linearGradient>
           </defs>
           {[0.25,0.5,0.75].map((g)=>(<line key={g} x1={PAD} x2={W-PAD} y1={PAD+(H-PAD*2)*g} y2={PAD+(H-PAD*2)*g} stroke="var(--border)" strokeWidth="1" strokeDasharray="4 6"/>))}
-          <path d={areaPath} fill="url(#area)" />
+          {metric === 'score' && <path d={areaPath} fill="url(#area)" />}
           {showMA && <path d={maLinePath} fill="none" stroke="var(--amber-700)" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" opacity="0.7" />}
-          <path d={linePath} fill="none" stroke="var(--amber-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+          <path d={linePath} fill="none" stroke={m.color} strokeWidth={dense ? 2 : 3} strokeLinecap="round" strokeLinejoin="round"
             style={{ strokeDasharray: 2000, strokeDashoffset: 0, animation: 'dash 1.1s var(--ease-out)' }} />
-          {pts.map((p) => (
+          {!dense && pts.map((p) => (
             <g key={p.key}>
-              <circle cx={p.x} cy={p.y} r={isToday(p.key) ? 6 : 4} fill="var(--surface)" stroke="var(--amber-500)" strokeWidth="3" />
+              <circle cx={p.x} cy={p.y} r={isToday(p.key) ? 6 : 4} fill="var(--surface)" stroke={m.color} strokeWidth="3" />
             </g>
           ))}
           <style>{`@keyframes dash { from { stroke-dashoffset: 2000; } to { stroke-dashoffset: 0; } }`}</style>
@@ -91,7 +133,7 @@ export default function TrendCharts({ state, units }) {
             const h = Math.max(4, (s.raw / peak) * 150);
             return (
               <div key={s.key} className="bar-col">
-                <div className="bar-val">{s.raw > 0 ? m.fmt(s.raw) : ''}</div>
+                <div className="bar-val">{s.raw > 0 && series.length <= 21 ? m.fmt(s.raw) : ''}</div>
                 <div className="bar" style={{ height: h, background: m.color, opacity: isToday(s.key) ? 1 : 0.82 }} />
               </div>
             );
@@ -110,15 +152,21 @@ export default function TrendCharts({ state, units }) {
 
       <div className="x-axis">
         {series.map((s) => (
-          <span key={s.key} className={isToday(s.key) ? 'x-today' : ''}>
-            {range <= 14 ? weekdayShort(s.key)[0] : (dayNum(s.key) % 5 === 0 ? dayNum(s.key) : '·')}
-          </span>
+          <span key={s.key} className={isToday(s.key) ? 'x-today' : ''}>{xLabel(s.key)}</span>
         ))}
       </div>
+
+      {!plus && (
+        <button className="trend-upsell" onClick={openPlus}>
+          <IconLock size={13} /> Free shows your last {FREE_HISTORY_DAYS} days — <b>Pulse Plus</b> opens your whole history
+        </button>
+      )}
 
       <style>{`
         .trend-head { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .metric-tabs, .range-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+        .chip-locked { display: inline-flex; align-items: center; gap: 4px; opacity: 0.6; }
+        .chip-locked:hover { opacity: 1; border-color: var(--amber-400); color: var(--amber-600); }
         .trend-stats { display: flex; gap: var(--s-6); margin-bottom: var(--s-5); }
         .ts-num { font-family: var(--font-display); font-weight: 600; font-size: 1.6rem; line-height: 1; }
         .ts-unit { font-size: 0.8rem; color: var(--text-soft); margin-left: 2px; font-family: var(--font-sans); }
@@ -133,8 +181,14 @@ export default function TrendCharts({ state, units }) {
         .bar-val { font-size: 0.6rem; font-weight: 700; color: var(--text-soft); }
         @keyframes growBar { from { height: 0 !important; opacity: 0; } }
         .x-axis { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 4px; }
-        .x-axis span { flex: 1; text-align: center; font-size: var(--t-xs); color: var(--text-faint); font-weight: 600; }
+        .x-axis span { flex: 1; text-align: center; font-size: var(--t-xs); color: var(--text-faint); font-weight: 600; white-space: nowrap; }
         .x-axis .x-today { color: var(--amber-600); }
+        .trend-upsell { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+          margin-top: var(--s-4); padding: 10px 12px; border-radius: var(--r-md); font-size: var(--t-xs); font-weight: 600;
+          color: var(--text-soft); background: var(--surface-soft); border: 1px dashed var(--border);
+          transition: all var(--dur-fast); }
+        .trend-upsell b { color: var(--amber-600); }
+        .trend-upsell:hover { border-color: var(--amber-400); color: var(--text); }
         @media (max-width: 640px) { .trend-stats { gap: var(--s-4); } .ts-num { font-size: 1.3rem; } }
       `}</style>
     </div>

@@ -3,6 +3,8 @@ import { waterGoalLabel } from '../lib/units.js';
 import { prettyDate } from '../lib/dates.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
 import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
+import { GENDERS, ACTIVITY_LEVELS, calorieGoal } from '../lib/nutrition.js';
+import { WeightStepper, recSubtitle } from './Onboarding.jsx';
 import { IconSparkle, IconLock, IconTrash } from './Icons.jsx';
 
 export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker, plus: plusProp, billing, managePlan }) {
@@ -147,6 +149,8 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         </div>
       </div>
 
+      <BodyGoal settings={settings} goals={goals} setSettings={setSettings} setGoals={setGoals} metric={metric} notify={notify} />
+
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--water)' }} /> Daily Goals</div>
         <Row label={`💧 Water`}>
@@ -234,6 +238,22 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         .ct-del { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0;
           color: var(--text-faint); background: var(--surface); border: 1px solid var(--border); transition: all var(--dur-fast); }
         .ct-del:hover { color: var(--bad); border-color: var(--bad); }
+
+        .bg-seg { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .bg-seg .chip { flex: 1 1 auto; justify-content: center; }
+        .bg-lbl { font-size: var(--t-sm); font-weight: 600; color: var(--text-soft); display: block; }
+        .bg-field { margin-top: 14px; }
+        .wt-stepper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;
+          background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 12px; }
+        .wt-val { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+        .bg-rec { margin-top: 16px; text-align: center; padding: 16px; border-radius: var(--r-lg);
+          border: 1px solid var(--border);
+          background: radial-gradient(380px 160px at 50% -40%, rgba(246,197,68,0.18), transparent 70%), var(--surface-soft); }
+        .bg-rec-eyebrow { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber-600); }
+        .bg-rec-num { font-family: var(--font-display); font-weight: 600; font-size: 2rem; line-height: 1; margin-top: 6px; }
+        .bg-rec-num span { font-family: var(--font); font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
+        .bg-rec-sub { font-size: var(--t-sm); color: var(--text-soft); line-height: 1.45; margin-top: 8px; }
+        .bg-current { font-size: var(--t-xs); color: var(--text-faint); margin-top: 10px; }
       `}</style>
     </div>
   );
@@ -261,6 +281,83 @@ function PlanManageButton({ live, cancelling, managePlan, notify }) {
       }}>
       {busy ? 'Working…' : (live ? 'Confirm cancel?' : 'Confirm?')}
     </button>
+  );
+}
+
+// Body profile → recommended daily calories. Editing any field recomputes the
+// suggestion live; one tap applies it as the Nutrition card's daily goal.
+function BodyGoal({ settings, goals, setSettings, setGoals, metric, notify }) {
+  const { gender, activity } = settings;
+  // Mirror the steppers' shown defaults so the estimate isn't blank before the
+  // user touches a weight (existing accounts start with null weights).
+  const weight = settings.weight ?? 70;
+  const targetWeight = settings.targetWeight ?? weight;
+  const rec = calorieGoal({ gender, weight, targetWeight, activity });
+  const applied = rec && goals.calories === rec.target;
+
+  const apply = () => {
+    // Persist the effective profile too, so the suggestion is stable next visit.
+    setSettings({ weight, targetWeight });
+    setGoals({ calories: rec.target });
+    notify(`Daily goal set to ${rec.target.toLocaleString()} kcal`, '🍽️');
+  };
+
+  return (
+    <div className="card">
+      <div className="card-title"><span className="dot" style={{ background: 'var(--sage)' }} /> Body & calorie goal</div>
+      <p className="faint" style={{ marginBottom: 4 }}>Tell Pulse a little about you and it suggests a daily calorie target to reach your goal at a healthy pace.</p>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Gender</span>
+        <div className="bg-seg">
+          {GENDERS.map((g) => (
+            <button key={g.id} className={`chip ${gender === g.id ? 'active' : ''}`} onClick={() => setSettings({ gender: g.id })}>{g.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Current weight</span>
+        <WeightStepper kg={weight ?? 70} onChange={(kg) => setSettings({ weight: kg })} metric={metric} />
+      </div>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Target weight</span>
+        <WeightStepper kg={targetWeight ?? weight ?? 70} onChange={(kg) => setSettings({ targetWeight: kg })} metric={metric} />
+      </div>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Daily activity</span>
+        <div className="bg-seg">
+          {ACTIVITY_LEVELS.map((a) => (
+            <button key={a.id} className={`chip ${activity === a.id ? 'active' : ''}`} onClick={() => setSettings({ activity: a.id })}>{a.emoji} {a.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-rec">
+        {!gender ? (
+          <p className="faint" style={{ margin: 0 }}>Pick your gender above to see a suggested target.</p>
+        ) : rec ? (
+          <>
+            <div className="bg-rec-eyebrow">Suggested daily target</div>
+            <div className="bg-rec-num">{rec.target.toLocaleString()} <span>kcal / day</span></div>
+            <p className="bg-rec-sub">{recSubtitle(rec, metric)}</p>
+            {applied ? (
+              <div className="bg-current">✓ This is your Nutrition daily goal.</div>
+            ) : (
+              <button className="btn btn-sm btn-primary" style={{ marginTop: 12 }} onClick={apply}>
+                Use {rec.target.toLocaleString()} kcal as my daily goal
+              </button>
+            )}
+            {goals.calories && !applied && (
+              <div className="bg-current">Current goal: {goals.calories.toLocaleString()} kcal/day</div>
+            )}
+          </>
+        ) : null}
+      </div>
+      <p className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 10 }}>An estimate to guide you, not medical advice. Check with a professional for a tailored plan.</p>
+    </div>
   );
 }
 

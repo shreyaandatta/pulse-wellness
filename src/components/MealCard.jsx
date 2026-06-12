@@ -44,7 +44,9 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
       <div className="row-between">
         <div>
           <span className="stat-big" key={count} style={{ display: 'inline-block', animation: 'popIn .35s var(--ease-spring)' }}>{count}</span> <span className="stat-unit">meals</span>
-          <div className="faint">goal {goals.meals} meals{kcal > 0 ? ` · ≈ ${kcal.toLocaleString()} kcal` : ''}</div>
+          <div className="faint">goal {goals.meals} meals{goals.calories
+            ? ` · ${kcal.toLocaleString()} / ${goals.calories.toLocaleString()} kcal`
+            : (kcal > 0 ? ` · ≈ ${kcal.toLocaleString()} kcal` : '')}</div>
           {reached && <div className="reached">🎉 Goal reached!</div>}
         </div>
         <button className="round-btn accent" onClick={() => (open ? reset() : setOpen(true))} aria-label="Add meal"><IconPlus size={20} /></button>

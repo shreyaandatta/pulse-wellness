@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { celebrate } from '../lib/celebrate.js';
-import { waterGoalLabel } from '../lib/units.js';
+import { waterGoalLabel, kgToLb, lbToKg } from '../lib/units.js';
+import { GENDERS, ACTIVITY_LEVELS, calorieGoal } from '../lib/nutrition.js';
 
 // A short, warm setup that turns the empty first screen into a welcome. Each
 // step pops in; the finish line gets a confetti burst.
@@ -10,14 +11,26 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
   const [goals, setGoals] = useState({ ...initialGoals });
   const [units, setUnits] = useState(initialSettings.units || 'metric');
   const [theme, setTheme] = useState(initialSettings.theme || 'light');
+  // Body profile (weights kept in kg internally) → recommended calorie goal.
+  const [gender, setGender] = useState(initialSettings.gender || '');
+  const [weight, setWeight] = useState(initialSettings.weight ?? 70);
+  const [targetWeight, setTargetWeight] = useState(initialSettings.targetWeight ?? 70);
+  const [activity, setActivity] = useState(initialSettings.activity || 'light');
   const metric = units === 'metric';
 
-  const STEPS = 4;
+  const rec = calorieGoal({ gender, weight, targetWeight, activity });
+
+  const STEPS = 5;
   const next = () => setStep((s) => Math.min(STEPS - 1, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
   const patch = (k, v) => setGoals((g) => ({ ...g, [k]: v }));
 
-  const finish = () => onFinish(goals, { name: name.trim(), units, theme, onboarded: true });
+  // Only commit a calorie goal once they've actually told us their gender —
+  // otherwise the dashboard would show a target derived from pure defaults.
+  const finish = () => onFinish(
+    { ...goals, calories: gender ? (rec?.target ?? null) : null },
+    { name: name.trim(), units, theme, gender, weight, targetWeight, activity, onboarded: true },
+  );
 
   return (
     <div className="ob">
@@ -37,11 +50,16 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
             <Prefs units={units} setUnits={setUnits} theme={theme} setTheme={setTheme} />
           )}
           {step === 3 && (
+            <Body gender={gender} setGender={setGender} weight={weight} setWeight={setWeight}
+              targetWeight={targetWeight} setTargetWeight={setTargetWeight}
+              activity={activity} setActivity={setActivity} metric={metric} rec={rec} />
+          )}
+          {step === 4 && (
             <Done name={name} onFinish={finish} />
           )}
         </div>
 
-        {step > 0 && step < 3 && (
+        {step > 0 && step < STEPS - 1 && (
           <div className="ob-nav">
             <button className="btn" onClick={back}>Back</button>
             <button className="btn btn-primary" onClick={next}>Continue</button>
@@ -86,6 +104,20 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
         .pref-group { text-align: left; margin-top: var(--s-5); }
         .seg { display: flex; gap: 8px; margin-top: 8px; }
         .seg .chip { flex: 1; justify-content: center; padding: 12px; }
+        .seg.wrap { flex-wrap: wrap; }
+        .seg.wrap .chip { flex: 1 1 calc(50% - 4px); }
+
+        .wt-stepper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;
+          background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 12px; }
+        .wt-val { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+        .rec { margin-top: var(--s-5); text-align: center; padding: 16px;
+          border-radius: var(--r-lg); border: 1px solid var(--amber-300, var(--border));
+          background: radial-gradient(420px 180px at 50% -40%, rgba(246,197,68,0.20), transparent 70%), var(--surface-soft); }
+        .rec-eyebrow { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber-600); }
+        .rec-num { font-family: var(--font-display); font-weight: 600; font-size: 2.1rem; line-height: 1; margin-top: 6px; }
+        .rec-num span { font-family: var(--font); font-size: 0.9rem; font-weight: 600; color: var(--text-soft); }
+        .rec-sub { font-size: var(--t-sm); color: var(--text-soft); line-height: 1.45; margin-top: 8px; }
+        .rec-empty { font-size: var(--t-sm); color: var(--text-faint); }
       `}</style>
     </div>
   );
@@ -165,6 +197,89 @@ function Prefs({ units, setUnits, theme, setTheme }) {
           <button className={`chip ${theme === 'dark' ? 'active' : ''}`} onClick={() => setTheme('dark')}>🌙 Dark</button>
         </div>
       </div>
+    </>
+  );
+}
+
+// A weight stepper that reads/writes kg but shows the user's units. Steps by 1
+// display unit (1 kg or 1 lb) so it feels natural either way.
+export function WeightStepper({ kg, onChange, metric, min = 30 }) {
+  const disp = metric ? Math.round(kg) : Math.round(kgToLb(kg));
+  const minDisp = metric ? min : Math.round(kgToLb(min));
+  const set = (d) => {
+    const nd = Math.max(minDisp, disp + d);
+    onChange(metric ? nd : +lbToKg(nd).toFixed(1));
+  };
+  return (
+    <div className="wt-stepper">
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(-1)} aria-label="Less">−</button>
+      <span className="wt-val">{disp} {metric ? 'kg' : 'lb'}</span>
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(1)} aria-label="More">+</button>
+    </div>
+  );
+}
+
+// Friendly one-liner explaining the recommended number. Shared by onboarding
+// and Settings so the wording stays identical.
+export function recSubtitle(rec, metric) {
+  if (!rec) return '';
+  const rate = metric ? `${rec.perWeekKg} kg` : `${(rec.perWeekKg * 2.20462).toFixed(1)} lb`;
+  if (rec.direction === 'maintain') return 'Enough to comfortably maintain your current weight.';
+  const verb = rec.direction === 'lose' ? 'lose' : 'gain';
+  const base = `A ${rec.direction === 'lose' ? 'gentle deficit' : 'small surplus'} to ${verb} about ${rate}/week — on track to reach your target in roughly ${rec.weeks} weeks.`;
+  return rec.floored
+    ? `${base} We kept it at a safe minimum of ${rec.floor.toLocaleString()} kcal.`
+    : base;
+}
+
+function RecCard({ rec, gender, metric }) {
+  if (!gender) return <div className="rec"><p className="rec-empty">Pick your gender above and we'll suggest a daily calorie target.</p></div>;
+  if (!rec) return <div className="rec"><p className="rec-empty">Add your weight and we'll suggest a daily calorie target.</p></div>;
+  return (
+    <div className="rec">
+      <div className="rec-eyebrow">Your suggested daily target</div>
+      <div className="rec-num">{rec.target.toLocaleString()} <span>kcal / day</span></div>
+      <p className="rec-sub">{recSubtitle(rec, metric)}</p>
+    </div>
+  );
+}
+
+function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWeight, activity, setActivity, metric, rec }) {
+  return (
+    <>
+      <div className="ob-eyebrow">Step 4</div>
+      <div className="ob-h">A bit about you</div>
+      <p className="ob-sub">This lets Pulse suggest a daily calorie target to reach your goal at a healthy pace. You can edit or skip it anytime.</p>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Gender</label>
+        <div className="seg">
+          {GENDERS.map((g) => (
+            <button key={g.id} className={`chip ${gender === g.id ? 'active' : ''}`} onClick={() => setGender(g.id)}>{g.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Current weight</label>
+        <WeightStepper kg={weight} onChange={setWeight} metric={metric} />
+      </div>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Target weight</label>
+        <WeightStepper kg={targetWeight} onChange={setTargetWeight} metric={metric} />
+      </div>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Daily activity</label>
+        <div className="seg wrap">
+          {ACTIVITY_LEVELS.map((a) => (
+            <button key={a.id} className={`chip ${activity === a.id ? 'active' : ''}`} onClick={() => setActivity(a.id)}>{a.emoji} {a.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <RecCard rec={rec} gender={gender} metric={metric} />
     </>
   );
 }

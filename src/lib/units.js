@@ -15,6 +15,18 @@ export function waterCurrentLabel(ml, units) {
   return ml >= 1000 ? `${(ml / 1000).toFixed(1)} L` : `${ml} ml`;
 }
 
+// ---- weight (stored in kg) ------------------------------------------------
+const LB_PER_KG = 2.20462;
+
+export function kgToLb(kg) { return kg * LB_PER_KG; }
+export function lbToKg(lb) { return lb / LB_PER_KG; }
+
+// A kg value shown in the user's units, e.g. "70 kg" or "154 lb".
+export function weightLabel(kg, units) {
+  if (kg == null || Number.isNaN(Number(kg))) return '—';
+  return units === 'imperial' ? `${Math.round(kg * LB_PER_KG)} lb` : `${Math.round(kg)} kg`;
+}
+
 // Quick-add increments in ml, labelled per unit system.
 export function waterIncrements(units) {
   if (units === 'imperial') {

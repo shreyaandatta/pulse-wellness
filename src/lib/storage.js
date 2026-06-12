@@ -21,6 +21,7 @@ export const DEFAULT_GOALS = {
   activeMinutes: 30,
   meals: 3,
   steps: 8000,
+  calories: null,   // kcal/day target — set from body profile (see lib/nutrition.js)
 };
 
 export const DEFAULT_SETTINGS = {
@@ -32,6 +33,11 @@ export const DEFAULT_SETTINGS = {
   pillarOrder: [...DEFAULT_PILLAR_ORDER], // order of the Today tracker cards
   hiddenPillars: [],                       // pillar ids to hide
   plan: 'free',     // 'free' | 'plus' — see lib/plan.js
+  // Body profile — drives the recommended calorie goal (see lib/nutrition.js).
+  gender: '',          // 'female' | 'male' | 'other' | ''
+  weight: null,        // current body weight in kg
+  targetWeight: null,  // target body weight in kg
+  activity: 'light',   // activity level id (see ACTIVITY_LEVELS)
 };
 
 function freshDay() {

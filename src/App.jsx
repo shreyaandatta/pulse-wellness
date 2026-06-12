@@ -29,6 +29,7 @@ import StreakCard from './components/StreakCard.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
 import SmartNudge from './components/SmartNudge.jsx';
+import InstallPrompt from './components/InstallPrompt.jsx';
 import DataVault from './components/DataVault.jsx';
 import Friends from './components/Friends.jsx';
 import Settings from './components/Settings.jsx';
@@ -187,6 +188,8 @@ function PulseApp({ auth }) {
 
       {tab === 'today' && (
         <div className="tab-pane" key="today">
+          <InstallPrompt notify={notify} />
+
           <DaySwitcher activeDay={p.activeDay} setActiveDay={p.setActiveDay} />
 
           {isToday(p.activeDay) && <SmartNudge state={p.state} units={settings.units} />}

@@ -7,6 +7,7 @@
 import { todayKey, addDays } from './dates.js';
 import { dayScore, goalsHit, scoreBand } from './score.js';
 import { currentStreak } from './streak.js';
+import { topBadges } from './badges.js';
 import { getDay } from './storage.js';
 
 export function buildSnapshot(state, name) {
@@ -34,6 +35,7 @@ export function buildSnapshot(state, name) {
     goalsTotal: g.total,
     last7,
     activeDays: Object.keys(state.days || {}).length,
+    badges: topBadges(state, 3), // the 3 best badges to show off to friends
     dayKey: key,
   };
 

@@ -33,3 +33,4 @@ export const IconShare = (p) => <I {...p}><path d="M12 14V3"/><path d="M8 7l4-4 
 export const IconAddSquare = (p) => <I {...p}><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></I>;
 export const IconX = (p) => <I {...p} d="M18 6 6 18M6 6l12 12" />;
 export const IconBell = (p) => <I {...p}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></I>;
+export const IconTrophy = (p) => <I {...p}><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v4"/><path d="M8 21h8"/></I>;

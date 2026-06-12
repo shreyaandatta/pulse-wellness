@@ -261,6 +261,13 @@ function FriendCard({ f, social, notify }) {
             <span className="fc-chip">🎯 {s.goalsHit}/{s.goalsTotal}</span>
             <span className="fc-chip">{s.band?.label}</span>
           </div>
+          {Array.isArray(s.badges) && s.badges.length > 0 && (
+            <div className="fc-badges" title="Top badges">
+              {s.badges.map((b) => (
+                <span key={b.id} className="fc-badge" title={b.title}>{b.emoji}</span>
+              ))}
+            </div>
+          )}
           {Array.isArray(s.last7) && <Spark values={s.last7} />}
           {detail && (
             <div className="fc-detail">
@@ -365,6 +372,11 @@ function FriendsStyle() {
         color: var(--text-soft); background: var(--surface); border: 1px solid var(--border); padding: 3px 9px; border-radius: var(--r-pill); }
       .fc-detail { display: flex; flex-wrap: wrap; gap: 9px; font-size: var(--t-xs); font-weight: 600; color: var(--text-soft);
         padding-top: 8px; border-top: 1px dashed var(--border); }
+
+      .fc-badges { display: flex; gap: 6px; }
+      .fc-badge { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 0.95rem;
+        background: radial-gradient(circle at 50% 35%, var(--honey-300), var(--amber-400));
+        border: 1px solid var(--amber-500); box-shadow: 0 0 0 2px rgba(240,174,56,0.15); }
 
       .spark { display: flex; align-items: flex-end; gap: 3px; height: 30px; padding: 2px 0; }
       .spark-bar { flex: 1; min-height: 2px; border-radius: 2px; background: linear-gradient(var(--amber-400), var(--amber-500)); }

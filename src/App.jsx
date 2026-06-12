@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
@@ -12,8 +12,10 @@ import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers,
+  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy,
 } from './components/Icons.jsx';
+import { resolveBadges, BADGES } from './lib/badges.js';
+import { celebrate } from './lib/celebrate.js';
 
 import AuthGate from './components/AuthGate.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
@@ -97,6 +99,26 @@ function PulseApp({ auth }) {
     card.classList.add('flash-card');
     setTimeout(() => card.classList.remove('flash-card'), 1400);
   }, []);
+
+  // Watch for newly-earned badges app-wide so the celebration fires no matter
+  // which tab you're on when you cross the line. The ref is seeded on first
+  // render, so we never confetti the whole case on load — only fresh unlocks.
+  const earnedBadgeIds = useMemo(
+    () => resolveBadges(p.state).badges.filter((b) => b.earned).map((b) => b.id),
+    [p.state]
+  );
+  const seenBadges = useRef(null);
+  useEffect(() => {
+    if (seenBadges.current === null) { seenBadges.current = new Set(earnedBadgeIds); return; }
+    const fresh = earnedBadgeIds.filter((id) => !seenBadges.current.has(id));
+    if (fresh.length) {
+      celebrate(null, 40);
+      const b = BADGES.find((x) => x.id === fresh[fresh.length - 1]);
+      if (b) notify(`Badge unlocked — ${b.title}`, b.emoji);
+      fresh.forEach((id) => seenBadges.current.add(id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [earnedBadgeIds.join(',')]);
 
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
@@ -189,6 +211,7 @@ function PulseApp({ auth }) {
             <button className={`tab ${tab==='today'?'active':''}`} onClick={() => setTab('today')}><IconHome size={17} /> Today</button>
             <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}><IconTrends size={17} /> Trends</button>
             <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}><IconInsight size={17} /> Insights</button>
+            <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => setTab('badges')}><IconTrophy size={17} /> Badges</button>
             <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}><span className="tab-badge-wrap"><IconUsers size={17} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends</button>
             <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}><IconShield size={17} /> Data</button>
             <button className={`tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}><IconGear size={17} /> Settings</button>
@@ -213,10 +236,6 @@ function PulseApp({ auth }) {
             <div className="pillar-anchor" id="pillar-steps">
               <StepsCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addSteps} onSet={p.setSteps} notify={notify} />
             </div>
-          </div>
-
-          <div style={{ marginTop: 'var(--s-5)' }}>
-            <Badges state={p.state} notify={notify} />
           </div>
 
           <div className="section-head"><h2>Log your day</h2></div>
@@ -251,6 +270,13 @@ function PulseApp({ auth }) {
         <div className="tab-pane" key="insights">
           <div className="section-head"><h2>Insights</h2><span className="faint">patterns from your own days</span></div>
           <Insights state={p.state} units={settings.units} />
+        </div>
+      )}
+
+      {tab === 'badges' && (
+        <div className="tab-pane" key="badges">
+          <div className="section-head"><h2>Achievements</h2><span className="faint">badges you earn by showing up</span></div>
+          <Badges state={p.state} user={auth.user} />
         </div>
       )}
 
@@ -293,6 +319,9 @@ function PulseApp({ auth }) {
         </button>
         <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}>
           <span className="tab-icon"><IconInsight size={22} /></span> Insights
+        </button>
+        <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => setTab('badges')}>
+          <span className="tab-icon"><IconTrophy size={22} /></span> Badges
         </button>
         <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}>
           <span className="tab-icon"><IconUsers size={22} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends

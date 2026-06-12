@@ -1,115 +1,123 @@
-import { useState, useRef, useEffect } from 'react';
-import { resolveBadges, BADGE_CATEGORIES } from '../lib/badges.js';
-import { celebrate } from '../lib/celebrate.js';
+import { resolveBadges, topBadges, BADGE_CATEGORIES } from '../lib/badges.js';
 
-// The "trophy case": every achievement the user can earn from their own data.
-// Collapsed it shows what's unlocked plus the next carrot; expanded it shows the
-// full catalogue grouped by category. New unlocks during a session pop confetti.
-export default function Badges({ state, notify }) {
-  const { badges, earnedCount, total, next } = resolveBadges(state);
-  const [open, setOpen] = useState(false);
-  const cardRef = useRef(null);
-
-  // Celebrate only badges that flip to earned *during this session*. The ref is
-  // seeded on first render so we never confetti the whole case on page load.
-  const earnedIds = badges.filter((b) => b.earned).map((b) => b.id);
-  const seen = useRef(null);
-  const key = earnedIds.join(',');
-  useEffect(() => {
-    if (seen.current === null) { seen.current = new Set(earnedIds); return; }
-    const fresh = earnedIds.filter((id) => !seen.current.has(id));
-    if (fresh.length) {
-      celebrate(cardRef.current, 36);
-      const b = badges.find((x) => x.id === fresh[fresh.length - 1]);
-      if (b && notify) notify(`Badge unlocked — ${b.title}`, b.emoji);
-      fresh.forEach((id) => seen.current.add(id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  const earned = badges.filter((b) => b.earned);
+// The full Achievements page: a showcase strip (the 3 badges friends see),
+// a "next up" carrot, and the complete catalogue grouped by category. Earning
+// badges is celebrated app-wide (see App.jsx) so it fires from any tab; this
+// component is purely the trophy room.
+export default function Badges({ state, user }) {
+  const { badges, earnedCount, total, next, stats } = resolveBadges(state);
+  const showcase = topBadges(state, 3);
   const allDone = earnedCount === total;
+  const isCloud = !!user?.cloud;
 
   return (
-    <div className="card badges-card" ref={cardRef}>
-      <div className="card-title">
-        <span className="dot" style={{ background: 'var(--honey-400)' }} />🏅 Achievements
-        <span className="bdg-count">{earnedCount}/{total}</span>
+    <div className="ach">
+      {/* —— Showcase: your best three, and who can see them —————————— */}
+      <div className="card ach-showcase">
+        <div className="ach-head">
+          <div>
+            <div className="ach-count"><b>{earnedCount}</b> / {total} unlocked</div>
+            <div className="faint ach-sub">
+              {isCloud
+                ? 'Your best three show on your friends’ check-ins'
+                : 'Your three best badges — sign in to show friends'}
+            </div>
+          </div>
+          <div className="ach-streak" title="Best streak">
+            <span className="ach-streak-num">{stats.bestStreak}</span>
+            <span className="faint">best streak</span>
+          </div>
+        </div>
+
+        <div className="ach-show-row">
+          {showcase.length > 0 ? showcase.map((b, i) => (
+            <div key={b.id} className="ach-show">
+              <div className="ach-show-disc">{b.emoji}</div>
+              <div className="ach-show-name">{b.title}</div>
+              {i === 0 && <div className="ach-show-tag">top badge</div>}
+            </div>
+          )) : (
+            <p className="faint ach-empty">No badges yet — log a few days and your first one appears here.</p>
+          )}
+          {/* pad to three slots so the row reads as "pick your best 3" */}
+          {showcase.length > 0 && Array.from({ length: Math.max(0, 3 - showcase.length) }).map((_, i) => (
+            <div key={`empty-${i}`} className="ach-show empty"><div className="ach-show-disc">＋</div></div>
+          ))}
+        </div>
       </div>
 
-      {/* Next-up carrot, or a victory line when everything's unlocked. */}
+      {/* —— Next-up carrot —————————————————————————————————————————— */}
       {allDone ? (
-        <div className="bdg-alldone">Every badge unlocked — what a run 🎉</div>
+        <div className="card ach-alldone">Every badge unlocked — what a run 🎉</div>
       ) : next && (
-        <div className="bdg-next">
-          <div className="bdg-next-head">
-            <span className="bdg-next-emoji">{next.emoji}</span>
-            <div className="bdg-next-text">
-              <b>Next: {next.title}</b>
-              <span className="faint">{next.desc}</span>
-            </div>
-            <span className="bdg-next-prog">{next.progressLabel}</span>
+        <div className="card ach-next">
+          <span className="ach-next-emoji">{next.emoji}</span>
+          <div className="ach-next-text">
+            <b>Next: {next.title}</b>
+            <span className="faint">{next.desc}</span>
           </div>
-          <div className="bdg-bar"><div className="bdg-bar-fill" style={{ width: `${Math.round(next.progress * 100)}%` }} /></div>
+          <div className="ach-next-right">
+            <span className="ach-next-prog">{next.progressLabel}</span>
+            <div className="ach-bar"><div className="ach-bar-fill" style={{ width: `${Math.round(next.progress * 100)}%` }} /></div>
+          </div>
         </div>
       )}
 
-      {/* Collapsed: just the medals you've earned. Expanded: the whole case. */}
-      {!open && earned.length > 0 && (
-        <div className="bdg-grid">
-          {earned.map((b) => <Medal key={b.id} b={b} />)}
-        </div>
-      )}
-      {!open && earned.length === 0 && (
-        <p className="faint bdg-empty">No badges yet — log a few days and they’ll start appearing.</p>
-      )}
-
-      {open && BADGE_CATEGORIES.map((cat) => {
+      {/* —— The full catalogue ——————————————————————————————————————— */}
+      {BADGE_CATEGORIES.map((cat) => {
         const group = badges.filter((b) => b.cat === cat);
+        const got = group.filter((b) => b.earned).length;
         return (
-          <div key={cat} className="bdg-section">
-            <div className="bdg-cat">{cat}</div>
-            <div className="bdg-grid">
-              {group.map((b) => <Medal key={b.id} b={b} showLock />)}
+          <div key={cat} className="card ach-section">
+            <div className="ach-cat-head">
+              <span className="ach-cat">{cat}</span>
+              <span className="ach-cat-count">{got}/{group.length}</span>
+            </div>
+            <div className="ach-grid">
+              {group.map((b) => <Medal key={b.id} b={b} />)}
             </div>
           </div>
         );
       })}
 
-      <button className="bdg-toggle" onClick={() => setOpen((o) => !o)}>
-        {open ? 'Show less' : `See all ${total} badges`}
-      </button>
-
       <style>{`
-        .badges-card { display: flex; flex-direction: column; }
-        .bdg-count { margin-left: auto; font-size: var(--t-sm); color: var(--text-soft);
-          font-variant-numeric: tabular-nums; font-family: var(--font-display); }
-        .bdg-next { background: var(--surface-soft); border: 1px solid var(--border);
-          border-radius: var(--r-md); padding: 10px 12px; margin-bottom: var(--s-4); }
-        .bdg-next-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .bdg-next-emoji { font-size: 1.5rem; filter: grayscale(1) opacity(0.55); }
-        .bdg-next-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
-        .bdg-next-text b { font-size: var(--t-sm); }
-        .bdg-next-text .faint { font-size: var(--t-xs); }
-        .bdg-next-prog { margin-left: auto; font-size: var(--t-xs); color: var(--text-soft);
-          font-variant-numeric: tabular-nums; white-space: nowrap; }
-        .bdg-bar { height: 7px; border-radius: 99px; background: var(--surface); overflow: hidden;
-          border: 1px solid var(--border); }
-        .bdg-bar-fill { height: 100%; border-radius: 99px;
-          background: linear-gradient(90deg, var(--honey-400), var(--amber-500));
-          transition: width var(--dur) var(--ease-spring); }
-        .bdg-alldone { font-size: var(--t-sm); font-weight: 600; color: var(--good);
-          margin-bottom: var(--s-4); }
-        .bdg-empty { margin: 4px 0 var(--s-4); font-size: var(--t-sm); }
-        .bdg-section { margin-bottom: var(--s-4); }
-        .bdg-cat { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.04em;
-          text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
-        .bdg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-          gap: 10px; }
-        .bdg-toggle { margin-top: auto; align-self: flex-start; background: none; border: none;
-          color: var(--amber-600, var(--amber-500)); font-weight: 600; font-size: var(--t-sm);
-          cursor: pointer; padding: 8px 2px 0; }
-        .bdg-toggle:hover { text-decoration: underline; }
+        .ach { display: flex; flex-direction: column; gap: var(--s-4); }
+        .ach-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-4); }
+        .ach-count { font-size: var(--t-md); }
+        .ach-count b { font-family: var(--font-display); font-size: 1.4rem; color: var(--amber-600); }
+        .ach-sub { font-size: var(--t-xs); margin-top: 2px; }
+        .ach-streak { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+        .ach-streak-num { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; color: var(--amber-500); }
+        .ach-streak .faint { font-size: var(--t-xs); }
+
+        .ach-show-row { display: flex; gap: 10px; }
+        .ach-show { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px;
+          background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 12px 6px; position: relative; }
+        .ach-show.empty { opacity: 0.5; }
+        .ach-show-disc { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; font-size: 1.5rem;
+          background: radial-gradient(circle at 50% 35%, var(--honey-300), var(--amber-400)); border: 1px solid var(--amber-500);
+          box-shadow: 0 0 0 3px rgba(240,174,56,0.18); }
+        .ach-show.empty .ach-show-disc { background: var(--surface); border-style: dashed; box-shadow: none; color: var(--text-faint); }
+        .ach-show-name { font-size: 0.72rem; font-weight: 600; line-height: 1.15; color: var(--text-soft); }
+        .ach-show-tag { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+          color: var(--amber-600); }
+        .ach-empty { padding: 8px 4px; font-size: var(--t-sm); text-align: center; flex: 1; }
+
+        .ach-next { display: flex; align-items: center; gap: 12px; }
+        .ach-next-emoji { font-size: 1.6rem; filter: grayscale(1) opacity(0.55); flex-shrink: 0; }
+        .ach-next-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+        .ach-next-text b { font-size: var(--t-sm); }
+        .ach-next-text .faint { font-size: var(--t-xs); }
+        .ach-next-right { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; min-width: 110px; }
+        .ach-next-prog { font-size: var(--t-xs); color: var(--text-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .ach-bar { width: 100%; height: 7px; border-radius: 99px; background: var(--surface-soft); overflow: hidden; border: 1px solid var(--border); }
+        .ach-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--honey-400), var(--amber-500)); transition: width var(--dur) var(--ease-spring); }
+        .ach-alldone { font-size: var(--t-sm); font-weight: 600; color: var(--good); }
+
+        .ach-cat-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-4); }
+        .ach-cat { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); }
+        .ach-cat-count { font-size: var(--t-xs); color: var(--text-soft); font-variant-numeric: tabular-nums; }
+        .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 12px; }
       `}</style>
     </div>
   );
@@ -117,24 +125,25 @@ export default function Badges({ state, notify }) {
 
 // One medallion. Earned = full colour + gold ring; locked = greyed with a tiny
 // progress label so the user sees how close they are.
-function Medal({ b, showLock }) {
+function Medal({ b }) {
   return (
     <div className={`bdg-medal ${b.earned ? 'earned' : 'locked'}`} title={`${b.title} — ${b.desc}`}>
       <div className="bm-disc">{b.emoji}</div>
       <div className="bm-name">{b.title}</div>
-      {!b.earned && showLock && <div className="bm-prog">{b.progressLabel}</div>}
+      <div className="bm-prog">{b.earned ? 'Unlocked' : b.progressLabel}</div>
       <style>{`
         .bdg-medal { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; }
-        .bm-disc { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
-          font-size: 1.35rem; background: var(--surface-soft); border: 1px solid var(--border);
+        .bm-disc { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center;
+          font-size: 1.45rem; background: var(--surface-soft); border: 1px solid var(--border);
           transition: transform var(--dur) var(--ease-spring); }
         .bdg-medal.earned .bm-disc { background: radial-gradient(circle at 50% 35%, var(--honey-300), var(--amber-400));
           border-color: var(--amber-500); box-shadow: 0 0 0 3px rgba(240,174,56,0.18); }
         .bdg-medal.earned:hover .bm-disc { transform: translateY(-2px) scale(1.05); }
         .bdg-medal.locked .bm-disc { filter: grayscale(1); opacity: 0.45; }
-        .bm-name { font-size: 0.66rem; font-weight: 600; line-height: 1.15; color: var(--text-soft); }
+        .bm-name { font-size: 0.68rem; font-weight: 600; line-height: 1.15; color: var(--text-soft); }
         .bdg-medal.locked .bm-name { color: var(--text-faint); }
         .bm-prog { font-size: 0.6rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+        .bdg-medal.earned .bm-prog { color: var(--good); font-weight: 600; }
       `}</style>
     </div>
   );

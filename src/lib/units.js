@@ -27,6 +27,25 @@ export function weightLabel(kg, units) {
   return units === 'imperial' ? `${Math.round(kg * LB_PER_KG)} lb` : `${Math.round(kg)} kg`;
 }
 
+// A "glass" of water — most people track in glasses, not millilitres.
+// ~250 ml metric / 8 oz imperial is the everyday standard.
+export function glassMl(units) {
+  return units === 'imperial' ? 237 : 250;
+}
+
+// How many glasses a volume (ml) works out to, e.g. 3 or 2.5.
+export function glassesCount(ml, units) {
+  const g = ml / glassMl(units);
+  return Math.round(g * 10) / 10; // one decimal
+}
+
+// "3 glasses" / "1 glass" / "2.5 glasses"
+export function glassesLabel(ml, units) {
+  const n = glassesCount(ml, units);
+  const pretty = Number.isInteger(n) ? String(n) : n.toFixed(1);
+  return `${pretty} ${n === 1 ? 'glass' : 'glasses'}`;
+}
+
 // Quick-add increments in ml, labelled per unit system.
 export function waterIncrements(units) {
   if (units === 'imperial') {

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { waterGoalLabel } from '../lib/units.js';
 import { prettyDate } from '../lib/dates.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
 import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
 import { GENDERS, ACTIVITY_LEVELS, calorieGoal } from '../lib/nutrition.js';
 import { WeightStepper, recSubtitle } from './Onboarding.jsx';
-import { IconSparkle, IconLock, IconTrash } from './Icons.jsx';
+import { IconSparkle, IconLock, IconTrash, IconBell } from './Icons.jsx';
+import { pushSupported, pushConfigured, permission, isEnabled, enableReminders, disableReminders } from '../lib/push.js';
 
 export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker, plus: plusProp, billing, managePlan }) {
   const { goals, settings } = state;
@@ -126,6 +127,8 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         </Row>
         <div className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 6 }}>Haptics buzz on taps where your device supports it (most Android phones; iPhone web doesn't allow it).</div>
       </div>
+
+      <RemindersCard user={user} notify={notify} />
 
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--plum)' }} /> Dashboard layout</div>
@@ -254,7 +257,97 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         .bg-rec-num span { font-family: var(--font); font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
         .bg-rec-sub { font-size: var(--t-sm); color: var(--text-soft); line-height: 1.45; margin-top: 8px; }
         .bg-current { font-size: var(--t-xs); color: var(--text-faint); margin-top: 10px; }
+
+        .rem-status { display: flex; align-items: center; gap: 7px; font-size: var(--t-sm); font-weight: 600; margin-top: 4px; }
+        .rem-status .dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 22%, transparent); }
+        .rem-note { font-size: var(--t-xs); color: var(--text-faint); margin-top: 10px; line-height: 1.5; }
+        .rem-note b { color: var(--text-soft); }
       `}</style>
+    </div>
+  );
+}
+
+// Web-Push reminders. Cloud accounts only (the server needs to see whether you've
+// logged today). Handles the unsupported / blocked / signed-out states honestly,
+// since notifications are full of browser- and platform-specific edge cases.
+function RemindersCard({ user, notify }) {
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [perm, setPerm] = useState(() => permission());
+  const cloud = !!user?.cloud;
+
+  useEffect(() => {
+    let alive = true;
+    if (cloud && pushSupported) isEnabled().then((v) => { if (alive) setEnabled(v); });
+    return () => { alive = false; };
+  }, [cloud]);
+
+  const toggle = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (enabled) {
+        await disableReminders();
+        setEnabled(false);
+        notify('Reminders turned off', '🔕');
+      } else {
+        await enableReminders();
+        setEnabled(true);
+        setPerm(permission());
+        notify('Reminders on — we’ll nudge you if you forget', '🔔');
+      }
+    } catch (e) {
+      setPerm(permission());
+      notify(e?.message || 'Could not update reminders', '⚠️');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const Title = (
+    <div className="card-title"><span className="dot" style={{ background: 'var(--amber-500)' }} /><IconBell size={15} /> Reminders</div>
+  );
+
+  // Cloud account required — the reminder server can only check logged-in data.
+  if (!cloud) {
+    return (
+      <div className="card">
+        {Title}
+        <p className="faint" style={{ marginTop: 2 }}>Get a gentle daily nudge if you haven’t logged your day.</p>
+        <p className="rem-note">Reminders need a free <b>cloud account</b> so we can check in on your behalf. {user?.guest ? 'Sign in from the Account card above to turn them on.' : 'This on-device account can’t receive them.'}</p>
+      </div>
+    );
+  }
+
+  if (!pushSupported || !pushConfigured) {
+    return (
+      <div className="card">
+        {Title}
+        <p className="faint" style={{ marginTop: 2 }}>Get a gentle daily nudge if you haven’t logged your day.</p>
+        <p className="rem-note">{!pushSupported
+          ? 'This browser doesn’t support push notifications. On iPhone, add Pulse to your home screen first, then enable reminders from there.'
+          : 'Reminders aren’t set up on this build yet.'}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card">
+      {Title}
+      <p className="faint" style={{ marginTop: 2, marginBottom: 12 }}>An evening nudge if you haven’t logged your day — so your streak stays alive.</p>
+
+      <div className="set-row" style={{ borderBottom: 'none', paddingTop: 0 }}>
+        <span>Daily reminder</span>
+        <button className={`toggle ${enabled ? 'on' : ''}`} onClick={toggle} disabled={busy} aria-label="Toggle reminders"><span className="knob" /></button>
+      </div>
+
+      {enabled && (
+        <div className="rem-status"><span className="dot-live" /> On for this device</div>
+      )}
+      {perm === 'denied' && !enabled && (
+        <p className="rem-note">Notifications are <b>blocked</b> for Pulse. Allow them in your browser’s site settings, then try again.</p>
+      )}
+      <p className="rem-note">Works on this device once you allow notifications. On iPhone, add Pulse to your home screen first. Turning it off here stops reminders on this device.</p>
     </div>
   );
 }

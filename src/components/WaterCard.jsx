@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { IconDrop } from './Icons.jsx';
-import { waterIncrements, waterCurrentLabel, waterGoalLabel } from '../lib/units.js';
+import { waterIncrements, waterCurrentLabel, waterGoalLabel, glassMl, glassesLabel } from '../lib/units.js';
 import { useGoalCelebration } from '../hooks/useGoalCelebration.js';
 
 export default function WaterCard({ day, dayKey, goals, units, onAdd, notify }) {
@@ -9,6 +9,7 @@ export default function WaterCard({ day, dayKey, goals, units, onAdd, notify }) 
   const pct = Math.min(100, (day.water / Math.max(1, goals.water)) * 100);
   const incs = waterIncrements(units);
   const reached = day.water >= goals.water;
+  const glass = glassMl(units);
 
   useGoalCelebration(reached, dayKey, cardRef, () => notify('Hydration goal reached!', '🎉'));
 
@@ -37,13 +38,15 @@ export default function WaterCard({ day, dayKey, goals, units, onAdd, notify }) 
             </span>
           </div>
           <div className="faint">of {waterGoalLabel(goals.water, units)} goal</div>
+          <div className="water-glasses">≈ {glassesLabel(day.water, units)} today</div>
           {reached && <div className="reached">🎉 Goal reached!</div>}
 
           <div className="water-btns">
+            <button className="chip glass-chip" onClick={() => add(glass, '1 glass')}>🥛 + 1 glass</button>
             {incs.map((i) => (
               <button key={i.ml} className="chip" onClick={() => add(i.ml, i.label)}>+ {i.label}</button>
             ))}
-            <button className="chip undo" onClick={() => { onAdd(-incs[0].ml); notify(`−${incs[0].label} water`, '↩️'); }} disabled={day.water === 0}>−</button>
+            <button className="chip undo" onClick={() => { onAdd(-glass); notify('−1 glass water', '↩️'); }} disabled={day.water === 0}>−</button>
           </div>
         </div>
       </div>
@@ -62,8 +65,11 @@ export default function WaterCard({ day, dayKey, goals, units, onAdd, notify }) 
         .bottle-pct { position: absolute; inset: 0; display: grid; place-items: center;
           font-weight: 700; font-size: var(--t-sm); color: var(--ink-900); mix-blend-mode: hard-light; }
         .water-meta { flex: 1; }
+        .water-glasses { font-size: var(--t-xs); font-weight: 600; color: var(--water); margin-top: 3px; }
         .water-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-4); }
         .water-btns .undo { width: 40px; justify-content: center; }
+        .water-btns .glass-chip { background: color-mix(in srgb, var(--water) 14%, var(--surface));
+          border-color: color-mix(in srgb, var(--water) 40%, var(--border)); font-weight: 600; }
       `}</style>
     </div>
   );

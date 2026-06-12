@@ -8,7 +8,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['apple-touch-icon.png'],
+      includeAssets: ['apple-touch-icon.png', 'sw-push.js'],
+      // Pull our push/notificationclick handlers into the generated SW without
+      // disturbing the auto-generated offline precache.
+      workbox: { importScripts: ['sw-push.js'] },
       manifest: {
         name: 'Pulse — Wellness Tracker',
         short_name: 'Pulse',

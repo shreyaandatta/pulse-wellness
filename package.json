@@ -8,13 +8,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "icons": "node scripts/gen-icons.mjs"
+    "icons": "node scripts/gen-icons.mjs",
+    "vapid": "node scripts/gen-vapid.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",
     "razorpay": "^2.9.6",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",

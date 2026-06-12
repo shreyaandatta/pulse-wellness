@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, cloneElement } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
@@ -26,6 +26,7 @@ import SleepCard from './components/SleepCard.jsx';
 import MoodCard from './components/MoodCard.jsx';
 import StepsCard from './components/StepsCard.jsx';
 import StreakCard from './components/StreakCard.jsx';
+import Badges from './components/Badges.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
 import SmartNudge from './components/SmartNudge.jsx';
@@ -83,6 +84,18 @@ function PulseApp({ auth }) {
     const id = ++tid.current;
     setToasts((t) => [...t, { id, msg, emoji }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 1900);
+  }, []);
+
+  // Smoothly scroll to a tracker card (from a tapped nudge) and flash it.
+  const jumpToPillar = useCallback((id) => {
+    const el = document.getElementById(`pillar-${id}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const card = el.querySelector('.card') || el;
+    card.classList.remove('flash-card');
+    void card.offsetWidth; // restart the animation if it's already mid-flash
+    card.classList.add('flash-card');
+    setTimeout(() => card.classList.remove('flash-card'), 1400);
   }, []);
 
   const { settings } = p.state;
@@ -192,18 +205,26 @@ function PulseApp({ auth }) {
 
           <DaySwitcher activeDay={p.activeDay} setActiveDay={p.setActiveDay} />
 
-          {isToday(p.activeDay) && <SmartNudge state={p.state} units={settings.units} />}
+          {isToday(p.activeDay) && <SmartNudge state={p.state} units={settings.units} onJump={jumpToPillar} />}
 
           <div className="grid dash stagger" style={{ marginTop: 'var(--s-5)' }}>
             <WellnessRing day={p.day} dayKey={p.activeDay} goals={p.state.goals} notify={notify} />
             <StreakCard state={p.state} />
-            <StepsCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addSteps} onSet={p.setSteps} notify={notify} />
+            <div className="pillar-anchor" id="pillar-steps">
+              <StepsCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addSteps} onSet={p.setSteps} notify={notify} />
+            </div>
+          </div>
+
+          <div style={{ marginTop: 'var(--s-5)' }}>
+            <Badges state={p.state} notify={notify} />
           </div>
 
           <div className="section-head"><h2>Log your day</h2></div>
           {(visiblePillars.length > 0 || (plus && (p.state.trackers || []).length > 0)) ? (
             <div className="grid trackers stagger">
-              {visiblePillars.map((id) => cloneElement(pillarCards[id], { key: id }))}
+              {visiblePillars.map((id) => (
+                <div className="pillar-anchor" id={`pillar-${id}`} key={id}>{pillarCards[id]}</div>
+              ))}
               {plus && (p.state.trackers || []).map((t) => (
                 <CustomCard key={t.id} tracker={t} day={p.day} dayKey={p.activeDay} onAdd={p.addCustom} notify={notify} />
               ))}

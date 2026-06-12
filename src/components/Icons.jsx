@@ -32,3 +32,4 @@ export const IconSparkle = (p) => <I {...p}><path d="M12 3l1.9 5.1L19 10l-5.1 1.
 export const IconShare = (p) => <I {...p}><path d="M12 14V3"/><path d="M8 7l4-4 4 4"/><path d="M8 8H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1"/></I>;
 export const IconAddSquare = (p) => <I {...p}><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></I>;
 export const IconX = (p) => <I {...p} d="M18 6 6 18M6 6l12 12" />;
+export const IconBell = (p) => <I {...p}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></I>;

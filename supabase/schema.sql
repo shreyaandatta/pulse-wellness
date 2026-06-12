@@ -140,3 +140,31 @@ revoke execute on function public.find_profile(text) from public, anon;
 revoke execute on function public.get_friend_snapshots() from public, anon;
 grant execute on function public.find_profile(text) to authenticated;
 grant execute on function public.get_friend_snapshots() to authenticated;
+
+-- ===========================================================================
+-- Web-Push reminders: one row per device/browser that opted into reminders.
+-- RLS limits each user to their own rows; the reminder cron uses the service
+-- role (which bypasses RLS) to read every enabled subscription.
+-- ===========================================================================
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  tz text,
+  enabled boolean not null default true,
+  last_sent_date date,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.push_subscriptions enable row level security;
+
+create policy "select own push subs" on public.push_subscriptions for select using (auth.uid() = user_id);
+create policy "insert own push subs" on public.push_subscriptions for insert with check (auth.uid() = user_id);
+create policy "update own push subs" on public.push_subscriptions for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "delete own push subs" on public.push_subscriptions for delete using (auth.uid() = user_id);
+
+create index if not exists push_subscriptions_user_idx on public.push_subscriptions(user_id);
+create index if not exists push_subscriptions_enabled_idx on public.push_subscriptions(enabled) where enabled;

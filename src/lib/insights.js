@@ -205,12 +205,13 @@ export function nudges(state, goals, units, now = new Date()) {
     return [{ tone: 'win', emoji: '🌟', text: 'Every goal met today. Beautifully balanced — enjoy it.' }];
   }
 
+  // `target` links each tip to its tracker card so the UI can scroll to it.
   const out = [];
-  if (d.sleep == null && h < 12) out.push({ pri: 1, tone: 'tip', emoji: '🌙', text: "Start the day right — log last night's sleep." });
-  if (d.mood == null && h >= 18) out.push({ pri: 1, tone: 'tip', emoji: '💭', text: 'How did today feel? A quick mood check rounds it off.' });
-  if (!met.water && h >= 16) out.push({ pri: 2, tone: 'tip', emoji: '💧', text: `${waterCurrentLabel(goals.water - d.water, units)} to your water goal — a glass now keeps the day on track.` });
-  if (!met.steps && d.steps > 0 && h >= 18) out.push({ pri: 2, tone: 'tip', emoji: '👟', text: `${(goals.steps - d.steps).toLocaleString()} steps to your goal. A short walk closes it.` });
-  if (!met.move && active === 0 && h >= 15) out.push({ pri: 3, tone: 'tip', emoji: '🔥', text: 'No movement logged yet — even 10 minutes counts.' });
+  if (d.sleep == null && h < 12) out.push({ pri: 1, tone: 'tip', emoji: '🌙', target: 'sleep', text: "Start the day right — log last night's sleep." });
+  if (d.mood == null && h >= 18) out.push({ pri: 1, tone: 'tip', emoji: '💭', target: 'mood', text: 'How did today feel? A quick mood check rounds it off.' });
+  if (!met.water && h >= 16) out.push({ pri: 2, tone: 'tip', emoji: '💧', target: 'water', text: `${waterCurrentLabel(goals.water - d.water, units)} to your water goal — a glass now keeps the day on track.` });
+  if (!met.steps && d.steps > 0 && h >= 18) out.push({ pri: 2, tone: 'tip', emoji: '👟', target: 'steps', text: `${(goals.steps - d.steps).toLocaleString()} steps to your goal. A short walk closes it.` });
+  if (!met.move && active === 0 && h >= 15) out.push({ pri: 3, tone: 'tip', emoji: '🔥', target: 'workout', text: 'No movement logged yet — even 10 minutes counts.' });
 
   return out.sort((a, b) => a.pri - b.pri).slice(0, 2);
 }

@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS = {
   hiddenPillars: [],                       // pillar ids to hide
   plan: 'free',     // 'free' | 'plus' — see lib/plan.js
   cycleEnabled: false, // show the menstrual-cycle tracker on Today (Plus)
+  welcomed: false,  // dismiss/complete the first-run "Get started" checklist
   // Body profile — drives the recommended calorie goal (see lib/nutrition.js).
   gender: '',          // 'female' | 'male' | 'other' | ''
   weight: null,        // current body weight in kg

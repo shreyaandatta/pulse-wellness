@@ -30,6 +30,7 @@ import MoodCard from './components/MoodCard.jsx';
 import StepsCard from './components/StepsCard.jsx';
 import StreakCard from './components/StreakCard.jsx';
 import WeightCard from './components/WeightCard.jsx';
+import WelcomeChecklist from './components/WelcomeChecklist.jsx';
 import Badges from './components/Badges.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
@@ -214,6 +215,10 @@ function PulseApp({ auth }) {
   };
   const visiblePillars = resolveOrder(settings.pillarOrder).filter((id) => !(settings.hiddenPillars || []).includes(id));
 
+  // First-run guide: only for a brand-new account (nothing logged yet) that
+  // hasn't finished or skipped it. Existing users (any real history) never see it.
+  const showWelcome = !settings.welcomed && Object.keys(p.state.days).length <= 1;
+
   return (
     <div className="app">
       <header className="topbar">
@@ -251,7 +256,11 @@ function PulseApp({ auth }) {
 
           <DaySwitcher activeDay={p.activeDay} setActiveDay={p.setActiveDay} />
 
-          {isToday(p.activeDay) && <SmartNudge state={p.state} units={settings.units} onJump={jumpToPillar} />}
+          {isToday(p.activeDay) && (
+            showWelcome
+              ? <WelcomeChecklist day={p.day} name={settings.name} onJump={jumpToPillar} onDismiss={() => p.setSettings({ welcomed: true })} />
+              : <SmartNudge state={p.state} units={settings.units} onJump={jumpToPillar} />
+          )}
 
           <div className="grid dash stagger" style={{ marginTop: 'var(--s-5)' }}>
             <WellnessRing day={p.day} dayKey={p.activeDay} goals={p.state.goals} notify={notify} />
@@ -300,7 +309,7 @@ function PulseApp({ auth }) {
           )}
 
           <div className="section-head"><h2>Take a breath</h2><span className="faint">a one-minute reset</span></div>
-          <div className="grid">
+          <div className="grid pillar-anchor" id="pillar-breath">
             <BreathingCard day={p.day} onComplete={p.logCalm} notify={notify} />
           </div>
         </div>

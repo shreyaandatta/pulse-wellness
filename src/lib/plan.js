@@ -19,6 +19,7 @@ export const PLUS_PERKS = [
   { emoji: '📈', title: 'Your whole history', desc: `All-time trends and charts — free shows the last ${FREE_HISTORY_DAYS} days.` },
   { emoji: '🎁', title: 'Year in review', desc: 'A beautiful look back at any year you\'ve tracked.' },
   { emoji: '🧩', title: 'Custom trackers', desc: 'Track anything — meditation, reading, screen time, you name it.' },
+  { emoji: '👨‍👩‍👧', title: 'Family', desc: 'Start a household and see your kids\' steps, meals, protein, workouts and mood. Members join free.' },
   { emoji: '👥', title: 'Unlimited friends', desc: `Connect with everyone — free includes ${FREE_CONNECTIONS} connections.` },
   { emoji: '📊', title: 'Spreadsheet export', desc: 'Download your full history as a CSV for any spreadsheet app.' },
 ];

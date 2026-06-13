@@ -168,3 +168,166 @@ create policy "delete own push subs" on public.push_subscriptions for delete usi
 
 create index if not exists push_subscriptions_user_idx on public.push_subscriptions(user_id);
 create index if not exists push_subscriptions_enabled_idx on public.push_subscriptions(enabled) where enabled;
+
+-- ===========================================================================
+-- Family (Pulse Plus): a household with up to two heads (parents) and many
+-- kids. Heads can read each member's curated daily snapshot (full detail) so
+-- parents can see their kids' steps, calories, protein, workouts and mood.
+--
+-- It rides the SAME privacy rails as Friends: members publish only the curated
+-- `shared_summary` row (numbers, no journal text). Family heads read it through
+-- a security-definer RPC; the raw `wellness` row is never exposed.
+-- ===========================================================================
+
+create table if not exists public.families (
+  id         uuid primary key default gen_random_uuid(),
+  name       text not null check (char_length(name) between 1 and 40),
+  created_by uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+-- One row per (family, person). `status` is 'pending' until the invitee accepts.
+create table if not exists public.family_members (
+  id         uuid primary key default gen_random_uuid(),
+  family_id  uuid not null references public.families(id) on delete cascade,
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  role       text not null default 'kid'    check (role in ('head','kid')),
+  status     text not null default 'pending' check (status in ('pending','active')),
+  invited_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (family_id, user_id)
+);
+create index if not exists family_members_user_idx   on public.family_members(user_id);
+create index if not exists family_members_family_idx on public.family_members(family_id);
+
+-- SECURITY DEFINER helpers so the RLS policies below can ask "is the caller a
+-- member / head of this family?" without recursively re-triggering RLS on
+-- family_members itself.
+create or replace function public.is_family_member(fid uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.family_members m
+    where m.family_id = fid and m.user_id = auth.uid() and m.status = 'active'
+  );
+$$;
+
+create or replace function public.is_family_head(fid uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.family_members m
+    where m.family_id = fid and m.user_id = auth.uid()
+      and m.status = 'active' and m.role = 'head'
+  );
+$$;
+
+alter table public.families       enable row level security;
+alter table public.family_members enable row level security;
+
+-- families: members read; the creator makes one; heads rename/disband.
+drop policy if exists "families_read" on public.families;
+create policy "families_read" on public.families
+  for select using (created_by = auth.uid() or public.is_family_member(id));
+drop policy if exists "families_insert" on public.families;
+create policy "families_insert" on public.families
+  for insert with check (created_by = auth.uid());
+drop policy if exists "families_update_head" on public.families;
+create policy "families_update_head" on public.families
+  for update using (public.is_family_head(id)) with check (public.is_family_head(id));
+drop policy if exists "families_delete_head" on public.families;
+create policy "families_delete_head" on public.families
+  for delete using (public.is_family_head(id));
+
+-- family_members: see your own row + the roster of any family you're active in.
+drop policy if exists "fm_read" on public.family_members;
+create policy "fm_read" on public.family_members
+  for select using (user_id = auth.uid() or public.is_family_member(family_id));
+-- insert: the family creator seeds their own head row, or a head invites others.
+drop policy if exists "fm_insert" on public.family_members;
+create policy "fm_insert" on public.family_members
+  for insert with check (
+    (user_id = auth.uid()
+      and exists (select 1 from public.families f where f.id = family_id and f.created_by = auth.uid()))
+    or public.is_family_head(family_id)
+  );
+-- update: a head manages members; an invitee can accept their own pending row.
+drop policy if exists "fm_update" on public.family_members;
+create policy "fm_update" on public.family_members
+  for update using (public.is_family_head(family_id) or user_id = auth.uid())
+            with check (public.is_family_head(family_id) or user_id = auth.uid());
+-- delete: a head removes a member; anyone can remove themselves (leave).
+drop policy if exists "fm_delete" on public.family_members;
+create policy "fm_delete" on public.family_members
+  for delete using (public.is_family_head(family_id) or user_id = auth.uid());
+
+-- At most two heads per family (parents). Kids are unlimited.
+create or replace function public.enforce_max_two_heads()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.role = 'head' then
+    if (select count(*) from public.family_members
+        where family_id = new.family_id and role = 'head' and id <> new.id) >= 2 then
+      raise exception 'A family can have at most two heads.';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists family_members_max_heads on public.family_members;
+create trigger family_members_max_heads
+  before insert or update on public.family_members
+  for each row execute function public.enforce_max_two_heads();
+-- This is a trigger function only — it must never be a callable RPC endpoint.
+-- (Triggers still fire after this; EXECUTE grants don't gate trigger execution.)
+revoke execute on function public.enforce_max_two_heads() from public, anon, authenticated;
+
+-- Roster of every family the caller is ACTIVE in (with each member's profile).
+-- Goes through this function so we don't have to widen the profiles RLS policy.
+create or replace function public.get_family_overview()
+returns table (family_id uuid, family_name text, created_by uuid,
+  member_id uuid, member_user_id uuid, role text, status text, username text, display_name text)
+language sql stable security definer set search_path = public as $$
+  select f.id, f.name, f.created_by, m.id, m.user_id, m.role, m.status, p.username, p.display_name
+  from public.family_members me
+  join public.families f       on f.id = me.family_id
+  join public.family_members m on m.family_id = f.id
+  left join public.profiles p  on p.id = m.user_id
+  where me.user_id = auth.uid() and me.status = 'active';
+$$;
+
+-- Pending invites addressed to the caller (family name + who invited them).
+create or replace function public.get_family_invites()
+returns table (member_id uuid, family_id uuid, family_name text, invited_by_name text, role text)
+language sql stable security definer set search_path = public as $$
+  select m.id, f.id, f.name,
+         coalesce(ip.display_name, ip.username, 'A family head'), m.role
+  from public.family_members m
+  join public.families f      on f.id = m.family_id
+  left join public.profiles ip on ip.id = m.invited_by
+  where m.user_id = auth.uid() and m.status = 'pending';
+$$;
+
+-- For a head: each active member's snapshot, with FULL detail (heads always see
+-- detail — that's the whole point of Family). Reads the curated shared_summary,
+-- never the raw wellness row.
+create or replace function public.get_family_snapshots()
+returns table (family_id uuid, member_user_id uuid, summary jsonb, detail jsonb, updated_at timestamptz)
+language sql stable security definer set search_path = public as $$
+  select m.family_id, m.user_id, ss.summary, ss.detail, ss.updated_at
+  from public.family_members me
+  join public.family_members m  on m.family_id = me.family_id
+  join public.shared_summary ss on ss.user_id = m.user_id
+  where me.user_id = auth.uid() and me.status = 'active' and me.role = 'head'
+    and m.status = 'active';
+$$;
+
+revoke execute on function public.get_family_overview()  from public, anon;
+revoke execute on function public.get_family_invites()   from public, anon;
+revoke execute on function public.get_family_snapshots() from public, anon;
+revoke execute on function public.is_family_member(uuid) from public, anon;
+revoke execute on function public.is_family_head(uuid)   from public, anon;
+grant execute on function public.get_family_overview()  to authenticated;
+grant execute on function public.get_family_invites()   to authenticated;
+grant execute on function public.get_family_snapshots() to authenticated;
+grant execute on function public.is_family_member(uuid) to authenticated;
+grant execute on function public.is_family_head(uuid)   to authenticated;

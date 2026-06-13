@@ -34,3 +34,5 @@ export const IconAddSquare = (p) => <I {...p}><rect x="3" y="3" width="18" heigh
 export const IconX = (p) => <I {...p} d="M18 6 6 18M6 6l12 12" />;
 export const IconBell = (p) => <I {...p}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></I>;
 export const IconTrophy = (p) => <I {...p}><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v4"/><path d="M8 21h8"/></I>;
+export const IconDots = (p) => <I {...p} fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></I>;
+export const IconFamily = (p) => <I {...p}><circle cx="8" cy="7" r="2.6"/><circle cx="16" cy="7.5" r="2.1"/><path d="M3.5 20v-1.5a4.5 4.5 0 0 1 9 0V20"/><path d="M14 20v-1.2a4 4 0 0 1 6.5-3.1"/><circle cx="12" cy="14.5" r="1.6"/><path d="M9.5 21v-.6a2.5 2.5 0 0 1 5 0V21"/></I>;

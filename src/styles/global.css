@@ -109,13 +109,13 @@ body::before {
   .grid.trackers { grid-template-columns: 1fr 1fr; }
 }
 
-.stagger > * { animation: rise var(--dur-slow) var(--ease-out) both; }
-.stagger > *:nth-child(1) { animation-delay: 40ms; }
-.stagger > *:nth-child(2) { animation-delay: 90ms; }
-.stagger > *:nth-child(3) { animation-delay: 140ms; }
-.stagger > *:nth-child(4) { animation-delay: 190ms; }
-.stagger > *:nth-child(5) { animation-delay: 240ms; }
-.stagger > *:nth-child(6) { animation-delay: 290ms; }
+.stagger > * { animation: rise var(--dur) var(--ease-out) both; }
+.stagger > *:nth-child(1) { animation-delay: 30ms; }
+.stagger > *:nth-child(2) { animation-delay: 65ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 135ms; }
+.stagger > *:nth-child(5) { animation-delay: 170ms; }
+.stagger > *:nth-child(6) { animation-delay: 205ms; }
 
 /* Scroll-target wrapper for a tracker card: transparent to layout, lets the
    card inside stretch to fill its grid cell exactly as before. */
@@ -256,7 +256,51 @@ body::before {
 .tab-badge { position: absolute; top: -6px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px;
   border-radius: 99px; background: var(--rose); color: #fff; font-size: 0.6rem; font-weight: 700;
   display: grid; place-items: center; line-height: 1; box-shadow: var(--shadow-xs); }
+/* unread indicator with no count — used on the More overflow */
+.tab-badge.dot { min-width: 9px; width: 9px; height: 9px; padding: 0; top: -3px; right: -5px;
+  border: 1.5px solid var(--bg); }
 @media (min-width: 760px) { .tabbar { display: none; } }
+
+/* ===================== "More" overflow menu ===================== */
+.more-scrim { position: fixed; inset: 0; z-index: 40;
+  background: color-mix(in srgb, var(--ink-900) 20%, transparent);
+  backdrop-filter: blur(2px); animation: fadeIn 160ms var(--ease-out) both; }
+@keyframes fadeIn { from { opacity: 0; } }
+
+.more-menu {
+  position: fixed; z-index: 41;
+  left: 12px; right: 12px; bottom: calc(78px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 2px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
+  transform-origin: bottom center;
+  animation: moreSheetIn 220ms var(--ease-spring) both;
+}
+@keyframes moreSheetIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+
+.more-item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 48px; padding: 10px 14px;
+  border-radius: var(--r-md); color: var(--text);
+  font-size: var(--t-base); font-weight: 600; text-align: left;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.more-item:hover { background: var(--surface-soft); }
+.more-item:active { transform: scale(0.98); }
+.more-item.active { background: linear-gradient(135deg, var(--amber-100), var(--amber-200)); color: var(--amber-800); }
+.more-ic { display: inline-flex; color: var(--text-soft); }
+.more-item.active .more-ic { color: var(--amber-700); }
+.more-lbl { flex: 1; }
+.more-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px;
+  background: var(--rose); color: #fff; font-size: var(--t-xs); font-weight: 700;
+  display: grid; place-items: center; line-height: 1; }
+
+@media (min-width: 760px) {
+  /* anchor as a dropdown under the top-right More tab */
+  .more-menu { left: auto; right: 16px; bottom: auto; top: 66px; width: 230px;
+    transform-origin: top right; animation-name: moreDropIn; }
+  @keyframes moreDropIn { from { opacity: 0; transform: translateY(-8px) scale(0.97); } }
+}
 
 /* Pulse Plus badge — marks anything that belongs to the paid tier */
 .plus-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 0.58rem; font-weight: 800;
@@ -320,8 +364,10 @@ body::before {
 
 .pop { animation: popIn var(--dur) var(--ease-spring) both; }
 
-/* tab switch transition */
-.tab-pane { animation: rise var(--dur-slow) var(--ease-out) both; }
+/* tab switch transition — quick opacity-led fade so content lands fast
+   (a slow rise made data-rich panes like Insights look empty for a beat) */
+@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tab-pane { animation: paneIn 240ms var(--ease-out) both; }
 
 /* shared "goal reached" badge */
 .reached { color: var(--good); font-weight: 700; font-size: var(--t-sm); margin-top: 4px; animation: popIn .4s var(--ease-spring); }

@@ -9,6 +9,7 @@ import { dayScore, goalsHit, scoreBand } from './score.js';
 import { currentStreak } from './streak.js';
 import { topBadges } from './badges.js';
 import { getDay } from './storage.js';
+import { dayCalories, dayProtein } from './foods.js';
 
 export function buildSnapshot(state, name) {
   const key = todayKey();
@@ -47,6 +48,8 @@ export function buildSnapshot(state, name) {
     active: { value: activeMin, goal: goals.activeMinutes },
     meals: { value: (today.meals || []).length, goal: goals.meals },
     steps: { value: today.steps || 0, goal: goals.steps },
+    calories: { value: dayCalories(today), goal: goals.calories },
+    protein: { value: dayProtein(today), goal: goals.protein },
     mood: today.mood ?? null,
   };
 

@@ -3,6 +3,7 @@ import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
 import { useSocial } from './hooks/useSocial.js';
+import { useFamily } from './hooks/useFamily.js';
 import { useEntitlement } from './hooks/useEntitlement.js';
 import { hasSupabase } from './lib/supabase.js';
 import { resolveOrder } from './lib/pillars.js';
@@ -12,7 +13,7 @@ import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy,
+  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy, IconDots, IconFamily,
 } from './components/Icons.jsx';
 import { resolveBadges, BADGES } from './lib/badges.js';
 import { celebrate } from './lib/celebrate.js';
@@ -35,6 +36,7 @@ import SmartNudge from './components/SmartNudge.jsx';
 import InstallPrompt from './components/InstallPrompt.jsx';
 import DataVault from './components/DataVault.jsx';
 import Friends from './components/Friends.jsx';
+import Family from './components/Family.jsx';
 import Settings from './components/Settings.jsx';
 import PlusModal from './components/PlusModal.jsx';
 import YearReview from './components/YearReview.jsx';
@@ -80,9 +82,27 @@ function PulseApp({ auth }) {
   useCloudSync({ cloudUserId: auth.user.cloud ? auth.user.id : null, state: p.state, replaceAll: p.replaceAll });
   // Friends / connections (cloud accounts only; inert otherwise).
   const social = useSocial({ user: auth.user, state: p.state });
+  // Family (Plus) — heads see members' daily stats. Inert for guests.
+  const family = useFamily({ user: auth.user });
   const [tab, setTab] = useState('today');
+  const [moreOpen, setMoreOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const tid = useRef(0);
+
+  // Secondary destinations tucked behind the "More" overflow so the primary
+  // nav stays at 5 items (Material/HIG bottom-nav guidance). Selecting any of
+  // these, or a primary tab, always closes the overflow.
+  const MORE_TABS = ['family', 'friends', 'data', 'settings'];
+  // A dot on the "More" tab when something inside needs attention.
+  const moreAlerts = social.incoming.length + (family.invites?.length || 0);
+  const go = useCallback((t) => { setTab(t); setMoreOpen(false); }, []);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setMoreOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [moreOpen]);
 
   const notify = useCallback((msg, emoji = '✨') => {
     const id = ++tid.current;
@@ -210,13 +230,13 @@ function PulseApp({ auth }) {
 
         <div className="topbar-actions">
           <nav className="toptabs">
-            <button className={`tab ${tab==='today'?'active':''}`} onClick={() => setTab('today')}><IconHome size={17} /> Today</button>
-            <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}><IconTrends size={17} /> Trends</button>
-            <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}><IconInsight size={17} /> Insights</button>
-            <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => setTab('badges')}><IconTrophy size={17} /> Badges</button>
-            <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}><span className="tab-badge-wrap"><IconUsers size={17} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends</button>
-            <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}><IconShield size={17} /> Data</button>
-            <button className={`tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}><IconGear size={17} /> Settings</button>
+            <button className={`tab ${tab==='today'?'active':''}`} onClick={() => go('today')}><IconHome size={17} /> Today</button>
+            <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => go('trends')}><IconTrends size={17} /> Trends</button>
+            <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => go('insights')}><IconInsight size={17} /> Insights</button>
+            <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => go('badges')}><IconTrophy size={17} /> Badges</button>
+            <button className={`tab ${MORE_TABS.includes(tab)?'active':''}`} onClick={() => setMoreOpen((o) => !o)} aria-haspopup="menu" aria-expanded={moreOpen}>
+              <span className="tab-badge-wrap"><IconDots size={17} />{moreAlerts > 0 && <span className="tab-badge dot" />}</span> More
+            </button>
           </nav>
           <button className="icon-btn" onClick={p.toggleTheme} aria-label="Toggle theme">
             {settings.theme === 'dark' ? <IconSun size={19} /> : <IconMoon size={19} />}
@@ -300,6 +320,13 @@ function PulseApp({ auth }) {
         </div>
       )}
 
+      {tab === 'family' && (
+        <div className="tab-pane" key="family">
+          <div className="section-head"><h2>Family</h2><span className="faint">your household, at a glance</span></div>
+          <Family family={family} user={auth.user} notify={notify} onLogout={auth.logout} plus={plus} openPlus={openPlus} />
+        </div>
+      )}
+
       {tab === 'friends' && (
         <div className="tab-pane" key="friends">
           <div className="section-head"><h2>Friends</h2><span className="faint">share check-ins · cheer each other on</span></div>
@@ -329,30 +356,51 @@ function PulseApp({ auth }) {
         </div>
       )}
 
-      {/* mobile bottom nav */}
+      {/* mobile bottom nav — 5 top-level items; secondary screens live in More */}
       <nav className="tabbar">
-        <button className={`tab ${tab==='today'?'active':''}`} onClick={() => setTab('today')}>
+        <button className={`tab ${tab==='today'?'active':''}`} onClick={() => go('today')}>
           <span className="tab-icon"><IconHome size={22} /></span> Today
         </button>
-        <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => setTab('trends')}>
+        <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => go('trends')}>
           <span className="tab-icon"><IconTrends size={22} /></span> Trends
         </button>
-        <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => setTab('insights')}>
+        <button className={`tab ${tab==='insights'?'active':''}`} onClick={() => go('insights')}>
           <span className="tab-icon"><IconInsight size={22} /></span> Insights
         </button>
-        <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => setTab('badges')}>
+        <button className={`tab ${tab==='badges'?'active':''}`} onClick={() => go('badges')}>
           <span className="tab-icon"><IconTrophy size={22} /></span> Badges
         </button>
-        <button className={`tab ${tab==='friends'?'active':''}`} onClick={() => setTab('friends')}>
-          <span className="tab-icon"><IconUsers size={22} />{social.incoming.length > 0 && <span className="tab-badge">{social.incoming.length}</span>}</span> Friends
-        </button>
-        <button className={`tab ${tab==='data'?'active':''}`} onClick={() => setTab('data')}>
-          <span className="tab-icon"><IconShield size={22} /></span> Data
-        </button>
-        <button className={`tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}>
-          <span className="tab-icon"><IconGear size={22} /></span> Settings
+        <button className={`tab ${MORE_TABS.includes(tab) || moreOpen ? 'active':''}`} onClick={() => setMoreOpen((o) => !o)} aria-haspopup="menu" aria-expanded={moreOpen}>
+          <span className="tab-icon"><IconDots size={22} />{moreAlerts > 0 && <span className="tab-badge dot" />}</span> More
         </button>
       </nav>
+
+      {/* "More" overflow — bottom sheet on mobile, dropdown on desktop */}
+      {moreOpen && (
+        <>
+          <div className="more-scrim" onClick={() => setMoreOpen(false)} />
+          <div className="more-menu" role="menu" aria-label="More">
+            <button role="menuitem" className={`more-item ${tab==='family'?'active':''}`} onClick={() => go('family')}>
+              <span className="more-ic"><IconFamily size={20} /></span>
+              <span className="more-lbl">Family</span>
+              {(family.invites?.length || 0) > 0 && <span className="more-count">{family.invites.length}</span>}
+            </button>
+            <button role="menuitem" className={`more-item ${tab==='friends'?'active':''}`} onClick={() => go('friends')}>
+              <span className="more-ic"><IconUsers size={20} /></span>
+              <span className="more-lbl">Friends</span>
+              {social.incoming.length > 0 && <span className="more-count">{social.incoming.length}</span>}
+            </button>
+            <button role="menuitem" className={`more-item ${tab==='data'?'active':''}`} onClick={() => go('data')}>
+              <span className="more-ic"><IconShield size={20} /></span>
+              <span className="more-lbl">Your data</span>
+            </button>
+            <button role="menuitem" className={`more-item ${tab==='settings'?'active':''}`} onClick={() => go('settings')}>
+              <span className="more-ic"><IconGear size={20} /></span>
+              <span className="more-lbl">Settings</span>
+            </button>
+          </div>
+        </>
+      )}
 
       <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
 

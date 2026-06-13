@@ -39,6 +39,8 @@ export const DEFAULT_SETTINGS = {
   gender: '',          // 'female' | 'male' | 'other' | ''
   weight: null,        // current body weight in kg
   targetWeight: null,  // target body weight in kg
+  age: null,           // years — sharpens the calorie estimate (Mifflin-St Jeor)
+  height: null,        // cm — sharpens the calorie estimate (Mifflin-St Jeor)
   activity: 'light',   // activity level id (see ACTIVITY_LEVELS)
 };
 

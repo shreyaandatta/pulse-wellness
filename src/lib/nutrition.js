@@ -1,10 +1,11 @@
-// Healthy daily-calorie estimation from a few simple inputs.
+// Healthy daily-calorie estimation.
 //
-// We deliberately don't demand height + age. Instead we use the widely used
-// "calories per kg of body weight" maintenance method, which already folds
-// activity into a single multiplier, then apply a *safe* deficit or surplus to
-// move toward the target weight — never below a sensible floor. It's an honest
-// estimate, not a clinical prescription, and the UI says so.
+// When we know height + age we use the Mifflin-St Jeor equation — the modern
+// clinical standard (the same one Calculator.net uses): BMR from weight, height,
+// age and sex, multiplied by an activity factor for total daily burn. Without
+// height/age we fall back to the simpler "calories per kg of body weight"
+// method. Either way we then apply a *safe* deficit or surplus toward the target
+// weight, never below a sensible floor. An honest estimate, not a prescription.
 
 export const GENDERS = [
   { id: 'female', label: 'Female', emoji: '♀' },
@@ -27,6 +28,10 @@ const KCAL_PER_KG = 7700;
 // Safe minimum daily intake — eating below this isn't healthy unsupervised.
 const FLOORS = { male: 1500, female: 1200, other: 1350 };
 
+// Standard activity multipliers (maintenance = BMR × factor). These map our
+// four activity ids to the widely-used Harris-Benedict / Mifflin factors.
+export const ACTIVITY_FACTOR = { sedentary: 1.2, light: 1.375, moderate: 1.55, high: 1.725 };
+
 function kcalPerKg(activity, gender) {
   const a = ACTIVITY_LEVELS.find((l) => l.id === activity) || ACTIVITY_LEVELS[1];
   if (gender === 'male') return a.kpk.male;
@@ -34,14 +39,33 @@ function kcalPerKg(activity, gender) {
   return (a.kpk.male + a.kpk.female) / 2; // 'other' / unspecified → average
 }
 
+// Mifflin-St Jeor resting burn (kcal/day) from weight (kg), height (cm) and age.
+// The sex constant is +5 for men, −161 for women, and the midpoint for 'other'.
+function bmrMifflin({ gender, weight, height, age }) {
+  const base = 10 * weight + 6.25 * height - 5 * age;
+  if (gender === 'male') return base + 5;
+  if (gender === 'female') return base - 161;
+  return base - 78; // 'other' / unspecified → midpoint of the two constants
+}
+
 // Returns the recommended daily target plus the reasoning, or null if we don't
-// have enough to compute (no current weight). All weights are in kg.
-export function calorieGoal({ gender, weight, targetWeight, activity = 'light' } = {}) {
+// have enough to compute (no current weight). Weights in kg, height in cm.
+export function calorieGoal({ gender, weight, targetWeight, activity = 'light', age, height } = {}) {
   const w = Number(weight);
   if (!w || w <= 0) return null;
   const t = Number(targetWeight) || w;
+  const h = Number(height), ag = Number(age);
 
-  const maintenance = Math.round(w * kcalPerKg(activity, gender));
+  // Prefer Mifflin-St Jeor when we have height + age; otherwise per-kg estimate.
+  let maintenance, method;
+  if (h > 0 && ag > 0) {
+    const factor = ACTIVITY_FACTOR[activity] ?? ACTIVITY_FACTOR.light;
+    maintenance = Math.round(bmrMifflin({ gender, weight: w, height: h, age: ag }) * factor);
+    method = 'mifflin';
+  } else {
+    maintenance = Math.round(w * kcalPerKg(activity, gender));
+    method = 'perkg';
+  }
   const floor = FLOORS[gender] ?? FLOORS.other;
 
   const delta = t - w; // negative → lose, positive → gain
@@ -58,7 +82,7 @@ export function calorieGoal({ gender, weight, targetWeight, activity = 'light' }
 
   const weeks = perWeekKg ? Math.max(1, Math.round(Math.abs(delta) / perWeekKg)) : 0;
 
-  return { target, maintenance, direction, perWeekKg, weeks, floored, floor, deltaKg: delta };
+  return { target, maintenance, direction, perWeekKg, weeks, floored, floor, deltaKg: delta, method };
 }
 
 // ---- Macro-based food health ---------------------------------------------
@@ -123,11 +147,13 @@ export const ACTIVITY_TRAINING = {
 
 // Estimate a daily protein target (grams) from body weight + activity. Weight
 // is in kg (Pulse stores metric internally), so this works the same whether the
-// user views kg or lb. Returns null without a usable weight.
-export function proteinGoal({ weight, activity = 'light' } = {}) {
+// user views kg or lb. Men carry more lean mass, so we nudge every level up by
+// 0.1 g/kg for males. Returns null without a usable weight.
+export function proteinGoal({ weight, activity = 'light', gender } = {}) {
   const w = Number(weight);
   if (!w || w <= 0) return null;
-  const perKg = PROTEIN_PER_KG[activity] ?? PROTEIN_PER_KG.light;
+  const base = PROTEIN_PER_KG[activity] ?? PROTEIN_PER_KG.light;
+  const perKg = Math.round((base + (gender === 'male' ? 0.1 : 0)) * 10) / 10;
   const grams = Math.round((w * perKg) / 5) * 5; // tidy to nearest 5 g
   return { grams, perKg, training: ACTIVITY_TRAINING[activity] || '' };
 }

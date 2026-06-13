@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { celebrate } from '../lib/celebrate.js';
-import { waterGoalLabel, kgToLb, lbToKg } from '../lib/units.js';
+import { waterGoalLabel, kgToLb, lbToKg, heightLabel } from '../lib/units.js';
 import { GENDERS, ACTIVITY_LEVELS, calorieGoal, proteinGoal } from '../lib/nutrition.js';
 
 // A short, warm setup that turns the empty first screen into a welcome. Each
@@ -15,11 +15,13 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
   const [gender, setGender] = useState(initialSettings.gender || '');
   const [weight, setWeight] = useState(initialSettings.weight ?? 70);
   const [targetWeight, setTargetWeight] = useState(initialSettings.targetWeight ?? 70);
+  const [age, setAge] = useState(initialSettings.age ?? 25);
+  const [height, setHeight] = useState(initialSettings.height ?? 170);
   const [activity, setActivity] = useState(initialSettings.activity || 'light');
   const metric = units === 'metric';
 
-  const rec = calorieGoal({ gender, weight, targetWeight, activity });
-  const protRec = proteinGoal({ weight, activity });
+  const rec = calorieGoal({ gender, weight, targetWeight, activity, age, height });
+  const protRec = proteinGoal({ weight, activity, gender });
 
   const STEPS = 5;
   const next = () => setStep((s) => Math.min(STEPS - 1, s + 1));
@@ -30,7 +32,7 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
   // otherwise the dashboard would show a target derived from pure defaults.
   const finish = () => onFinish(
     { ...goals, calories: gender ? (rec?.target ?? null) : null, protein: gender ? (protRec?.grams ?? null) : null },
-    { name: name.trim(), units, theme, gender, weight, targetWeight, activity, onboarded: true },
+    { name: name.trim(), units, theme, gender, weight, targetWeight, age, height, activity, onboarded: true },
   );
 
   return (
@@ -53,6 +55,7 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
           {step === 3 && (
             <Body gender={gender} setGender={setGender} weight={weight} setWeight={setWeight}
               targetWeight={targetWeight} setTargetWeight={setTargetWeight}
+              age={age} setAge={setAge} height={height} setHeight={setHeight}
               activity={activity} setActivity={setActivity} metric={metric} rec={rec} protRec={protRec} />
           )}
           {step === 4 && (
@@ -220,6 +223,37 @@ export function WeightStepper({ kg, onChange, metric, min = 30 }) {
   );
 }
 
+// Age in whole years.
+export function AgeStepper({ value, onChange, min = 13, max = 100 }) {
+  const v = value ?? 25;
+  return (
+    <div className="wt-stepper">
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => onChange(Math.max(min, v - 1))} aria-label="Younger">−</button>
+      <span className="wt-val">{v} yrs</span>
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => onChange(Math.min(max, v + 1))} aria-label="Older">+</button>
+    </div>
+  );
+}
+
+// Height stored in cm, shown in cm (metric) or ft/in (imperial). Steps by 1 cm
+// or 1 inch so it feels natural either way.
+export function HeightStepper({ cm, onChange, metric, min = 120, max = 220 }) {
+  const v = cm ?? 170;
+  const set = (dir) => {
+    if (metric) { onChange(Math.max(min, Math.min(max, Math.round(v) + dir))); return; }
+    const inMin = Math.round(min / 2.54), inMax = Math.round(max / 2.54);
+    const totalIn = Math.max(inMin, Math.min(inMax, Math.round(v / 2.54) + dir));
+    onChange(+(totalIn * 2.54).toFixed(1));
+  };
+  return (
+    <div className="wt-stepper">
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(-1)} aria-label="Shorter">−</button>
+      <span className="wt-val">{heightLabel(v, metric ? 'metric' : 'imperial')}</span>
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(1)} aria-label="Taller">+</button>
+    </div>
+  );
+}
+
 // Friendly one-liner explaining the recommended number. Shared by onboarding
 // and Settings so the wording stays identical.
 export function recSubtitle(rec, metric) {
@@ -245,12 +279,12 @@ function RecCard({ rec, gender, metric }) {
   );
 }
 
-function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWeight, activity, setActivity, metric, rec, protRec }) {
+function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWeight, age, setAge, height, setHeight, activity, setActivity, metric, rec, protRec }) {
   return (
     <>
       <div className="ob-eyebrow">Step 4</div>
       <div className="ob-h">A bit about you</div>
-      <p className="ob-sub">This lets Pulse suggest a daily calorie target to reach your goal at a healthy pace. You can edit or skip it anytime.</p>
+      <p className="ob-sub">Your age and height let Pulse use the Mifflin-St Jeor formula for a precise calorie target. You can edit or skip it anytime.</p>
 
       <div className="pref-group">
         <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Gender</label>
@@ -259,6 +293,16 @@ function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWei
             <button key={g.id} className={`chip ${gender === g.id ? 'active' : ''}`} onClick={() => setGender(g.id)}>{g.label}</button>
           ))}
         </div>
+      </div>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Age</label>
+        <AgeStepper value={age} onChange={setAge} />
+      </div>
+
+      <div className="pref-group">
+        <label style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--text-soft)' }}>Height</label>
+        <HeightStepper cm={height} onChange={setHeight} metric={metric} />
       </div>
 
       <div className="pref-group">

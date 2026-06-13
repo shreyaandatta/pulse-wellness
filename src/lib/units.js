@@ -27,6 +27,22 @@ export function weightLabel(kg, units) {
   return units === 'imperial' ? `${Math.round(kg * LB_PER_KG)} lb` : `${Math.round(kg)} kg`;
 }
 
+// ---- height (stored in cm) ------------------------------------------------
+const CM_PER_IN = 2.54;
+
+export function cmToInches(cm) { return cm / CM_PER_IN; }
+export function inchesToCm(inches) { return inches * CM_PER_IN; }
+
+// A cm value shown in the user's units, e.g. "175 cm" or "5'9\"".
+export function heightLabel(cm, units) {
+  if (cm == null || Number.isNaN(Number(cm))) return '—';
+  if (units === 'imperial') {
+    const totalIn = Math.round(cm / CM_PER_IN);
+    return `${Math.floor(totalIn / 12)}'${totalIn % 12}"`;
+  }
+  return `${Math.round(cm)} cm`;
+}
+
 // A "glass" of water — most people track in glasses, not millilitres.
 // ~250 ml metric / 8 oz imperial is the everyday standard.
 export function glassMl(units) {

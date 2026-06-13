@@ -4,7 +4,7 @@ import { prettyDate } from '../lib/dates.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
 import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
 import { GENDERS, ACTIVITY_LEVELS, calorieGoal, proteinGoal } from '../lib/nutrition.js';
-import { WeightStepper, recSubtitle } from './Onboarding.jsx';
+import { WeightStepper, AgeStepper, HeightStepper, recSubtitle } from './Onboarding.jsx';
 import { IconSparkle, IconLock, IconTrash, IconBell } from './Icons.jsx';
 import { pushSupported, pushConfigured, permission, isEnabled, enableReminders, disableReminders } from '../lib/push.js';
 
@@ -401,23 +401,25 @@ function PlanManageButton({ live, cancelling, managePlan, notify }) {
 function BodyGoal({ settings, goals, setSettings, setGoals, metric, notify }) {
   const { gender, activity } = settings;
   // Mirror the steppers' shown defaults so the estimate isn't blank before the
-  // user touches a weight (existing accounts start with null weights).
+  // user touches a value (existing accounts start with nulls).
   const weight = settings.weight ?? 70;
   const targetWeight = settings.targetWeight ?? weight;
-  const rec = calorieGoal({ gender, weight, targetWeight, activity });
+  const age = settings.age ?? 25;
+  const height = settings.height ?? 170;
+  const rec = calorieGoal({ gender, weight, targetWeight, activity, age, height });
   const applied = rec && goals.calories === rec.target;
-  const protRec = proteinGoal({ weight, activity });
+  const protRec = proteinGoal({ weight, activity, gender });
   const pApplied = protRec && goals.protein === protRec.grams;
 
   const apply = () => {
     // Persist the effective profile too, so the suggestion is stable next visit.
-    setSettings({ weight, targetWeight });
+    setSettings({ weight, targetWeight, age, height });
     setGoals({ calories: rec.target });
     notify(`Daily goal set to ${rec.target.toLocaleString()} kcal`, '🍽️');
   };
 
   const applyProtein = () => {
-    setSettings({ weight });
+    setSettings({ weight, age, height });
     setGoals({ protein: protRec.grams });
     notify(`Protein goal set to ${protRec.grams} g/day`, '🍗');
   };
@@ -434,6 +436,16 @@ function BodyGoal({ settings, goals, setSettings, setGoals, metric, notify }) {
             <button key={g.id} className={`chip ${gender === g.id ? 'active' : ''}`} onClick={() => setSettings({ gender: g.id })}>{g.label}</button>
           ))}
         </div>
+      </div>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Age</span>
+        <AgeStepper value={age} onChange={(v) => setSettings({ age: v })} />
+      </div>
+
+      <div className="bg-field">
+        <span className="bg-lbl">Height</span>
+        <HeightStepper cm={height} onChange={(cm) => setSettings({ height: cm })} metric={metric} />
       </div>
 
       <div className="bg-field">

@@ -108,6 +108,23 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
       />
 
       <div className="card">
+        <div className="card-title"><span className="dot" style={{ background: 'var(--rose)' }} /> 🌸 Cycle tracking <span className="plus-pill">Plus</span></div>
+        {plus ? (
+          <>
+            <Row label="Track my menstrual cycle">
+              <button className={`toggle ${settings.cycleEnabled ? 'on' : ''}`} onClick={() => setSettings({ cycleEnabled: !settings.cycleEnabled })} aria-label="Toggle cycle tracking"><span className="knob" /></button>
+            </Row>
+            <p className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 6 }}>Adds a period &amp; symptom tracker to your Today screen, with next-period predictions and phase. Your cycle data stays private — it's never shared with friends.</p>
+          </>
+        ) : (
+          <>
+            <p className="faint" style={{ marginBottom: 10 }}>Predict your next period, see today's phase, and tie symptoms to your mood.</p>
+            <button className="btn btn-sm btn-primary" onClick={openPlus}><IconLock size={14} /> Unlock with Plus</button>
+          </>
+        )}
+      </div>
+
+      <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--amber-500)' }} /> Profile & Look</div>
         <div className="field">
           <label>Your name</label>

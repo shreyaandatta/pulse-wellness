@@ -33,12 +33,33 @@ export const DEFAULT_SETTINGS = {
   pillarOrder: [...DEFAULT_PILLAR_ORDER], // order of the Today tracker cards
   hiddenPillars: [],                       // pillar ids to hide
   plan: 'free',     // 'free' | 'plus' — see lib/plan.js
+  cycleEnabled: false, // show the menstrual-cycle tracker on Today (Plus)
   // Body profile — drives the recommended calorie goal (see lib/nutrition.js).
   gender: '',          // 'female' | 'male' | 'other' | ''
   weight: null,        // current body weight in kg
   targetWeight: null,  // target body weight in kg
   activity: 'light',   // activity level id (see ACTIVITY_LEVELS)
 };
+
+// Cycle-tracking store (Plus). `starts` anchors predictions; `logs` keeps
+// per-day flow + symptoms. Lives at the top level (not in a day) so it can be
+// reasoned about as a whole and ride backup/restore like everything else.
+export const DEFAULT_CYCLE = {
+  avgCycle: 28,   // typical cycle length in days (also learned from `starts`)
+  periodLen: 5,   // typical bleed length in days
+  starts: [],     // sorted 'YYYY-MM-DD' first-day-of-period dates
+  logs: {},       // 'YYYY-MM-DD' -> { flow: 0..3, symptoms: [id] }
+};
+
+export function normalizeCycle(c) {
+  const x = c && typeof c === 'object' ? c : {};
+  return {
+    avgCycle: Number(x.avgCycle) || DEFAULT_CYCLE.avgCycle,
+    periodLen: Number(x.periodLen) || DEFAULT_CYCLE.periodLen,
+    starts: Array.isArray(x.starts) ? [...x.starts].sort() : [],
+    logs: x.logs && typeof x.logs === 'object' ? x.logs : {},
+  };
+}
 
 function freshDay() {
   return {
@@ -50,6 +71,7 @@ function freshDay() {
     mood: null,          // 1..5
     moodNote: '',
     steps: 0,
+    calm: 0,             // breathing/calm sessions completed that day
     custom: {},          // custom tracker values: trackerId -> number
   };
 }
@@ -68,6 +90,7 @@ export function migrate(parsed) {
     settings: { ...DEFAULT_SETTINGS, ...(data.settings || {}) },
     foods: Array.isArray(data.foods) ? data.foods : [],  // user's custom foods
     trackers: Array.isArray(data.trackers) ? data.trackers : [],  // custom trackers (Plus)
+    cycle: normalizeCycle(data.cycle),  // menstrual-cycle tracking (Plus)
   };
 }
 

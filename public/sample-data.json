@@ -1,0 +1,4758 @@
+{
+  "app": "Pulse",
+  "kind": "pulse-backup",
+  "version": 1,
+  "exportedAt": "2026-06-13T16:00:00.000Z",
+  "days": {
+    "2026-02-24": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w1_928392",
+          "type": "Cycling",
+          "minutes": 46,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m1_74493",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m2_91125",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m3_952554",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 5100,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-02-25": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w2_323079",
+          "type": "Walk",
+          "minutes": 30,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m4_673411",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m5_184690",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m6_168511",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 8,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 5700,
+      "calm": 0,
+      "custom": {
+        "med": 14
+      }
+    },
+    "2026-02-26": {
+      "water": 1300,
+      "workouts": [
+        {
+          "id": "w3_107882",
+          "type": "HIIT",
+          "minutes": 38,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m7_734358",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m8_875184",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m9_352588",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m10_831696",
+          "label": "Chai & biscuits",
+          "type": "snack",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10100,
+      "calm": 2,
+      "custom": {
+        "med": 23,
+        "read": 15
+      }
+    },
+    "2026-02-27": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w4_59209",
+          "type": "Yoga",
+          "minutes": 30,
+          "intensity": "light"
+        },
+        {
+          "id": "w5_975190",
+          "type": "Yoga",
+          "minutes": 21,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m11_742913",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m12_997187",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m13_974141",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt focused and calm.",
+      "steps": 10100,
+      "calm": 2,
+      "custom": {
+        "med": 23
+      }
+    },
+    "2026-02-28": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w6_621920",
+          "type": "Walk",
+          "minutes": 46,
+          "intensity": "moderate"
+        },
+        {
+          "id": "w7_299486",
+          "type": "Run",
+          "minutes": 19,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m14_961557",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m15_368575",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m16_934499",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m17_851359",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.2,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 6900,
+      "calm": 2,
+      "custom": {
+        "med": 18
+      }
+    },
+    "2026-03-01": {
+      "water": 1500,
+      "workouts": [
+        {
+          "id": "w8_949423",
+          "type": "Run",
+          "minutes": 41,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m18_468242",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m19_298749",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m20_149888",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 5300,
+      "calm": 1,
+      "custom": {}
+    },
+    "2026-03-02": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w9_254853",
+          "type": "Strength",
+          "minutes": 41,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m21_982628",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m22_443860",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m23_268208",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.9,
+      "sleepQuality": 3,
+      "mood": 2,
+      "moodNote": "Felt focused and calm.",
+      "steps": 5600,
+      "calm": 0,
+      "custom": {
+        "med": 14
+      }
+    },
+    "2026-03-03": {
+      "water": 1500,
+      "workouts": [
+        {
+          "id": "w10_868337",
+          "type": "HIIT",
+          "minutes": 44,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m24_381680",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m25_626908",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m26_306353",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 9300,
+      "calm": 2,
+      "custom": {
+        "read": 11
+      }
+    },
+    "2026-03-04": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w11_720020",
+          "type": "Yoga",
+          "minutes": 42,
+          "intensity": "light"
+        },
+        {
+          "id": "w12_521472",
+          "type": "Run",
+          "minutes": 22,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m27_198863",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m28_376257",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m29_777364",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m30_922244",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10300,
+      "calm": 0,
+      "custom": {
+        "med": 16,
+        "read": 9
+      }
+    },
+    "2026-03-05": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w13_627251",
+          "type": "Cycling",
+          "minutes": 30,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m31_57751",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m32_390711",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m33_209522",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 9100,
+      "calm": 0,
+      "custom": {
+        "med": 7,
+        "read": 29
+      }
+    },
+    "2026-03-06": {
+      "water": 2100,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m34_285169",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m35_232376",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m36_349888",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m37_252403",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.7,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 6200,
+      "calm": 0,
+      "custom": {
+        "med": 7,
+        "read": 36
+      }
+    },
+    "2026-03-07": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w14_989385",
+          "type": "HIIT",
+          "minutes": 31,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m38_824624",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m39_761877",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m40_662958",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 10700,
+      "calm": 1,
+      "custom": {
+        "read": 24
+      }
+    },
+    "2026-03-08": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w15_562314",
+          "type": "Strength",
+          "minutes": 25,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m41_125681",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m42_624776",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m43_591772",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.8,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 4900,
+      "calm": 0,
+      "custom": {
+        "med": 7
+      }
+    },
+    "2026-03-09": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w16_300372",
+          "type": "Yoga",
+          "minutes": 51,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m44_148203",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m45_355159",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m46_556932",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Felt focused and calm.",
+      "steps": 10700,
+      "calm": 1,
+      "custom": {
+        "med": 14,
+        "read": 13
+      }
+    },
+    "2026-03-10": {
+      "water": 1600,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m47_967834",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m48_434431",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m49_611569",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.8,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 5600,
+      "calm": 0,
+      "custom": {
+        "med": 23
+      }
+    },
+    "2026-03-11": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w17_164844",
+          "type": "Yoga",
+          "minutes": 48,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m50_155301",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m51_632410",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m52_563152",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6000,
+      "calm": 0,
+      "custom": {
+        "med": 11,
+        "read": 37
+      }
+    },
+    "2026-03-12": {
+      "water": 1400,
+      "workouts": [
+        {
+          "id": "w18_432283",
+          "type": "HIIT",
+          "minutes": 51,
+          "intensity": "intense"
+        },
+        {
+          "id": "w19_90772",
+          "type": "Cycling",
+          "minutes": 15,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m53_8203",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m54_667696",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m55_550667",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m56_566923",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 3,
+      "mood": 3,
+      "moodNote": "Stressful day at work.",
+      "steps": 4700,
+      "calm": 0,
+      "custom": {
+        "read": 31
+      }
+    },
+    "2026-03-13": {
+      "water": 1400,
+      "workouts": [
+        {
+          "id": "w20_88757",
+          "type": "HIIT",
+          "minutes": 34,
+          "intensity": "intense"
+        },
+        {
+          "id": "w21_387194",
+          "type": "Walk",
+          "minutes": 28,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m57_568822",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m58_113748",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m59_975063",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m60_713207",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 6.6,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 10500,
+      "calm": 0,
+      "custom": {
+        "med": 7,
+        "read": 16
+      }
+    },
+    "2026-03-14": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w22_556159",
+          "type": "Yoga",
+          "minutes": 31,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m61_969813",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m62_221338",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m63_208325",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m64_11156",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.8,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 7200,
+      "calm": 1,
+      "custom": {
+        "med": 22
+      }
+    },
+    "2026-03-15": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w23_652396",
+          "type": "Yoga",
+          "minutes": 41,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m65_859450",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m66_882655",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m67_483591",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.5,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 7700,
+      "calm": 0,
+      "custom": {
+        "med": 10,
+        "read": 31
+      }
+    },
+    "2026-03-16": {
+      "water": 2200,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m68_316837",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m69_573125",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m70_200647",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 6.4,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 8300,
+      "calm": 0,
+      "custom": {
+        "med": 17
+      }
+    },
+    "2026-03-17": {
+      "water": 1900,
+      "workouts": [
+        {
+          "id": "w24_249871",
+          "type": "Swim",
+          "minutes": 53,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m71_270465",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m72_298492",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m73_917642",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m74_820149",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.4,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 6600,
+      "calm": 1,
+      "custom": {
+        "read": 12
+      }
+    },
+    "2026-03-18": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w25_944171",
+          "type": "Swim",
+          "minutes": 33,
+          "intensity": "light"
+        },
+        {
+          "id": "w26_425136",
+          "type": "Walk",
+          "minutes": 22,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m75_662306",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m76_835151",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m77_165535",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m78_786599",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.8,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 10600,
+      "calm": 0,
+      "custom": {
+        "med": 20,
+        "read": 8
+      }
+    },
+    "2026-03-19": {
+      "water": 2000,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m79_74435",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m80_977571",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m81_571678",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        },
+        {
+          "id": "m82_875665",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.7,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 7300,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-03-20": {
+      "water": 1700,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m83_666525",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m84_610183",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m85_228597",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.7,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "Stressful day at work.",
+      "steps": 10500,
+      "calm": 2,
+      "custom": {}
+    },
+    "2026-03-21": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w27_894495",
+          "type": "Walk",
+          "minutes": 49,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m86_157906",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m87_805193",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m88_943776",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.5,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10100,
+      "calm": 1,
+      "custom": {
+        "med": 20
+      }
+    },
+    "2026-03-22": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w28_163419",
+          "type": "Run",
+          "minutes": 28,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m89_635442",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m90_719698",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m91_766057",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 5700,
+      "calm": 2,
+      "custom": {
+        "med": 9,
+        "read": 37
+      }
+    },
+    "2026-03-23": {
+      "water": 2400,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m92_929474",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m93_159792",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m94_454042",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.3,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 8100,
+      "calm": 1,
+      "custom": {}
+    },
+    "2026-03-24": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w29_611561",
+          "type": "Cycling",
+          "minutes": 27,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m95_897571",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m96_401496",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m97_771876",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "Stressful day at work.",
+      "steps": 10100,
+      "calm": 0,
+      "custom": {
+        "med": 8
+      }
+    },
+    "2026-03-25": {
+      "water": 1800,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m98_706430",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m99_373896",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m100_831687",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m101_793504",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 6.9,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Felt focused and calm.",
+      "steps": 9700,
+      "calm": 2,
+      "custom": {
+        "med": 24,
+        "read": 24
+      }
+    },
+    "2026-03-26": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w30_503482",
+          "type": "Swim",
+          "minutes": 52,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m102_516664",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m103_575768",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m104_470306",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.5,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 6100,
+      "calm": 0,
+      "custom": {
+        "med": 6,
+        "read": 35
+      }
+    },
+    "2026-03-27": {
+      "water": 1500,
+      "workouts": [
+        {
+          "id": "w31_502184",
+          "type": "Run",
+          "minutes": 42,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m105_208907",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m106_17042",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m107_103865",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.8,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "Great energy today!",
+      "steps": 6600,
+      "calm": 0,
+      "custom": {
+        "med": 15,
+        "read": 36
+      }
+    },
+    "2026-03-28": {
+      "water": 2300,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m108_652072",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m109_309976",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m110_71533",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.9,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6500,
+      "calm": 1,
+      "custom": {
+        "med": 11,
+        "read": 6
+      }
+    },
+    "2026-03-29": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w32_909461",
+          "type": "Cycling",
+          "minutes": 40,
+          "intensity": "intense"
+        },
+        {
+          "id": "w33_228830",
+          "type": "Walk",
+          "minutes": 22,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m111_923870",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m112_37159",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m113_101011",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m114_864728",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 7.2,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 6000,
+      "calm": 0,
+      "custom": {
+        "med": 6,
+        "read": 34
+      }
+    },
+    "2026-03-30": {
+      "water": 1600,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m115_883691",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m116_445540",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m117_105760",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m118_323204",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 6800,
+      "calm": 0,
+      "custom": {
+        "med": 25,
+        "read": 15
+      }
+    },
+    "2026-03-31": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w34_41620",
+          "type": "Strength",
+          "minutes": 55,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m119_4107",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m120_927927",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m121_674669",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.3,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 8500,
+      "calm": 2,
+      "custom": {
+        "read": 31
+      }
+    },
+    "2026-04-01": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w35_622645",
+          "type": "HIIT",
+          "minutes": 54,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m122_497195",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m123_641018",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m124_7794",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "Felt focused and calm.",
+      "steps": 7600,
+      "calm": 0,
+      "custom": {
+        "med": 17
+      }
+    },
+    "2026-04-02": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w36_993597",
+          "type": "Yoga",
+          "minutes": 38,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m125_18186",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m126_105768",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m127_417138",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 6100,
+      "calm": 0,
+      "custom": {
+        "med": 20
+      }
+    },
+    "2026-04-03": {
+      "water": 1800,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m128_410389",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m129_292252",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        }
+      ],
+      "sleep": 8,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 9200,
+      "calm": 0,
+      "custom": {
+        "med": 25
+      }
+    },
+    "2026-04-04": {
+      "water": 2000,
+      "workouts": [
+        {
+          "id": "w37_532090",
+          "type": "Run",
+          "minutes": 29,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m130_665274",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m131_339668",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m132_769647",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 8700,
+      "calm": 0,
+      "custom": {
+        "med": 8,
+        "read": 18
+      }
+    },
+    "2026-04-05": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w38_166098",
+          "type": "Strength",
+          "minutes": 42,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m133_274517",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m134_601411",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m135_622696",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        },
+        {
+          "id": "m136_66422",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.8,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "Great energy today!",
+      "steps": 7000,
+      "calm": 2,
+      "custom": {
+        "med": 5,
+        "read": 10
+      }
+    },
+    "2026-04-06": {
+      "water": 2400,
+      "workouts": [
+        {
+          "id": "w39_829818",
+          "type": "Run",
+          "minutes": 27,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m137_837137",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m138_352821",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m139_180314",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        },
+        {
+          "id": "m140_782990",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.1,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10300,
+      "calm": 0,
+      "custom": {
+        "med": 11
+      }
+    },
+    "2026-04-07": {
+      "water": 1600,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m141_348979",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m142_882317",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m143_361198",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m144_958122",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 9000,
+      "calm": 0,
+      "custom": {
+        "med": 15,
+        "read": 36
+      }
+    },
+    "2026-04-08": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w40_545714",
+          "type": "Cycling",
+          "minutes": 25,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m145_233190",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m146_790921",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m147_429701",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 8200,
+      "calm": 0,
+      "custom": {
+        "med": 18,
+        "read": 26
+      }
+    },
+    "2026-04-09": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w41_402702",
+          "type": "HIIT",
+          "minutes": 26,
+          "intensity": "moderate"
+        },
+        {
+          "id": "w42_286232",
+          "type": "HIIT",
+          "minutes": 25,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m148_268104",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m149_977231",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m150_957194",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.6,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 11200,
+      "calm": 0,
+      "custom": {
+        "med": 5,
+        "read": 34
+      }
+    },
+    "2026-04-10": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w43_355514",
+          "type": "Run",
+          "minutes": 43,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m151_717090",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m152_9816",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m153_660961",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 10000,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-04-11": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w44_257640",
+          "type": "Yoga",
+          "minutes": 36,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m154_450610",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m155_179271",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m156_940121",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.9,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "Stressful day at work.",
+      "steps": 6300,
+      "calm": 0,
+      "custom": {
+        "med": 12
+      }
+    },
+    "2026-04-12": {
+      "water": 2400,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m157_313770",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m158_620509",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m159_472666",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m160_311846",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "",
+      "steps": 10700,
+      "calm": 0,
+      "custom": {
+        "med": 9,
+        "read": 35
+      }
+    },
+    "2026-04-13": {
+      "water": 1500,
+      "workouts": [
+        {
+          "id": "w45_926956",
+          "type": "Walk",
+          "minutes": 53,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m161_837256",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m162_120312",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m163_860202",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Great energy today!",
+      "steps": 6700,
+      "calm": 2,
+      "custom": {
+        "med": 11,
+        "read": 15
+      }
+    },
+    "2026-04-14": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w46_441892",
+          "type": "Cycling",
+          "minutes": 40,
+          "intensity": "intense"
+        },
+        {
+          "id": "w47_118415",
+          "type": "Swim",
+          "minutes": 25,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m164_776489",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m165_888899",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m166_459879",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.1,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 7600,
+      "calm": 0,
+      "custom": {
+        "read": 30
+      }
+    },
+    "2026-04-15": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w48_812307",
+          "type": "Walk",
+          "minutes": 36,
+          "intensity": "intense"
+        },
+        {
+          "id": "w49_184593",
+          "type": "Swim",
+          "minutes": 21,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m167_392997",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m168_78124",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m169_947323",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.9,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6700,
+      "calm": 1,
+      "custom": {}
+    },
+    "2026-04-16": {
+      "water": 2300,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m170_297891",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m171_747205",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m172_583961",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m173_401183",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.9,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 12300,
+      "calm": 0,
+      "custom": {
+        "med": 9
+      }
+    },
+    "2026-04-17": {
+      "water": 1900,
+      "workouts": [
+        {
+          "id": "w50_518409",
+          "type": "Run",
+          "minutes": 48,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m174_887857",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m175_812868",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m176_741285",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m177_285398",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 8800,
+      "calm": 0,
+      "custom": {
+        "med": 13,
+        "read": 8
+      }
+    },
+    "2026-04-18": {
+      "water": 2500,
+      "workouts": [
+        {
+          "id": "w51_238161",
+          "type": "Run",
+          "minutes": 40,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m178_129870",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m179_592412",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m180_272573",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.3,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Stressful day at work.",
+      "steps": 12300,
+      "calm": 1,
+      "custom": {
+        "read": 25
+      }
+    },
+    "2026-04-19": {
+      "water": 2500,
+      "workouts": [
+        {
+          "id": "w52_273574",
+          "type": "HIIT",
+          "minutes": 28,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m181_9099",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m182_839856",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m183_352647",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 8700,
+      "calm": 0,
+      "custom": {
+        "med": 13
+      }
+    },
+    "2026-04-20": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w53_162069",
+          "type": "Strength",
+          "minutes": 53,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m184_808024",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m185_136649",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m186_616382",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.7,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 7200,
+      "calm": 2,
+      "custom": {
+        "med": 13,
+        "read": 35
+      }
+    },
+    "2026-04-21": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w54_581044",
+          "type": "HIIT",
+          "minutes": 31,
+          "intensity": "intense"
+        },
+        {
+          "id": "w55_721477",
+          "type": "Strength",
+          "minutes": 22,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m187_724446",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m188_357211",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m189_94476",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.5,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 5600,
+      "calm": 1,
+      "custom": {
+        "med": 20
+      }
+    },
+    "2026-04-22": {
+      "water": 2500,
+      "workouts": [
+        {
+          "id": "w56_790091",
+          "type": "Strength",
+          "minutes": 53,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m190_528512",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m191_748235",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m192_662622",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 5800,
+      "calm": 0,
+      "custom": {
+        "read": 32
+      }
+    },
+    "2026-04-23": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w57_832808",
+          "type": "HIIT",
+          "minutes": 46,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m193_473588",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m194_571559",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m195_613930",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m196_954541",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.8,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 8500,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-04-24": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w58_611656",
+          "type": "Yoga",
+          "minutes": 40,
+          "intensity": "light"
+        },
+        {
+          "id": "w59_248504",
+          "type": "Yoga",
+          "minutes": 21,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m197_906101",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m198_762305",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m199_268722",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m200_980652",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 8700,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-04-25": {
+      "water": 1600,
+      "workouts": [
+        {
+          "id": "w60_38070",
+          "type": "Cycling",
+          "minutes": 28,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m201_526174",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m202_809162",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m203_256849",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6800,
+      "calm": 2,
+      "custom": {
+        "med": 5
+      }
+    },
+    "2026-04-26": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w61_964339",
+          "type": "Swim",
+          "minutes": 39,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m204_382368",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m205_94714",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m206_667032",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 7700,
+      "calm": 0,
+      "custom": {
+        "med": 22,
+        "read": 38
+      }
+    },
+    "2026-04-27": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w62_501854",
+          "type": "Run",
+          "minutes": 52,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m207_221730",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m208_780150",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m209_869225",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.6,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 5700,
+      "calm": 0,
+      "custom": {
+        "med": 15,
+        "read": 19
+      }
+    },
+    "2026-04-28": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w63_526767",
+          "type": "Walk",
+          "minutes": 33,
+          "intensity": "moderate"
+        },
+        {
+          "id": "w64_447268",
+          "type": "Yoga",
+          "minutes": 16,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m210_464879",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m211_463636",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m212_396478",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "Great energy today!",
+      "steps": 11200,
+      "calm": 2,
+      "custom": {
+        "med": 12
+      }
+    },
+    "2026-04-29": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w65_28697",
+          "type": "Cycling",
+          "minutes": 32,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m213_429040",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m214_902634",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m215_475138",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m216_787662",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 6700,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-04-30": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w66_549433",
+          "type": "Run",
+          "minutes": 55,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m217_812037",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m218_228283",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m219_309895",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 11500,
+      "calm": 1,
+      "custom": {
+        "read": 32
+      }
+    },
+    "2026-05-01": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w67_751710",
+          "type": "Yoga",
+          "minutes": 52,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m220_883051",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m221_275322",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m222_334304",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.3,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 11500,
+      "calm": 0,
+      "custom": {
+        "med": 14,
+        "read": 12
+      }
+    },
+    "2026-05-02": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w68_740628",
+          "type": "Yoga",
+          "minutes": 40,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m223_699255",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m224_506046",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m225_146189",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m226_951200",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.3,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "Stressful day at work.",
+      "steps": 12100,
+      "calm": 2,
+      "custom": {
+        "med": 21,
+        "read": 34
+      }
+    },
+    "2026-05-03": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w69_600151",
+          "type": "Strength",
+          "minutes": 37,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m227_542256",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m228_382029",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m229_595262",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m230_443866",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.7,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 13200,
+      "calm": 0,
+      "custom": {
+        "med": 12
+      }
+    },
+    "2026-05-04": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w70_548242",
+          "type": "Swim",
+          "minutes": 39,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m231_723494",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m232_226094",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m233_561351",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6200,
+      "calm": 0,
+      "custom": {
+        "med": 10,
+        "read": 25
+      }
+    },
+    "2026-05-05": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w71_783186",
+          "type": "Yoga",
+          "minutes": 38,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m234_821672",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m235_964076",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m236_609340",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 11200,
+      "calm": 0,
+      "custom": {
+        "med": 15,
+        "read": 23
+      }
+    },
+    "2026-05-06": {
+      "water": 2500,
+      "workouts": [
+        {
+          "id": "w72_550967",
+          "type": "Run",
+          "minutes": 43,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m237_258658",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m238_207466",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m239_646325",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m240_884986",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 8500,
+      "calm": 0,
+      "custom": {
+        "med": 11
+      }
+    },
+    "2026-05-07": {
+      "water": 2300,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m241_285794",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m242_962128",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m243_714399",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 8200,
+      "calm": 2,
+      "custom": {
+        "med": 20,
+        "read": 13
+      }
+    },
+    "2026-05-08": {
+      "water": 1700,
+      "workouts": [
+        {
+          "id": "w73_805367",
+          "type": "Cycling",
+          "minutes": 46,
+          "intensity": "light"
+        },
+        {
+          "id": "w74_564419",
+          "type": "Yoga",
+          "minutes": 27,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m244_837784",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m245_984552",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m246_245537",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m247_224436",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 8.3,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 7700,
+      "calm": 0,
+      "custom": {
+        "med": 23
+      }
+    },
+    "2026-05-09": {
+      "water": 2000,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m248_659504",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m249_207015",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m250_203359",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.1,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 11400,
+      "calm": 0,
+      "custom": {
+        "read": 35
+      }
+    },
+    "2026-05-10": {
+      "water": 2600,
+      "workouts": [
+        {
+          "id": "w75_717213",
+          "type": "Swim",
+          "minutes": 42,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m251_662484",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m252_338220",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m253_581250",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.6,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Quiet, restful day.",
+      "steps": 6400,
+      "calm": 0,
+      "custom": {
+        "med": 16
+      }
+    },
+    "2026-05-11": {
+      "water": 2700,
+      "workouts": [
+        {
+          "id": "w76_936663",
+          "type": "HIIT",
+          "minutes": 30,
+          "intensity": "light"
+        },
+        {
+          "id": "w77_814427",
+          "type": "Run",
+          "minutes": 22,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m254_696939",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m255_365400",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m256_785533",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 7,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "",
+      "steps": 9600,
+      "calm": 0,
+      "custom": {
+        "med": 10
+      }
+    },
+    "2026-05-12": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w78_214712",
+          "type": "Run",
+          "minutes": 35,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m257_388763",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m258_794422",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m259_548964",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.1,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10700,
+      "calm": 2,
+      "custom": {
+        "med": 7,
+        "read": 37
+      }
+    },
+    "2026-05-13": {
+      "water": 2500,
+      "workouts": [
+        {
+          "id": "w79_427500",
+          "type": "Walk",
+          "minutes": 55,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m260_835066",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m261_784228",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m262_976328",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m263_489708",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.3,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt focused and calm.",
+      "steps": 13200,
+      "calm": 2,
+      "custom": {
+        "med": 16,
+        "read": 36
+      }
+    },
+    "2026-05-14": {
+      "water": 1700,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m264_37114",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m265_502852",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m266_6457",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.2,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "",
+      "steps": 5900,
+      "calm": 2,
+      "custom": {
+        "med": 21,
+        "read": 8
+      }
+    },
+    "2026-05-15": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w80_781853",
+          "type": "HIIT",
+          "minutes": 41,
+          "intensity": "intense"
+        },
+        {
+          "id": "w81_887227",
+          "type": "HIIT",
+          "minutes": 17,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m267_483741",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m268_111579",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 11200,
+      "calm": 0,
+      "custom": {
+        "med": 14,
+        "read": 33
+      }
+    },
+    "2026-05-16": {
+      "water": 2600,
+      "workouts": [
+        {
+          "id": "w82_139420",
+          "type": "HIIT",
+          "minutes": 28,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m269_281359",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m270_876720",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m271_658473",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.6,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 6300,
+      "calm": 0,
+      "custom": {
+        "med": 8,
+        "read": 31
+      }
+    },
+    "2026-05-17": {
+      "water": 2700,
+      "workouts": [
+        {
+          "id": "w83_549428",
+          "type": "Swim",
+          "minutes": 54,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m272_852948",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m273_260190",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m274_352056",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        },
+        {
+          "id": "m275_599719",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.8,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 11300,
+      "calm": 0,
+      "custom": {
+        "med": 25,
+        "read": 18
+      }
+    },
+    "2026-05-18": {
+      "water": 2400,
+      "workouts": [
+        {
+          "id": "w84_158578",
+          "type": "Swim",
+          "minutes": 45,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m276_570049",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m277_72771",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m278_770326",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7,
+      "sleepQuality": 3,
+      "mood": 5,
+      "moodNote": "Great energy today!",
+      "steps": 12700,
+      "calm": 1,
+      "custom": {
+        "med": 9
+      }
+    },
+    "2026-05-19": {
+      "water": 2600,
+      "workouts": [
+        {
+          "id": "w85_806733",
+          "type": "HIIT",
+          "minutes": 47,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m279_686983",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m280_530113",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m281_974557",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 8100,
+      "calm": 2,
+      "custom": {
+        "med": 16,
+        "read": 26
+      }
+    },
+    "2026-05-20": {
+      "water": 1800,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m282_402961",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m283_417126",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m284_839821",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m285_527043",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "",
+      "steps": 12000,
+      "calm": 0,
+      "custom": {
+        "med": 16
+      }
+    },
+    "2026-05-21": {
+      "water": 2000,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m286_716488",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m287_863212",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m288_742507",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m289_150273",
+          "label": "Dark chocolate",
+          "type": "snack",
+          "quality": 3
+        }
+      ],
+      "sleep": 6.5,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Great energy today!",
+      "steps": 13900,
+      "calm": 0,
+      "custom": {
+        "med": 21,
+        "read": 36
+      }
+    },
+    "2026-05-22": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w86_353265",
+          "type": "HIIT",
+          "minutes": 43,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m290_237358",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m291_591284",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m292_295002",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 8400,
+      "calm": 0,
+      "custom": {
+        "med": 7
+      }
+    },
+    "2026-05-23": {
+      "water": 2800,
+      "workouts": [
+        {
+          "id": "w87_231630",
+          "type": "Walk",
+          "minutes": 45,
+          "intensity": "moderate"
+        },
+        {
+          "id": "w88_283151",
+          "type": "HIIT",
+          "minutes": 26,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m293_509278",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m294_292380",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m295_594721",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m296_687115",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.2,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 9100,
+      "calm": 0,
+      "custom": {
+        "read": 13
+      }
+    },
+    "2026-05-24": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w89_576043",
+          "type": "Cycling",
+          "minutes": 33,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m297_256716",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m298_495436",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m299_506583",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 6.7,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 6900,
+      "calm": 0,
+      "custom": {
+        "read": 25
+      }
+    },
+    "2026-05-25": {
+      "water": 2100,
+      "workouts": [
+        {
+          "id": "w90_340673",
+          "type": "Run",
+          "minutes": 32,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m300_235514",
+          "label": "Poha",
+          "type": "breakfast",
+          "quality": 3
+        },
+        {
+          "id": "m301_285440",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m302_642810",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 13100,
+      "calm": 1,
+      "custom": {
+        "med": 7
+      }
+    },
+    "2026-05-26": {
+      "water": 1800,
+      "workouts": [
+        {
+          "id": "w91_555946",
+          "type": "Swim",
+          "minutes": 39,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m303_584553",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m304_162746",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m305_585565",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m306_475725",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.3,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Great energy today!",
+      "steps": 8300,
+      "calm": 1,
+      "custom": {
+        "read": 36
+      }
+    },
+    "2026-05-27": {
+      "water": 1700,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m307_815036",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m308_183176",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m309_598572",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.1,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "Felt focused and calm.",
+      "steps": 10800,
+      "calm": 1,
+      "custom": {
+        "med": 22,
+        "read": 40
+      }
+    },
+    "2026-05-28": {
+      "water": 2500,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m310_120282",
+          "label": "Oatmeal & berries",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m311_61559",
+          "label": "Quinoa bowl",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m312_212559",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.4,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 6300,
+      "calm": 0,
+      "custom": {
+        "med": 25
+      }
+    },
+    "2026-05-29": {
+      "water": 2000,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m313_743692",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m314_113039",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m315_260383",
+          "label": "Stir-fry tofu & rice",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.1,
+      "sleepQuality": 5,
+      "mood": 5,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 10200,
+      "calm": 0,
+      "custom": {
+        "med": 22,
+        "read": 10
+      }
+    },
+    "2026-05-30": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w92_327220",
+          "type": "Swim",
+          "minutes": 51,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m316_934978",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m317_548076",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m318_83006",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 5,
+      "mood": 3,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 11200,
+      "calm": 1,
+      "custom": {
+        "med": 22
+      }
+    },
+    "2026-05-31": {
+      "water": 2300,
+      "workouts": [
+        {
+          "id": "w93_778639",
+          "type": "Swim",
+          "minutes": 48,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m319_511849",
+          "label": "Banana protein smoothie",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m320_573941",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m321_270094",
+          "label": "Salmon & roasted veg",
+          "type": "dinner",
+          "quality": 5
+        },
+        {
+          "id": "m322_316835",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 6.8,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "",
+      "steps": 7800,
+      "calm": 0,
+      "custom": {
+        "read": 25
+      }
+    },
+    "2026-06-01": {
+      "water": 2800,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m323_931383",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m324_20237",
+          "label": "Rajma chawal",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m325_784839",
+          "label": "Pizza",
+          "type": "dinner",
+          "quality": 2
+        }
+      ],
+      "sleep": 7.6,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 6800,
+      "calm": 0,
+      "custom": {
+        "med": 9
+      }
+    },
+    "2026-06-02": {
+      "water": 2400,
+      "workouts": [
+        {
+          "id": "w94_98503",
+          "type": "Strength",
+          "minutes": 53,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m326_113890",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m327_110624",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m328_509054",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.9,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 6200,
+      "calm": 0,
+      "custom": {}
+    },
+    "2026-06-03": {
+      "water": 2400,
+      "workouts": [
+        {
+          "id": "w95_106709",
+          "type": "Walk",
+          "minutes": 40,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m329_656996",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m330_663508",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m331_634601",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m332_517462",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.2,
+      "sleepQuality": 4,
+      "mood": 5,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 10700,
+      "calm": 0,
+      "custom": {
+        "med": 6,
+        "read": 29
+      }
+    },
+    "2026-06-04": {
+      "water": 2400,
+      "workouts": [
+        {
+          "id": "w96_154354",
+          "type": "Cycling",
+          "minutes": 36,
+          "intensity": "light"
+        },
+        {
+          "id": "w97_107878",
+          "type": "HIIT",
+          "minutes": 23,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m333_943169",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m334_959412",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m335_301676",
+          "label": "Soup & salad",
+          "type": "dinner",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 7500,
+      "calm": 0,
+      "custom": {
+        "med": 8
+      }
+    },
+    "2026-06-05": {
+      "water": 1800,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m336_65173",
+          "label": "Idli & sambar",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m337_856615",
+          "label": "Veg sandwich",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m338_130287",
+          "label": "Chicken curry & rice",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m339_106569",
+          "label": "Apple",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.7,
+      "sleepQuality": 4,
+      "mood": 2,
+      "moodNote": "A bit tired but pushed through.",
+      "steps": 7800,
+      "calm": 0,
+      "custom": {
+        "med": 7,
+        "read": 6
+      }
+    },
+    "2026-06-06": {
+      "water": 2100,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m340_834410",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m341_199834",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.9,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Stressful day at work.",
+      "steps": 12600,
+      "calm": 0,
+      "custom": {
+        "med": 22
+      }
+    },
+    "2026-06-07": {
+      "water": 2700,
+      "workouts": [
+        {
+          "id": "w98_164121",
+          "type": "Strength",
+          "minutes": 34,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m342_672003",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m343_605626",
+          "label": "Burger & fries",
+          "type": "lunch",
+          "quality": 2
+        },
+        {
+          "id": "m344_471391",
+          "label": "Khichdi",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m345_402349",
+          "label": "Fruit bowl",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Felt strong in my workout.",
+      "steps": 14500,
+      "calm": 0,
+      "custom": {
+        "med": 20
+      }
+    },
+    "2026-06-08": {
+      "water": 2700,
+      "workouts": [
+        {
+          "id": "w99_247259",
+          "type": "Yoga",
+          "minutes": 25,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m346_301964",
+          "label": "Croissant & coffee",
+          "type": "breakfast",
+          "quality": 2
+        },
+        {
+          "id": "m347_395552",
+          "label": "Grilled chicken salad",
+          "type": "lunch",
+          "quality": 5
+        },
+        {
+          "id": "m348_60245",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m349_161149",
+          "label": "Chai & biscuits",
+          "type": "snack",
+          "quality": 2
+        }
+      ],
+      "sleep": 7,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Quiet, restful day.",
+      "steps": 10900,
+      "calm": 0,
+      "custom": {
+        "med": 18
+      }
+    },
+    "2026-06-09": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w100_25638",
+          "type": "Run",
+          "minutes": 47,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m350_949011",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m351_916423",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m352_661348",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m353_912809",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 7.8,
+      "sleepQuality": 4,
+      "mood": 4,
+      "moodNote": "Felt focused and calm.",
+      "steps": 11900,
+      "calm": 2,
+      "custom": {
+        "med": 15,
+        "read": 15
+      }
+    },
+    "2026-06-10": {
+      "water": 2200,
+      "workouts": [
+        {
+          "id": "w101_403359",
+          "type": "Run",
+          "minutes": 47,
+          "intensity": "moderate"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m354_484739",
+          "label": "Greek yogurt & honey",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m355_264411",
+          "label": "Paneer wrap",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m356_297852",
+          "label": "Leftover takeout",
+          "type": "dinner",
+          "quality": 2
+        },
+        {
+          "id": "m357_68809",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.1,
+      "sleepQuality": 3,
+      "mood": 4,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 14200,
+      "calm": 1,
+      "custom": {
+        "med": 12
+      }
+    },
+    "2026-06-11": {
+      "water": 2200,
+      "workouts": [],
+      "meals": [
+        {
+          "id": "m358_499531",
+          "label": "Scrambled eggs & spinach",
+          "type": "breakfast",
+          "quality": 5
+        },
+        {
+          "id": "m359_169259",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m360_731925",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.4,
+      "sleepQuality": 4,
+      "mood": 3,
+      "moodNote": "Long day, glad it's over.",
+      "steps": 9800,
+      "calm": 0,
+      "custom": {
+        "med": 24,
+        "read": 11
+      }
+    },
+    "2026-06-12": {
+      "water": 2600,
+      "workouts": [
+        {
+          "id": "w102_612032",
+          "type": "HIIT",
+          "minutes": 48,
+          "intensity": "light"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m361_920339",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m362_677642",
+          "label": "Pasta",
+          "type": "lunch",
+          "quality": 3
+        },
+        {
+          "id": "m363_434360",
+          "label": "Protein bar",
+          "type": "snack",
+          "quality": 4
+        }
+      ],
+      "sleep": 6.4,
+      "sleepQuality": 3,
+      "mood": 2,
+      "moodNote": "Stressful day at work.",
+      "steps": 12100,
+      "calm": 0,
+      "custom": {
+        "med": 13
+      }
+    },
+    "2026-06-13": {
+      "water": 2900,
+      "workouts": [
+        {
+          "id": "w103_630747",
+          "type": "Run",
+          "minutes": 43,
+          "intensity": "intense"
+        }
+      ],
+      "meals": [
+        {
+          "id": "m364_553255",
+          "label": "Avocado toast",
+          "type": "breakfast",
+          "quality": 4
+        },
+        {
+          "id": "m365_127351",
+          "label": "Dal, rice & veggies",
+          "type": "lunch",
+          "quality": 4
+        },
+        {
+          "id": "m366_424869",
+          "label": "Roti, sabzi & dal",
+          "type": "dinner",
+          "quality": 4
+        },
+        {
+          "id": "m367_104714",
+          "label": "Mixed nuts",
+          "type": "snack",
+          "quality": 5
+        }
+      ],
+      "sleep": 8.4,
+      "sleepQuality": 5,
+      "mood": 4,
+      "moodNote": "Slept well, productive morning.",
+      "steps": 8500,
+      "calm": 0,
+      "custom": {
+        "med": 13,
+        "read": 19
+      }
+    }
+  },
+  "goals": {
+    "water": 2000,
+    "sleep": 8,
+    "activeMinutes": 30,
+    "meals": 3,
+    "steps": 8000,
+    "calories": 2200
+  },
+  "settings": {
+    "units": "metric",
+    "theme": "light",
+    "name": "Alex",
+    "haptics": true,
+    "sounds": true,
+    "pillarOrder": [
+      "water",
+      "sleep",
+      "movement",
+      "nutrition",
+      "mood"
+    ],
+    "hiddenPillars": [],
+    "plan": "plus",
+    "cycleEnabled": true,
+    "gender": "female",
+    "weight": 62,
+    "targetWeight": 60,
+    "activity": "moderate"
+  },
+  "foods": [],
+  "trackers": [
+    {
+      "id": "med",
+      "name": "Meditation",
+      "emoji": "🧘",
+      "unit": "min",
+      "goal": 15,
+      "step": 5
+    },
+    {
+      "id": "read",
+      "name": "Reading",
+      "emoji": "📖",
+      "unit": "pages",
+      "goal": 20,
+      "step": 5
+    }
+  ],
+  "cycle": {
+    "avgCycle": 28,
+    "periodLen": 5,
+    "starts": [
+      "2026-03-14",
+      "2026-04-11",
+      "2026-05-09",
+      "2026-06-06"
+    ],
+    "logs": {
+      "2026-03-14": {
+        "flow": 2,
+        "symptoms": [
+          "cramps"
+        ]
+      },
+      "2026-03-15": {
+        "flow": 3,
+        "symptoms": [
+          "cramps",
+          "tender"
+        ]
+      },
+      "2026-03-16": {
+        "flow": 2,
+        "symptoms": []
+      },
+      "2026-03-17": {
+        "flow": 1,
+        "symptoms": []
+      },
+      "2026-04-11": {
+        "flow": 2,
+        "symptoms": [
+          "headache"
+        ]
+      },
+      "2026-04-12": {
+        "flow": 3,
+        "symptoms": [
+          "cramps",
+          "tender"
+        ]
+      },
+      "2026-04-13": {
+        "flow": 2,
+        "symptoms": []
+      },
+      "2026-04-14": {
+        "flow": 2,
+        "symptoms": []
+      },
+      "2026-04-15": {
+        "flow": 1,
+        "symptoms": []
+      },
+      "2026-05-09": {
+        "flow": 2,
+        "symptoms": [
+          "cramps"
+        ]
+      },
+      "2026-05-10": {
+        "flow": 3,
+        "symptoms": [
+          "cramps",
+          "headache"
+        ]
+      },
+      "2026-05-11": {
+        "flow": 2,
+        "symptoms": [
+          "headache"
+        ]
+      },
+      "2026-05-12": {
+        "flow": 2,
+        "symptoms": []
+      },
+      "2026-05-13": {
+        "flow": 1,
+        "symptoms": []
+      },
+      "2026-06-06": {
+        "flow": 2,
+        "symptoms": [
+          "cramps"
+        ]
+      },
+      "2026-06-07": {
+        "flow": 3,
+        "symptoms": [
+          "cramps",
+          "cravings"
+        ]
+      },
+      "2026-06-08": {
+        "flow": 2,
+        "symptoms": [
+          "bloating"
+        ]
+      },
+      "2026-06-09": {
+        "flow": 2,
+        "symptoms": [
+          "tender"
+        ]
+      },
+      "2026-06-10": {
+        "flow": 2,
+        "symptoms": [
+          "acne"
+        ]
+      },
+      "2026-06-11": {
+        "flow": 1,
+        "symptoms": [
+          "bloating"
+        ]
+      }
+    }
+  }
+}

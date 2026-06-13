@@ -73,13 +73,41 @@ export function usePulse() {
     setSteps: (steps) => mutateDay(activeDay, (d) => ({ ...d, steps: Math.max(0, steps) })),
     addSteps: (n) => mutateDay(activeDay, (d) => ({ ...d, steps: Math.max(0, d.steps + n) })),
 
+    // breathing / calm sessions — count completed sessions for the day
+    logCalm: () => mutateDay(activeDay, (d) => ({ ...d, calm: (d.calm || 0) + 1 })),
+
+    // menstrual cycle (Plus). Period starts anchor predictions; per-day logs
+    // hold flow + symptoms. See lib/cycle.js for the math.
+    setCycleConfig: (patch) => setState((s) => ({ ...s, cycle: { ...s.cycle, ...patch } })),
+    togglePeriodStart: (key) => setState((s) => {
+      const starts = s.cycle?.starts || [];
+      const has = starts.includes(key);
+      const nextStarts = has ? starts.filter((x) => x !== key) : [...starts, key].sort();
+      const logs = { ...(s.cycle?.logs || {}) };
+      if (has) { if (logs[key]) logs[key] = { ...logs[key], flow: 0 }; }
+      else { logs[key] = { flow: logs[key]?.flow || 2, symptoms: logs[key]?.symptoms || [] }; }
+      return { ...s, cycle: { ...s.cycle, starts: nextStarts, logs } };
+    }),
+    setCycleFlow: (key, flow) => setState((s) => {
+      const logs = { ...(s.cycle?.logs || {}) };
+      logs[key] = { symptoms: [], ...(logs[key] || {}), flow };
+      return { ...s, cycle: { ...s.cycle, logs } };
+    }),
+    toggleCycleSymptom: (key, id) => setState((s) => {
+      const logs = { ...(s.cycle?.logs || {}) };
+      const cur = logs[key]?.symptoms || [];
+      const symptoms = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+      logs[key] = { flow: 0, ...(logs[key] || {}), symptoms };
+      return { ...s, cycle: { ...s.cycle, logs } };
+    }),
+
     // goals + settings
     setGoals: (patch) => setState((s) => ({ ...s, goals: { ...s.goals, ...patch } })),
     setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
     toggleTheme: () => setState((s) => ({ ...s, settings: { ...s.settings, theme: s.settings.theme === 'dark' ? 'light' : 'dark' } })),
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
-    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [] })),
+    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [], cycle: { ...(s.cycle || {}), starts: [], logs: {} } })),
 
     // custom trackers (Plus) — definitions live in state.trackers, the day's
     // values in day.custom keyed by tracker id.

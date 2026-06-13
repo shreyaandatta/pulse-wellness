@@ -39,6 +39,8 @@ import Settings from './components/Settings.jsx';
 import PlusModal from './components/PlusModal.jsx';
 import YearReview from './components/YearReview.jsx';
 import CustomCard from './components/CustomCard.jsx';
+import BreathingCard from './components/BreathingCard.jsx';
+import CycleCard from './components/CycleCard.jsx';
 
 export default function App() {
   const auth = useAuth();
@@ -253,6 +255,24 @@ function PulseApp({ auth }) {
               All trackers are hidden. Re-enable them in <b>Settings → Dashboard layout</b>.
             </p>
           )}
+
+          {plus && settings.cycleEnabled && (
+            <>
+              <div className="section-head"><h2>Cycle</h2><span className="faint">predictions from your own logs</span></div>
+              <div className="grid">
+                <CycleCard
+                  cycle={p.state.cycle} days={p.state.days} dayKey={p.activeDay}
+                  togglePeriodStart={p.togglePeriodStart} setCycleFlow={p.setCycleFlow}
+                  toggleCycleSymptom={p.toggleCycleSymptom} setCycleConfig={p.setCycleConfig} notify={notify}
+                />
+              </div>
+            </>
+          )}
+
+          <div className="section-head"><h2>Take a breath</h2><span className="faint">a one-minute reset</span></div>
+          <div className="grid">
+            <BreathingCard day={p.day} onComplete={p.logCalm} notify={notify} />
+          </div>
         </div>
       )}
 

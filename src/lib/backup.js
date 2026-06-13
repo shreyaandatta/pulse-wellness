@@ -18,6 +18,7 @@ export function buildBackup(state) {
     settings: state.settings,
     foods: state.foods || [],
     trackers: state.trackers || [],
+    cycle: state.cycle || undefined,
   };
 }
 

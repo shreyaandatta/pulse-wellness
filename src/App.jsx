@@ -29,6 +29,7 @@ import SleepCard from './components/SleepCard.jsx';
 import MoodCard from './components/MoodCard.jsx';
 import StepsCard from './components/StepsCard.jsx';
 import StreakCard from './components/StreakCard.jsx';
+import WeightCard from './components/WeightCard.jsx';
 import Badges from './components/Badges.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
@@ -274,6 +275,15 @@ function PulseApp({ auth }) {
             <p className="faint" style={{ textAlign: 'center', padding: 'var(--s-6)' }}>
               All trackers are hidden. Re-enable them in <b>Settings → Dashboard layout</b>.
             </p>
+          )}
+
+          {isToday(p.activeDay) && (
+            <>
+              <div className="section-head"><h2>Weight</h2><span className="faint">log your weigh-in · watch the trend</span></div>
+              <div className="grid">
+                <WeightCard weights={p.state.weights} settings={settings} onLog={p.logWeight} notify={notify} />
+              </div>
+            </>
           )}
 
           {plus && settings.cycleEnabled && (

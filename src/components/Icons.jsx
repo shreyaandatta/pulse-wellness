@@ -21,6 +21,7 @@ export const IconLeaf = (p) => <I {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 
 export const IconHeart = (p) => <I {...p}><path d="M19 14c1.5-1.5 3-3.4 3-5.5A4.5 4.5 0 0 0 12 6 4.5 4.5 0 0 0 2 8.5C2 12 7 16 12 21c2-2 5-4.5 7-7z"/></I>;
 export const IconBolt = (p) => <I {...p} d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z" />;
 export const IconShoe = (p) => <I {...p}><path d="M2 17h13l5-1c1.5-.3 2-1.4 2-2.5 0-1-.7-1.7-1.8-2L13 8 9 5l-2 1 1 4-6 2z"/><path d="M2 17v2h20v-1"/></I>;
+export const IconScale = (p) => <I {...p}><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7l2.5 4h-5z"/><circle cx="12" cy="14" r="1.2"/></I>;
 export const IconCheck = (p) => <I {...p} d="M20 6 9 17l-5-5" />;
 export const IconShield = (p) => <I {...p}><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></I>;
 export const IconDownload = (p) => <I {...p}><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></I>;

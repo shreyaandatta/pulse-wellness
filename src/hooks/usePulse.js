@@ -101,13 +101,25 @@ export function usePulse() {
       return { ...s, cycle: { ...s.cycle, logs } };
     }),
 
+    // body weight — log today's weigh-in. Writes the sparse history map *and*
+    // mirrors into settings.weight so the calorie/protein goals stay current.
+    logWeight: (kg) => setState((s) => {
+      const w = Math.max(0, Number(kg) || 0);
+      if (!w) return s;
+      return {
+        ...s,
+        weights: { ...(s.weights || {}), [todayKey()]: w },
+        settings: { ...s.settings, weight: w },
+      };
+    }),
+
     // goals + settings
     setGoals: (patch) => setState((s) => ({ ...s, goals: { ...s.goals, ...patch } })),
     setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
     toggleTheme: () => setState((s) => ({ ...s, settings: { ...s.settings, theme: s.settings.theme === 'dark' ? 'light' : 'dark' } })),
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
-    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [], cycle: { ...(s.cycle || {}), starts: [], logs: {} } })),
+    resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [], cycle: { ...(s.cycle || {}), starts: [], logs: {} }, weights: {} })),
 
     // custom trackers (Plus) — definitions live in state.trackers, the day's
     // values in day.custom keyed by tracker id.

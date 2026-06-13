@@ -54,6 +54,19 @@ export const DEFAULT_CYCLE = {
   logs: {},       // 'YYYY-MM-DD' -> { flow: 0..3, symptoms: [id] }
 };
 
+// Body-weight history — a sparse 'YYYY-MM-DD' -> kg map (you weigh in now and
+// then, not every day). The source of truth for the weight trend; the latest
+// entry is mirrored into settings.weight so the calorie math always sees it.
+export function normalizeWeights(w) {
+  if (!w || typeof w !== 'object') return {};
+  const out = {};
+  for (const [k, v] of Object.entries(w)) {
+    const n = Number(v);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(k) && n > 0) out[k] = n;
+  }
+  return out;
+}
+
 export function normalizeCycle(c) {
   const x = c && typeof c === 'object' ? c : {};
   return {
@@ -94,6 +107,7 @@ export function migrate(parsed) {
     foods: Array.isArray(data.foods) ? data.foods : [],  // user's custom foods
     trackers: Array.isArray(data.trackers) ? data.trackers : [],  // custom trackers (Plus)
     cycle: normalizeCycle(data.cycle),  // menstrual-cycle tracking (Plus)
+    weights: normalizeWeights(data.weights),  // 'YYYY-MM-DD' -> kg body-weight log
   };
 }
 

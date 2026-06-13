@@ -3,6 +3,7 @@
 // always beats a lopsided one.
 
 import { getDay } from './storage.js';
+import { foodHealth } from './nutrition.js';
 
 const WEIGHTS = { water: 20, sleep: 25, movement: 25, nutrition: 15, mood: 15 };
 
@@ -21,11 +22,14 @@ export function pillarScores(day, goals) {
   const activeMin = (day.workouts || []).reduce((s, w) => s + (w.minutes || 0), 0);
   const movement = clamp01(activeMin / Math.max(1, goals.activeMinutes));
 
-  // Nutrition: meals logged vs goal, gently weighted by avg quality.
+  // Nutrition: meals logged vs goal, weighted by how healthy those meals are.
+  // Each meal's health is computed from its macros (see lib/nutrition.js), so
+  // a day of protein-rich, balanced meals scores higher than the same number
+  // of sugary ones.
   const meals = day.meals || [];
   const mealRatio = clamp01(meals.length / Math.max(1, goals.meals));
-  const avgQ = meals.length ? meals.reduce((s, m) => s + (m.quality || 3), 0) / meals.length : 3;
-  const nutrition = clamp01(mealRatio * (0.7 + 0.3 * (avgQ / 5)));
+  const avgHealth = meals.length ? meals.reduce((s, m) => s + foodHealth(m), 0) / meals.length / 100 : 0.6;
+  const nutrition = clamp01(mealRatio * (0.55 + 0.45 * avgHealth));
 
   // Mood: 1..5 → 0..1.
   const mood = day.mood != null ? (day.mood - 1) / 4 : 0;

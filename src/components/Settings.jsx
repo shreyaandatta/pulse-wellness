@@ -3,7 +3,7 @@ import { waterGoalLabel } from '../lib/units.js';
 import { prettyDate } from '../lib/dates.js';
 import { PILLARS, resolveOrder } from '../lib/pillars.js';
 import { isPlus, PLUS_PERKS, PLUS_PRICE, MAX_TRACKERS } from '../lib/plan.js';
-import { GENDERS, ACTIVITY_LEVELS, calorieGoal } from '../lib/nutrition.js';
+import { GENDERS, ACTIVITY_LEVELS, calorieGoal, proteinGoal } from '../lib/nutrition.js';
 import { WeightStepper, recSubtitle } from './Onboarding.jsx';
 import { IconSparkle, IconLock, IconTrash, IconBell } from './Icons.jsx';
 import { pushSupported, pushConfigured, permission, isEnabled, enableReminders, disableReminders } from '../lib/push.js';
@@ -181,6 +181,8 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
         <Row label="🔥 Active (min)"><Stepper value={goals.activeMinutes} step={5} suffix="m" onChange={(v) => setGoals({ activeMinutes: v })} min={5} /></Row>
         <Row label="🥗 Meals"><Stepper value={goals.meals} step={1} suffix="" onChange={(v) => setGoals({ meals: v })} min={1} /></Row>
         <Row label="👟 Steps"><Stepper value={goals.steps} step={500} suffix="" onChange={(v) => setGoals({ steps: v })} min={1000} /></Row>
+        <Row label="🍗 Protein (g)"><Stepper value={goals.protein || 0} step={5} suffix="g" onChange={(v) => setGoals({ protein: v })} min={0} /></Row>
+        <div className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: -6 }}>Set 0 to hide the protein goal, or get an estimate from your body profile above.</div>
       </div>
 
       <div className="card">
@@ -404,12 +406,20 @@ function BodyGoal({ settings, goals, setSettings, setGoals, metric, notify }) {
   const targetWeight = settings.targetWeight ?? weight;
   const rec = calorieGoal({ gender, weight, targetWeight, activity });
   const applied = rec && goals.calories === rec.target;
+  const protRec = proteinGoal({ weight, activity });
+  const pApplied = protRec && goals.protein === protRec.grams;
 
   const apply = () => {
     // Persist the effective profile too, so the suggestion is stable next visit.
     setSettings({ weight, targetWeight });
     setGoals({ calories: rec.target });
     notify(`Daily goal set to ${rec.target.toLocaleString()} kcal`, '🍽️');
+  };
+
+  const applyProtein = () => {
+    setSettings({ weight });
+    setGoals({ protein: protRec.grams });
+    notify(`Protein goal set to ${protRec.grams} g/day`, '🍗');
   };
 
   return (
@@ -466,6 +476,25 @@ function BodyGoal({ settings, goals, setSettings, setGoals, metric, notify }) {
           </>
         ) : null}
       </div>
+
+      {protRec && (
+        <div className="bg-rec" style={{ marginTop: 12 }}>
+          <div className="bg-rec-eyebrow">Suggested protein target</div>
+          <div className="bg-rec-num">{protRec.grams} <span>g / day</span></div>
+          <p className="bg-rec-sub">≈ {protRec.perKg} g per kg, based on {protRec.training}.</p>
+          {pApplied ? (
+            <div className="bg-current">✓ This is your daily protein goal.</div>
+          ) : (
+            <button className="btn btn-sm btn-primary" style={{ marginTop: 12 }} onClick={applyProtein}>
+              Use {protRec.grams} g as my protein goal
+            </button>
+          )}
+          {goals.protein > 0 && !pApplied && (
+            <div className="bg-current">Current goal: {goals.protein} g/day</div>
+          )}
+        </div>
+      )}
+
       <p className="faint" style={{ fontSize: 'var(--t-xs)', marginTop: 10 }}>An estimate to guide you, not medical advice. Check with a professional for a tailored plan.</p>
     </div>
   );

@@ -60,3 +60,74 @@ export function calorieGoal({ gender, weight, targetWeight, activity = 'light' }
 
   return { target, maintenance, direction, perWeekKg, weeks, floored, floor, deltaKg: delta };
 }
+
+// ---- Macro-based food health ---------------------------------------------
+// A 0–100 "nourish score" computed from a food's macros. The spine is the
+// macro split — protein density lifts a food, an excessive fat ratio and a
+// heavy refined-carb load (lots of carbs with little protein) pull it down.
+// Macros alone can't tell an apple from a soda (both read as "just carbs", and
+// there's no fibre data), so we temper the macro score with the curated
+// whole-food `quality` hint. Net: protein-rich foods rate highest, whole
+// produce sits comfortably mid, and sugary/greasy items sink — all driven by
+// what's actually in the food.
+export function foodHealth(food = {}) {
+  const p = +food.protein || 0, c = +food.carbs || 0, f = +food.fat || 0;
+  const macroCal = p * 4 + c * 4 + f * 9;
+
+  let macro;
+  if (macroCal <= 0) {
+    macro = 75; // calorie-free (water, green tea) — count as nourishing
+  } else {
+    const pR = (p * 4) / macroCal;   // share of energy from protein
+    const fR = (f * 9) / macroCal;   // …from fat
+    const cR = (c * 4) / macroCal;   // …from carbs
+    macro = 50
+      + 95 * pR                                              // protein is king
+      - 55 * Math.max(0, fR - 0.40)                          // very fatty → down
+      - 60 * Math.max(0, cR - 0.55) * Math.max(0, 1 - 1.4 * pR); // refined carbs w/o protein
+    macro = Math.max(0, Math.min(100, macro));
+  }
+
+  // Whole-food temper: the dataset's 1–5 quality, normalised to 0–100.
+  const whole = ((Math.min(5, Math.max(1, +food.quality || 3)) - 1) / 4) * 100;
+  return Math.round(0.7 * macro + 0.3 * whole);
+}
+
+// Map a health score to a labelled band with a colour token.
+export function healthBand(score) {
+  if (score >= 70) return { id: 'great', label: 'Great',     color: 'var(--good)' };
+  if (score >= 55) return { id: 'good',  label: 'Good',      color: 'var(--sage)' };
+  if (score >= 40) return { id: 'ok',    label: 'OK',        color: 'var(--amber-500)' };
+  return                    { id: 'poor', label: 'Go easy',  color: 'var(--clay)' };
+}
+
+// ---- Protein goal estimation ---------------------------------------------
+// Grams of protein per kg of body weight, by how active someone is. Ranges
+// reflect common sports-nutrition guidance (≈0.8 g/kg RDA up to ~2 g/kg for
+// very active / strength training). An estimate, not a prescription.
+export const PROTEIN_PER_KG = {
+  sedentary: 1.2,
+  light: 1.4,
+  moderate: 1.6,
+  high: 1.9,
+};
+
+// A plain-language sense of how often each activity level trains — used to
+// explain the protein estimate ("because you're active ~4–5 days/week").
+export const ACTIVITY_TRAINING = {
+  sedentary: 'little to no exercise',
+  light: 'a workout or two a week',
+  moderate: 'exercising ~3–4 days a week',
+  high: 'training ~5+ days a week',
+};
+
+// Estimate a daily protein target (grams) from body weight + activity. Weight
+// is in kg (Pulse stores metric internally), so this works the same whether the
+// user views kg or lb. Returns null without a usable weight.
+export function proteinGoal({ weight, activity = 'light' } = {}) {
+  const w = Number(weight);
+  if (!w || w <= 0) return null;
+  const perKg = PROTEIN_PER_KG[activity] ?? PROTEIN_PER_KG.light;
+  const grams = Math.round((w * perKg) / 5) * 5; // tidy to nearest 5 g
+  return { grams, perKg, training: ACTIVITY_TRAINING[activity] || '' };
+}

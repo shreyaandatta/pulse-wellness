@@ -22,6 +22,7 @@ export const DEFAULT_GOALS = {
   meals: 3,
   steps: 8000,
   calories: null,   // kcal/day target — set from body profile (see lib/nutrition.js)
+  protein: null,    // g/day target — set/estimated from body profile + activity
 };
 
 export const DEFAULT_SETTINGS = {

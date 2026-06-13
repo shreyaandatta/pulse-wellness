@@ -285,6 +285,18 @@ export function dayCalories(day) {
   return (day.meals || []).reduce((s, m) => s + (m.calories || 0), 0);
 }
 
+export function dayProtein(day) {
+  return (day.meals || []).reduce((s, m) => s + (m.protein || 0), 0);
+}
+
+// Total protein / carbs / fat (grams) logged across the day's meals.
+export function dayMacros(day) {
+  return (day.meals || []).reduce(
+    (a, m) => ({ protein: a.protein + (m.protein || 0), carbs: a.carbs + (m.carbs || 0), fat: a.fat + (m.fat || 0) }),
+    { protein: 0, carbs: 0, fat: 0 },
+  );
+}
+
 // ---- file export / import ----------------------------------------------
 export function exportFoods(custom) {
   const data = {

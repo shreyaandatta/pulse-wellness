@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { celebrate } from '../lib/celebrate.js';
 import { waterGoalLabel, kgToLb, lbToKg } from '../lib/units.js';
-import { GENDERS, ACTIVITY_LEVELS, calorieGoal } from '../lib/nutrition.js';
+import { GENDERS, ACTIVITY_LEVELS, calorieGoal, proteinGoal } from '../lib/nutrition.js';
 
 // A short, warm setup that turns the empty first screen into a welcome. Each
 // step pops in; the finish line gets a confetti burst.
@@ -19,6 +19,7 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
   const metric = units === 'metric';
 
   const rec = calorieGoal({ gender, weight, targetWeight, activity });
+  const protRec = proteinGoal({ weight, activity });
 
   const STEPS = 5;
   const next = () => setStep((s) => Math.min(STEPS - 1, s + 1));
@@ -28,7 +29,7 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
   // Only commit a calorie goal once they've actually told us their gender —
   // otherwise the dashboard would show a target derived from pure defaults.
   const finish = () => onFinish(
-    { ...goals, calories: gender ? (rec?.target ?? null) : null },
+    { ...goals, calories: gender ? (rec?.target ?? null) : null, protein: gender ? (protRec?.grams ?? null) : null },
     { name: name.trim(), units, theme, gender, weight, targetWeight, activity, onboarded: true },
   );
 
@@ -52,7 +53,7 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
           {step === 3 && (
             <Body gender={gender} setGender={setGender} weight={weight} setWeight={setWeight}
               targetWeight={targetWeight} setTargetWeight={setTargetWeight}
-              activity={activity} setActivity={setActivity} metric={metric} rec={rec} />
+              activity={activity} setActivity={setActivity} metric={metric} rec={rec} protRec={protRec} />
           )}
           {step === 4 && (
             <Done name={name} onFinish={finish} />
@@ -244,7 +245,7 @@ function RecCard({ rec, gender, metric }) {
   );
 }
 
-function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWeight, activity, setActivity, metric, rec }) {
+function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWeight, activity, setActivity, metric, rec, protRec }) {
   return (
     <>
       <div className="ob-eyebrow">Step 4</div>
@@ -280,6 +281,14 @@ function Body({ gender, setGender, weight, setWeight, targetWeight, setTargetWei
       </div>
 
       <RecCard rec={rec} gender={gender} metric={metric} />
+
+      {protRec && (
+        <div className="rec" style={{ marginTop: 'var(--s-4)' }}>
+          <div className="rec-eyebrow">Suggested protein target</div>
+          <div className="rec-num">{protRec.grams} <span>g / day</span></div>
+          <p className="rec-sub">≈ {protRec.perKg} g per kg of body weight, based on {protRec.training}. You can change it anytime.</p>
+        </div>
+      )}
     </>
   );
 }

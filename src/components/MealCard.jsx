@@ -1,7 +1,20 @@
 import { useState, useRef } from 'react';
 import { IconLeaf, IconPlus, IconTrash } from './Icons.jsx';
 import { useGoalCelebration } from '../hooks/useGoalCelebration.js';
-import { searchFoods, makeFood, foodToMeal, dayCalories, fmtQty } from '../lib/foods.js';
+import { searchFoods, makeFood, foodToMeal, dayCalories, dayProtein, fmtQty } from '../lib/foods.js';
+import { foodHealth, healthBand } from '../lib/nutrition.js';
+
+// A small colour-coded health mark for a food/meal, scored from its macros.
+function HealthDot({ item, withLabel = false }) {
+  const score = foodHealth(item);
+  const band = healthBand(score);
+  return (
+    <span className="health-dot-wrap" title={`Health ${score}/100 · ${band.label}`}>
+      <span className="health-dot" style={{ background: band.color }} />
+      {withLabel && <span className="health-lbl" style={{ color: band.color }}>{band.label}</span>}
+    </span>
+  );
+}
 
 const MEAL_TYPES = [
   { t: 'Breakfast', e: '🍳' }, { t: 'Lunch', e: '🥗' },
@@ -21,6 +34,10 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
   const pct = Math.min(100, (count / Math.max(1, goals.meals)) * 100);
   const reached = count >= goals.meals;
   const kcal = dayCalories(day);
+  const protein = dayProtein(day);
+  const pGoal = goals.protein || 0;
+  const pPct = pGoal ? Math.min(100, (protein / pGoal) * 100) : 0;
+  const pReached = pGoal > 0 && protein >= pGoal;
 
   useGoalCelebration(reached, dayKey, cardRef, () => notify('All meals logged!', '🎉'));
 
@@ -56,6 +73,23 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
         <div className="progress-fill" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--honey-400), var(--sage))' }} />
       </div>
 
+      {(protein > 0 || pGoal > 0) && (
+        <div className="protein-meta">
+          <div className="protein-head">
+            <span className="protein-name">🍗 Protein</span>
+            <span className={`protein-val ${pReached ? 'hit' : ''}`}>
+              {protein} {pGoal ? <span className="faint">/ {pGoal} g</span> : <span className="faint">g</span>}
+              {pReached && ' ✓'}
+            </span>
+          </div>
+          {pGoal > 0 && (
+            <div className="progress-track" style={{ marginTop: 7 }}>
+              <div className="progress-fill" style={{ width: `${pPct}%`, background: pReached ? 'var(--good)' : 'linear-gradient(90deg, var(--clay), var(--honey-400))' }} />
+            </div>
+          )}
+        </div>
+      )}
+
       {open && (
         <div className="form pop" style={{ marginTop: 16 }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -81,7 +115,7 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
                     <span className="fr-emoji">{f.emoji}</span>
                     <span className="fr-body">
                       <span className="fr-name">{f.name}{f.custom && <span className="fr-tag">yours</span>}</span>
-                      <span className="fr-sub">{f.serving} · {f.calories} kcal</span>
+                      <span className="fr-sub"><HealthDot item={f} /> {f.serving} · {f.calories} kcal · {f.protein}g protein</span>
                     </span>
                     <span className="fr-add"><IconPlus size={16} /></span>
                   </button>
@@ -114,8 +148,8 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
         <div className="log-list">
           {day.meals.map((m) => (
             <div className="log-item pop" key={m.id}>
-              <span>{m.emoji || MEAL_TYPES.find((t) => t.t === m.type)?.e || '🍽️'} {m.label}{m.qty && m.qty !== 1 ? ` ×${fmtQty(m.qty)}` : ''}</span>
-              <span className="faint mi-kcal">{m.calories ? `${m.calories} kcal` : '●'.repeat(m.quality || 0)}</span>
+              <span className="mi-label"><HealthDot item={m} /> {m.emoji || MEAL_TYPES.find((t) => t.t === m.type)?.e || '🍽️'} {m.label}{m.qty && m.qty !== 1 ? ` ×${fmtQty(m.qty)}` : ''}</span>
+              <span className="faint mi-kcal">{m.calories ? `${m.calories} kcal` : ''}{m.protein ? ` · ${m.protein}g P` : ''}</span>
               <button className="del" onClick={() => onRemove(m.id)} aria-label="Remove"><IconTrash size={15} /></button>
             </div>
           ))}
@@ -151,6 +185,22 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
         .qp-amount { text-align: center; }
         .qp-amount b { font-family: var(--font-display); font-size: 1.5rem; line-height: 1; }
         .qp-kcal { display: block; font-size: var(--t-xs); color: var(--sage); font-weight: 600; margin-top: 3px; }
+
+        .health-dot-wrap { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; }
+        .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 10%, transparent); }
+        .health-lbl { font-size: var(--t-xs); font-weight: 700; }
+
+        .protein-meta { margin-top: 12px; }
+        .protein-head { display: flex; align-items: baseline; justify-content: space-between; }
+        .protein-name { font-size: var(--t-sm); font-weight: 600; color: var(--text-soft); }
+        .protein-val { font-size: var(--t-sm); font-weight: 700; font-variant-numeric: tabular-nums; }
+        .protein-val.hit { color: var(--good); }
+        .protein-val .faint { font-weight: 600; }
+
+        .mi-label { display: flex; align-items: center; gap: 6px; min-width: 0; }
+        .cf-health { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px;
+          padding: 10px 12px; border-radius: var(--r-md); background: var(--surface-soft); border: 1px solid var(--border); }
+        .cf-health-lbl { font-size: var(--t-sm); font-weight: 600; color: var(--text-soft); }
       `}</style>
     </div>
   );
@@ -161,13 +211,14 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
 function QuantityPanel({ food, qty, setQty, onBack, onConfirm }) {
   const step = (d) => setQty((q) => Math.max(0.25, +(q + d).toFixed(2)));
   const kcal = Math.round(food.calories * qty);
+  const prot = Math.round((food.protein || 0) * qty);
   return (
     <div className="qp pop">
       <div className="qp-head">
         <span className="qp-emoji">{food.emoji}</span>
         <div>
-          <div className="qp-name">{food.name}</div>
-          <div className="fr-sub">{food.serving} · {food.calories} kcal each</div>
+          <div className="qp-name">{food.name} <HealthDot item={food} withLabel /></div>
+          <div className="fr-sub">{food.serving} · {food.calories} kcal · {food.protein || 0}g protein each</div>
         </div>
       </div>
 
@@ -182,7 +233,7 @@ function QuantityPanel({ food, qty, setQty, onBack, onConfirm }) {
         <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => step(-0.25)} aria-label="Less">−</button>
         <div className="qp-amount">
           <b>{fmtQty(qty)}×</b>
-          <span className="qp-kcal">{kcal} kcal · {food.serving}</span>
+          <span className="qp-kcal">{kcal} kcal · {prot}g protein</span>
         </div>
         <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => step(0.25)} aria-label="More">+</button>
       </div>
@@ -203,10 +254,13 @@ function CustomFood({ initialName, onCancel, onSave }) {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
-  const [quality, setQuality] = useState(3);
 
   const valid = name.trim().length > 0;
-  const save = () => valid && onSave(makeFood({ name, serving, calories, protein, carbs, fat, quality }));
+  // Health is derived from macros, so there's no manual rating to set.
+  const save = () => valid && onSave(makeFood({ name, serving, calories, protein, carbs, fat, quality: 3 }));
+
+  const macros = { protein: +protein || 0, carbs: +carbs || 0, fat: +fat || 0, quality: 3 };
+  const hasMacros = macros.protein || macros.carbs || macros.fat;
 
   const Num = ({ label, value, set }) => (
     <div className="field">
@@ -235,14 +289,12 @@ function CustomFood({ initialName, onCancel, onSave }) {
         <Num label="Carbs (g)" value={carbs} set={setCarbs} />
         <Num label="Fat (g)" value={fat} set={setFat} />
       </div>
-      <div className="field" style={{ marginTop: 10 }}>
-        <label>How nourishing?</label>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {[1,2,3,4,5].map((q) => (
-            <button key={q} className={`q-dot ${quality >= q ? 'on' : ''}`} onClick={() => setQuality(q)} aria-label={`quality ${q}`} />
-          ))}
+      {hasMacros && (
+        <div className="cf-health">
+          <span className="cf-health-lbl">Health rating <span className="faint">· from macros</span></span>
+          <HealthDot item={macros} withLabel />
         </div>
-      </div>
+      )}
       <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
         <button className="btn" style={{ flex: 1 }} onClick={onCancel}>Back</button>
         <button className="btn btn-primary" style={{ flex: 2 }} disabled={!valid} onClick={save}>Save &amp; log</button>

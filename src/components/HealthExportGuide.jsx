@@ -139,8 +139,7 @@ function renderApple(i) {
     return (
       <div className="ph ph-summary">
         <div className="ph-statusbar"><span>9:41</span><span className="ph-sig" /></div>
-        <div className="ph-nav"><span className="ph-h1">Summary</span><span className="ph-avatar tap-target" /></div>
-        <Tap x="86%" y="13%" />
+        <div className="ph-nav"><span className="ph-h1">Summary</span><span className="ph-avatar tap-target"><TapDot /></span></div>
         <div className="ph-pill" />
         <div className="ph-card"><span className="ph-heart">❤️</span><div className="ph-lines"><i style={{ width: '50%' }} /><i style={{ width: '74%' }} /></div></div>
         <div className="ph-card"><span className="ph-heart">👟</span><div className="ph-lines"><i style={{ width: '42%' }} /><i style={{ width: '66%' }} /></div></div>
@@ -157,8 +156,7 @@ function renderApple(i) {
         <div className="ph-row"><i style={{ width: '40%' }} /></div>
         <div className="ph-row"><i style={{ width: '52%' }} /></div>
         <div className="ph-row"><i style={{ width: '34%' }} /></div>
-        <div className="ph-row ph-export tap-target"><span>Export All Health Data</span></div>
-        <Tap x="50%" y="80%" />
+        <div className="ph-row ph-export tap-target"><span>Export All Health Data</span><TapDot /></div>
       </div>
     );
   }
@@ -169,10 +167,9 @@ function renderApple(i) {
         <div className="ph-dim" />
         <div className="ph-sheet">
           <p className="ph-sheet-t">Exporting your health data may take a few minutes.</p>
-          <button className="ph-sheet-btn tap-target">Export</button>
+          <button className="ph-sheet-btn tap-target">Export<TapDot /></button>
           <button className="ph-sheet-btn ghost">Cancel</button>
         </div>
-        <Tap x="50%" y="70%" />
       </div>
     );
   }
@@ -182,11 +179,10 @@ function renderApple(i) {
       <div className="ph-dim" />
       <div className="ph-sharesheet">
         <div className="ph-share-apps"><span /><span /><span /><span /></div>
-        <div className="ph-share-row tap-target"><span className="ph-files">📁</span> Save to Files</div>
+        <div className="ph-share-row tap-target"><span className="ph-files">📁</span> Save to Files<TapDot /></div>
         <div className="ph-share-row"><span className="ph-files">✉️</span> Mail</div>
         <div className="ph-share-row"><span className="ph-files">💬</span> Messages</div>
       </div>
-      <Tap x="50%" y="58%" />
     </div>
   );
 }
@@ -197,8 +193,7 @@ function renderAndroid(i) {
     return (
       <div className="ph gph">
         <div className="ph-statusbar g-status"><span>9:41</span><span className="ph-sig" /></div>
-        <div className="g-omnibox tap-target"><span className="g-lock">🔒</span> takeout.google.com</div>
-        <Tap x="50%" y="15%" />
+        <div className="g-omnibox tap-target"><span className="g-lock">🔒</span> takeout.google.com<TapDot /></div>
         <div className="g-wordmark"><b style={{ color: '#4285F4' }}>G</b><b style={{ color: '#EA4335' }}>o</b><b style={{ color: '#FBBC05' }}>o</b><b style={{ color: '#4285F4' }}>g</b><b style={{ color: '#34A853' }}>l</b><b style={{ color: '#EA4335' }}>e</b> <span className="g-takeout">Takeout</span></div>
         <div className="g-hero">Download your data</div>
         <div className="g-row"><i style={{ width: '70%' }} /></div>
@@ -213,9 +208,8 @@ function renderAndroid(i) {
         <div className="g-bar"><span>Select data</span><span className="g-link">Deselect all</span></div>
         <div className="g-prod"><span className="g-check" /> <i style={{ width: '36%' }} /></div>
         <div className="g-prod"><span className="g-check" /> <i style={{ width: '50%' }} /></div>
-        <div className="g-prod tap-target on"><span className="g-check ck">✓</span> <b>Fit</b></div>
+        <div className="g-prod tap-target on"><span className="g-check ck">✓</span> <b>Fit</b><TapDot /></div>
         <div className="g-prod"><span className="g-check" /> <i style={{ width: '40%' }} /></div>
-        <Tap x="50%" y="62%" />
       </div>
     );
   }
@@ -227,8 +221,7 @@ function renderAndroid(i) {
         <div className="g-opt"><i style={{ width: '60%' }} /><span className="g-pick" /></div>
         <div className="g-opt"><i style={{ width: '44%' }} /><span className="g-pick" /></div>
         <div className="g-opt"><i style={{ width: '52%' }} /><span className="g-pick" /></div>
-        <button className="g-cta tap-target">Create export</button>
-        <Tap x="50%" y="78%" />
+        <button className="g-cta tap-target">Create export<TapDot /></button>
       </div>
     );
   }
@@ -238,16 +231,16 @@ function renderAndroid(i) {
       <div className="g-done-ico">📦</div>
       <div className="g-done-t">Your export is ready</div>
       <div className="g-done-s">1 file · Google Fit</div>
-      <button className="g-cta g-dl tap-target">⬇ Download</button>
-      <Tap x="50%" y="66%" />
+      <button className="g-cta g-dl tap-target">⬇ Download<TapDot /></button>
     </div>
   );
 }
 
-// A pulsing ring + finger that marks where to tap.
-function Tap({ x, y }) {
+// A pulsing ring + finger. Rendered INSIDE a .tap-target element so it always
+// centres on the exact thing to tap — no hand-tuned coordinates to drift.
+function TapDot() {
   return (
-    <span className="hg-tap" style={{ left: x, top: y }}>
+    <span className="hg-tap">
       <span className="hg-ring" /><span className="hg-ring d" /><span className="hg-finger">👆</span>
     </span>
   );
@@ -382,7 +375,7 @@ const styles = `
   /* the tap-target glow + finger */
   .tap-target { position: relative; animation: hgGlow 1.6s var(--ease-out) infinite; border-radius: 12px; }
   @keyframes hgGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(26,115,232,.0); } 45% { box-shadow: 0 0 0 4px rgba(26,115,232,.26); } }
-  .hg-tap { position: absolute; transform: translate(-50%,-50%); z-index: 5; pointer-events: none; }
+  .hg-tap { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 5; pointer-events: none; }
   .hg-ring { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px;
     border-radius: 50%; border: 2px solid rgba(26,115,232,.9); animation: hgRipple 1.6s var(--ease-out) infinite; }
   .hg-ring.d { animation-delay: .8s; }

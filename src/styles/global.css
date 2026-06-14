@@ -184,6 +184,19 @@ body::before {
   color: #fff; border: none; box-shadow: var(--shadow-glow);
 }
 
+/* Weight / height / age stepper — shared by onboarding, Settings and the
+   weight card, so it lives here (component <style> blocks only exist while that
+   component is mounted, which isn't guaranteed for an already-onboarded user). */
+.wt-stepper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;
+  background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 12px; }
+.wt-val { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; font-variant-numeric: tabular-nums;
+  display: inline-flex; align-items: baseline; gap: 4px; }
+.wt-input { width: 3.2em; text-align: center; border: none; background: transparent; color: var(--text);
+  font: inherit; padding: 2px 4px; border-radius: var(--r-sm); -moz-appearance: textfield; }
+.wt-input::-webkit-outer-spin-button, .wt-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.wt-input:focus { outline: none; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--amber-400); }
+.wt-unit { font-size: 0.85em; color: var(--text-soft); }
+
 /* ============================ INPUTS ============================ */
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: var(--t-sm); font-weight: 600; color: var(--text-soft); }

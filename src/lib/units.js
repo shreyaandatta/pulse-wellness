@@ -24,7 +24,10 @@ export function lbToKg(lb) { return lb / LB_PER_KG; }
 // A kg value shown in the user's units, e.g. "70 kg" or "154 lb".
 export function weightLabel(kg, units) {
   if (kg == null || Number.isNaN(Number(kg))) return '—';
-  return units === 'imperial' ? `${Math.round(kg * LB_PER_KG)} lb` : `${Math.round(kg)} kg`;
+  const v = units === 'imperial' ? kg * LB_PER_KG : kg;
+  const r = Math.round(v * 10) / 10;                 // one decimal of precision
+  const s = Number.isInteger(r) ? String(r) : r.toFixed(1); // drop a trailing .0
+  return `${s} ${units === 'imperial' ? 'lb' : 'kg'}`;
 }
 
 // ---- height (stored in cm) ------------------------------------------------

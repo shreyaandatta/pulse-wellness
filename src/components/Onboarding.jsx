@@ -111,9 +111,6 @@ export default function Onboarding({ name: initialName, goals: initialGoals, set
         .seg.wrap { flex-wrap: wrap; }
         .seg.wrap .chip { flex: 1 1 calc(50% - 4px); }
 
-        .wt-stepper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;
-          background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 12px; }
-        .wt-val { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
         .rec { margin-top: var(--s-5); text-align: center; padding: 16px;
           border-radius: var(--r-lg); border: 1px solid var(--amber-300, var(--border));
           background: radial-gradient(420px 180px at 50% -40%, rgba(246,197,68,0.20), transparent 70%), var(--surface-soft); }
@@ -205,20 +202,53 @@ function Prefs({ units, setUnits, theme, setTheme }) {
   );
 }
 
-// A weight stepper that reads/writes kg but shows the user's units. Steps by 1
-// display unit (1 kg or 1 lb) so it feels natural either way.
+// A weight stepper that reads/writes kg but shows the user's units. You can type
+// an exact value (e.g. 60.5) or nudge it by 0.1 with the buttons — body weight
+// wants one decimal of precision either way.
 export function WeightStepper({ kg, onChange, metric, min = 30 }) {
-  const disp = metric ? Math.round(kg) : Math.round(kgToLb(kg));
-  const minDisp = metric ? min : Math.round(kgToLb(min));
-  const set = (d) => {
-    const nd = Math.max(minDisp, disp + d);
-    onChange(metric ? nd : +lbToKg(nd).toFixed(1));
+  const round1 = (n) => Math.round(n * 10) / 10;
+  const toDisp = (k) => round1(metric ? k : kgToLb(k));
+  const fromDisp = (d) => +(metric ? d : lbToKg(d)).toFixed(1);
+  const minDisp = round1(metric ? min : kgToLb(min));
+  const unit = metric ? 'kg' : 'lb';
+
+  const disp = toDisp(kg);
+  // Local text lets the user type freely (incl. a trailing "."). We commit live
+  // on every keystroke so the value is never stranded waiting for a blur, and
+  // only re-sync from the prop when it genuinely differs (e.g. the +/- buttons)
+  // so an in-progress "60." isn't wiped mid-type.
+  const [text, setText] = useState(String(disp));
+  useEffect(() => { if (parseFloat(text) !== disp) setText(String(disp)); }, [disp]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onType = (raw) => {
+    setText(raw);
+    const v = parseFloat(raw);
+    if (Number.isFinite(v)) onChange(fromDisp(v));
   };
+  const onBlur = () => {
+    const v = parseFloat(text);
+    const clamped = Number.isFinite(v) ? Math.max(minDisp, v) : disp;
+    onChange(fromDisp(clamped));
+    setText(String(round1(clamped)));
+  };
+  const nudge = (d) => onChange(fromDisp(Math.max(minDisp, round1(disp + d))));
+
   return (
     <div className="wt-stepper">
-      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(-1)} aria-label="Less">−</button>
-      <span className="wt-val">{disp} {metric ? 'kg' : 'lb'}</span>
-      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => set(1)} aria-label="More">+</button>
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => nudge(-0.1)} aria-label="Less">−</button>
+      <span className="wt-val">
+        <input
+          className="wt-input" type="text" inputMode="decimal"
+          value={text}
+          onChange={(e) => onType(e.target.value)}
+          onFocus={(e) => e.target.select()}
+          onBlur={onBlur}
+          onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+          aria-label={`Weight in ${unit}`}
+        />
+        <span className="wt-unit">{unit}</span>
+      </span>
+      <button className="round-btn" style={{ width: 38, height: 38, fontSize: '1.2rem' }} onClick={() => nudge(0.1)} aria-label="More">+</button>
     </div>
   );
 }

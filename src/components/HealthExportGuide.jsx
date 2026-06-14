@@ -254,7 +254,7 @@ const styles = `
   @keyframes hgFade { from { opacity: 0; } to { opacity: 1; } }
 
   .hg-glass { position: relative; width: 100%; max-width: 380px; max-height: 92dvh; overflow-y: auto;
-    padding: 22px 22px 20px; border-radius: 26px; text-align: center;
+    padding: 22px 22px 20px; border-radius: 26px; text-align: center; color: var(--text);
     background: linear-gradient(165deg, color-mix(in srgb, var(--surface) 82%, transparent),
       color-mix(in srgb, var(--surface) 60%, transparent));
     backdrop-filter: blur(26px) saturate(1.5); -webkit-backdrop-filter: blur(26px) saturate(1.5);
@@ -278,7 +278,7 @@ const styles = `
     font-size: var(--t-sm); font-weight: 600; color: var(--text-soft); cursor: pointer;
     transition: color var(--dur-fast), background var(--dur), box-shadow var(--dur); }
   .hg-seg-btn.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
-  .hg-head h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; }
+  .hg-head h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; color: var(--text); }
 
   /* stage + phone */
   .hg-stage { display: grid; place-items: center; padding: 6px 0 4px; }
@@ -388,7 +388,11 @@ const styles = `
   .hg-copy { margin-top: 14px; min-height: 84px; animation: hgSwap .45s var(--ease-out); }
   @keyframes hgSwap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .hg-step-n { font-size: var(--t-xs); font-weight: 700; color: var(--amber-600); letter-spacing: .04em; text-transform: uppercase; }
-  .hg-title { font-family: var(--font-display); font-weight: 600; font-size: 1.12rem; margin: 4px 0 6px; }
+  .hg-title { font-family: var(--font-display); font-weight: 600; font-size: 1.12rem; margin: 4px 0 6px; color: var(--text); }
+  /* Dark mode: warm gradient titles so they read clearly on the dark glass. */
+  [data-theme="dark"] .hg-head h3, [data-theme="dark"] .hg-title {
+    background: linear-gradient(120deg, var(--amber-200), var(--clay));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hg-cap { font-size: var(--t-sm); color: var(--text-soft); line-height: 1.5; max-width: 300px; margin: 0 auto; }
 
   /* nav */

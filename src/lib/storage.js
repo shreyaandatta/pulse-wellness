@@ -36,6 +36,8 @@ export const DEFAULT_SETTINGS = {
   plan: 'free',     // 'free' | 'plus' — see lib/plan.js
   cycleEnabled: false, // show the menstrual-cycle tracker on Today (Plus)
   welcomed: false,  // dismiss/complete the first-run "Get started" checklist
+  lastHealthSync: null, // 'YYYY-MM-DD' of the last Apple Health / Google Fit import
+  skipHealthGuide: false, // skip the animated export walkthrough before the file picker
   // Body profile — drives the recommended calorie goal (see lib/nutrition.js).
   gender: '',          // 'female' | 'male' | 'other' | ''
   weight: null,        // current body weight in kg

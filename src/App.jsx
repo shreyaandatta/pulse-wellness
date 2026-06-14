@@ -31,6 +31,7 @@ import StepsCard from './components/StepsCard.jsx';
 import StreakCard from './components/StreakCard.jsx';
 import WeightCard from './components/WeightCard.jsx';
 import WelcomeChecklist from './components/WelcomeChecklist.jsx';
+import HealthImportCard from './components/HealthImportCard.jsx';
 import AdSlot from './components/AdSlot.jsx';
 import AdConsentBanner from './components/AdConsentBanner.jsx';
 import { useAds } from './hooks/useAds.js';
@@ -275,6 +276,18 @@ function PulseApp({ auth }) {
               <StepsCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addSteps} onSet={p.setSteps} notify={notify} />
             </div>
           </div>
+
+          {isToday(p.activeDay) && (
+            <div className="grid" style={{ marginTop: 'var(--s-5)' }}>
+              <HealthImportCard
+                onImport={p.importHealth}
+                lastSync={settings.lastHealthSync}
+                skipGuide={settings.skipHealthGuide}
+                onSkipGuide={(v) => p.setSettings({ skipHealthGuide: v })}
+                notify={notify}
+              />
+            </div>
+          )}
 
           <div className="section-head"><h2>Log your day</h2></div>
           {(visiblePillars.length > 0 || (plus && (p.state.trackers || []).length > 0)) ? (

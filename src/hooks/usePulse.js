@@ -113,6 +113,37 @@ export function usePulse() {
       };
     }),
 
+    // import from Apple Health / Google Fit (a normalised blob from
+    // lib/healthImport.js). Non-destructive: steps only ever go up, sleep fills
+    // an empty night, workouts dedupe by their health key, weigh-ins are added.
+    importHealth: (parsed) => setState((s) => {
+      if (!parsed || !parsed.days) return s;
+      const days = { ...s.days };
+      for (const [key, inc] of Object.entries(parsed.days)) {
+        const cur = days[key] ? { ...days[key] } : getDay(s, key);
+        const next = { ...cur };
+        if (inc.steps > 0) next.steps = Math.max(cur.steps || 0, inc.steps);
+        if ((cur.sleep == null) && inc.sleepHours > 0) next.sleep = inc.sleepHours;
+        if (inc.workouts && inc.workouts.length) {
+          const seen = new Set((cur.workouts || []).map((w) => w.key).filter(Boolean));
+          const fresh = inc.workouts
+            .filter((w) => !seen.has(w.key))
+            .map((w) => ({ id: uid(), key: w.key, type: w.type, minutes: w.minutes, intensity: w.intensity }));
+          if (fresh.length) next.workouts = [...(cur.workouts || []), ...fresh];
+        }
+        days[key] = next;
+      }
+      const weights = { ...(s.weights || {}), ...(parsed.weights || {}) };
+      // keep settings.weight on the most recent weigh-in we now hold
+      const latestKey = Object.keys(weights).sort().pop();
+      const settings = {
+        ...s.settings,
+        lastHealthSync: todayKey(),
+        ...(latestKey ? { weight: weights[latestKey] } : {}),
+      };
+      return { ...s, days, weights, settings };
+    }),
+
     // goals + settings
     setGoals: (patch) => setState((s) => ({ ...s, goals: { ...s.goals, ...patch } })),
     setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),

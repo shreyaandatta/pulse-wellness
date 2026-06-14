@@ -8,7 +8,7 @@ import { WeightStepper, AgeStepper, HeightStepper, recSubtitle } from './Onboard
 import { IconSparkle, IconLock, IconTrash, IconBell } from './Icons.jsx';
 import { pushSupported, pushConfigured, permission, isEnabled, enableReminders, disableReminders } from '../lib/push.js';
 
-export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker, plus: plusProp, billing, managePlan }) {
+export default function Settings({ state, setGoals, setSettings, toggleTheme, toggleUnits, resetAll, notify, user, onLogout, openPlus, addTracker, removeTracker, plus: plusProp, billing, managePlan, ads }) {
   const { goals, settings } = state;
   const [confirm, setConfirm] = useState(false);
   const metric = settings.units === 'metric';
@@ -146,6 +146,8 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
       </div>
 
       <RemindersCard user={user} notify={notify} />
+
+      {ads?.active && <AdsCard ads={ads} openPlus={openPlus} notify={notify} />}
 
       <div className="card">
         <div className="card-title"><span className="dot" style={{ background: 'var(--plum)' }} /> Dashboard layout</div>
@@ -287,6 +289,31 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
 }
 
 // Web-Push reminders. Cloud accounts only (the server needs to see whether you've
+// Ad preferences (free plan only — shown by App only when AdSense is configured).
+// Lets the user switch between personalised and non-personalised ads, or jump to
+// Plus to drop ads entirely. Mirrors the consent choice made in the banner.
+function AdsCard({ ads, openPlus, notify }) {
+  const set = (v) => { ads.choose(v); notify?.(v === 'personalized' ? 'Personalised ads on' : 'Non-personalised ads on', '📣'); };
+  return (
+    <div className="card">
+      <div className="card-title"><span className="dot" style={{ background: 'var(--text-faint)' }} /> Ads</div>
+      <p className="faint" style={{ marginBottom: 12 }}>
+        Pulse stays free with the occasional sponsored slot. Choose how ads are shown — your wellness data is never shared.
+      </p>
+      <div className="seg">
+        <button className={`seg-btn ${ads.consent === 'personalized' ? 'active' : ''}`} onClick={() => set('personalized')}>Personalised</button>
+        <button className={`seg-btn ${ads.consent === 'declined' ? 'active' : ''}`} onClick={() => set('declined')}>Non-personalised</button>
+      </div>
+      <button className="btn btn-block" style={{ marginTop: 12 }} onClick={openPlus}>🚫 Go ad-free with Plus</button>
+      <style>{`
+        .seg { display: flex; gap: 6px; background: var(--surface-soft); padding: 4px; border-radius: var(--r-md); }
+        .seg-btn { flex: 1; padding: 8px; border-radius: var(--r-sm); font-weight: 600; font-size: var(--t-sm); color: var(--text-soft); }
+        .seg-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-xs); }
+      `}</style>
+    </div>
+  );
+}
+
 // logged today). Handles the unsupported / blocked / signed-out states honestly,
 // since notifications are full of browser- and platform-specific edge cases.
 function RemindersCard({ user, notify }) {

@@ -22,5 +22,4 @@ export const PLUS_PERKS = [
   { emoji: '👨‍👩‍👧', title: 'Family', desc: 'Start a household and see your kids\' steps, meals, protein, workouts and mood. Members join free.' },
   { emoji: '👥', title: 'Unlimited friends', desc: `Connect with everyone — free includes ${FREE_CONNECTIONS} connections.` },
   { emoji: '📊', title: 'Spreadsheet export', desc: 'Download your full history as a CSV for any spreadsheet app.' },
-  { emoji: '🚫', title: 'No ads', desc: 'A calm, ad-free Pulse — the free plan is supported by the odd sponsored slot.' },
 ];

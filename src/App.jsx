@@ -32,9 +32,6 @@ import StreakCard from './components/StreakCard.jsx';
 import WeightCard from './components/WeightCard.jsx';
 import WelcomeChecklist from './components/WelcomeChecklist.jsx';
 import HealthImportCard from './components/HealthImportCard.jsx';
-import AdSlot from './components/AdSlot.jsx';
-import AdConsentBanner from './components/AdConsentBanner.jsx';
-import { useAds } from './hooks/useAds.js';
 import Badges from './components/Badges.jsx';
 import TrendCharts from './components/TrendCharts.jsx';
 import Insights from './components/Insights.jsx';
@@ -158,9 +155,6 @@ function PulseApp({ auth }) {
   const plus = entitlement.enabled ? entitlement.plus : isPlus(settings);
   const [plusOpen, setPlusOpen] = useState(false);
   const openPlus = useCallback(() => setPlusOpen(true), []);
-
-  // Ads (free plan only; dormant unless AdSense is configured). Consent-gated.
-  const ads = useAds({ plus });
 
   // The upgrade action: real Razorpay checkout when live, else the demo flip.
   const startPlus = useCallback(async (cycle) => {
@@ -331,8 +325,6 @@ function PulseApp({ auth }) {
           <div className="grid pillar-anchor" id="pillar-breath">
             <BreathingCard day={p.day} onComplete={p.logCalm} notify={notify} />
           </div>
-
-          <AdSlot show={ads.canShowAds} onRemove={openPlus} />
         </div>
       )}
 
@@ -392,7 +384,6 @@ function PulseApp({ auth }) {
             user={auth.user} onLogout={auth.logout}
             openPlus={openPlus} addTracker={p.addTracker} removeTracker={p.removeTracker}
             plus={plus} billing={entitlement} managePlan={managePlan}
-            ads={ads}
           />
         </div>
       )}
@@ -444,8 +435,6 @@ function PulseApp({ auth }) {
       )}
 
       <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
-      <AdConsentBanner ads={ads} onManagePlus={openPlus} />
-
       <div className="toast-wrap">
         {toasts.map((t) => (
           <div className="toast" key={t.id}><span className="t-emoji">{t.emoji}</span>{t.msg}</div>

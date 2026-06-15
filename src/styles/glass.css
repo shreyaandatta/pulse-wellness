@@ -1,0 +1,144 @@
+/* =========================================================
+   PULSE — Glassmorphism theme layer  (EXPERIMENTAL)
+   Additive override on top of tokens.css + global.css.
+   To revert entirely: remove the `import './styles/glass.css'`
+   line in src/main.jsx. Nothing else needs to change.
+
+   Recipe (per ui-ux-pro-max glassmorphism spec):
+   frosted translucent surfaces · backdrop blur 14–20px ·
+   1px light edge · vibrant backdrop to refract · text kept ≥4.5:1.
+   ========================================================= */
+
+:root {
+  --glass-blur: 26px;
+  --glass-sat: 1.75;
+  /* light top-edge "shine" + soft ambient drop, layered together */
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --glass-shadow: 0 12px 40px rgba(120, 80, 30, 0.18);
+
+  /* Surfaces become translucent so the colourful backdrop shows through.
+     Kept high enough that text on them still clears 4.5:1. */
+  --surface:      rgba(255, 255, 255, 0.46);
+  --surface-soft: rgba(255, 255, 255, 0.32);
+  --bg-elev:      rgba(255, 255, 255, 0.42);
+  --border:       rgba(255, 255, 255, 0.7);
+}
+
+:root[data-theme="dark"] {
+  --glass-sat: 1.6;
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 14px 42px rgba(0, 0, 0, 0.52);
+
+  --surface:      rgba(58, 47, 36, 0.42);
+  --surface-soft: rgba(64, 52, 40, 0.36);
+  --bg-elev:      rgba(52, 42, 32, 0.48);
+  --border:       rgba(255, 255, 255, 0.16);
+}
+
+/* ---- Vibrant backdrop for the glass to refract ----
+   Fixed so it stays put while frosted panels scroll over it. */
+body {
+  background:
+    radial-gradient(1100px 740px at 4% -14%, rgba(240, 174, 56, 0.48), transparent 56%),
+    radial-gradient(1020px 700px at 104% -4%, rgba(63, 167, 196, 0.34), transparent 56%),
+    radial-gradient(980px 840px at 48% 114%, rgba(142, 111, 168, 0.32), transparent 56%),
+    radial-gradient(800px 680px at -8% 106%, rgba(224, 135, 155, 0.32), transparent 56%),
+    radial-gradient(700px 520px at 88% 70%, rgba(125, 163, 122, 0.22), transparent 60%),
+    var(--cream-100);
+  background-attachment: fixed;
+}
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(1100px 740px at 4% -14%, rgba(240, 174, 56, 0.28), transparent 56%),
+    radial-gradient(1020px 700px at 104% -4%, rgba(63, 167, 196, 0.26), transparent 56%),
+    radial-gradient(980px 840px at 48% 114%, rgba(142, 111, 168, 0.34), transparent 56%),
+    radial-gradient(800px 680px at -8% 106%, rgba(224, 135, 155, 0.22), transparent 56%),
+    radial-gradient(700px 520px at 88% 70%, rgba(125, 163, 122, 0.16), transparent 60%),
+    #150E09;
+  background-attachment: fixed;
+}
+/* the old warm wash is replaced by the gradient above */
+body::before { display: none; }
+
+/* ---- Frost the shared surfaces ----
+   Accent surfaces (primary buttons, the brand mark, the accent stepper)
+   stay solid so they remain vivid anchors, hence the :not() guards. */
+.card,
+.icon-btn,
+.more-menu,
+.chip,
+.btn:not(.btn-primary),
+.round-btn:not(.accent),
+.wt-stepper,
+.input,
+.select,
+.toast {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+/* light edge + softer, deeper shadow for real depth */
+.card {
+  box-shadow: var(--glass-shadow), var(--glass-edge);
+}
+.card:hover {
+  box-shadow: 0 16px 46px rgba(120, 80, 30, 0.2), var(--glass-edge);
+}
+:root[data-theme="dark"] .card:hover {
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), var(--glass-edge);
+}
+.more-menu {
+  box-shadow: var(--shadow-lg), var(--glass-edge);
+}
+
+/* the frosted-glass top bars (mobile bottom nav already blurs — deepen it) */
+.tabbar {
+  background: color-mix(in srgb, var(--bg) 48%, transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(1.7);
+  backdrop-filter: blur(30px) saturate(1.7);
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Wellness ring: a frosted glass disc floats the score ---- */
+.ring-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.42);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  backdrop-filter: blur(12px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 8px 26px rgba(120, 80, 30, 0.14);
+  z-index: 0;
+}
+:root[data-theme="dark"] .ring-wrap::before {
+  background: rgba(60, 49, 39, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+/* keep the score number crisp above the disc */
+.ring-center { z-index: 2; }
+/* the SVG ring sits above the disc so its track + progress stay sharp */
+.ring-svg { position: relative; z-index: 1; }
+/* the unfilled ring track went faint on the translucent token — re-ink it */
+.ring-svg circle:first-of-type { stroke: rgba(120, 90, 50, 0.16); }
+:root[data-theme="dark"] .ring-svg circle:first-of-type { stroke: rgba(255, 255, 255, 0.12); }
+
+/* chart data points / dots used var(--surface) fills that vanished on glass */
+.chart circle { fill: var(--cream-0); }
+.pillar-bar { background: rgba(120, 90, 50, 0.14); }
+:root[data-theme="dark"] .pillar-bar { background: rgba(255, 255, 255, 0.12); }
+
+/* the more-menu scrim: a touch more frost so the sheet reads as glass-on-glass */
+.more-scrim {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* sub-panels (progress tracks, soft fills) pick up the translucent token
+   automatically; nudge their contrast so they don't muddy on glass */
+.progress-track { background: rgba(120, 90, 50, 0.14); }
+:root[data-theme="dark"] .progress-track { background: rgba(255, 255, 255, 0.12); }
+
+/* keep input focus legible on glass */
+.wt-input:focus { background: rgba(255, 255, 255, 0.65); }
+:root[data-theme="dark"] .wt-input:focus { background: rgba(255, 255, 255, 0.12); }

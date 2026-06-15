@@ -277,8 +277,8 @@ body::before {
 /* ===================== "More" overflow menu ===================== */
 .more-scrim { position: fixed; inset: 0; z-index: 40;
   background: color-mix(in srgb, var(--ink-900) 20%, transparent);
-  backdrop-filter: blur(2px); animation: fadeIn 160ms var(--ease-out) both; }
-@keyframes fadeIn { from { opacity: 0; } }
+  backdrop-filter: blur(2px); }
+/* enter/exit handled by framer-motion (AnimatePresence) */
 
 .more-menu {
   position: fixed; z-index: 41;
@@ -287,9 +287,8 @@ body::before {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
   transform-origin: bottom center;
-  animation: moreSheetIn 220ms var(--ease-spring) both;
+  /* enter/exit handled by framer-motion (AnimatePresence) */
 }
-@keyframes moreSheetIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
 
 .more-item {
   display: flex; align-items: center; gap: 12px;
@@ -311,8 +310,7 @@ body::before {
 @media (min-width: 760px) {
   /* anchor as a dropdown under the top-right More tab */
   .more-menu { left: auto; right: 16px; bottom: auto; top: 66px; width: 230px;
-    transform-origin: top right; animation-name: moreDropIn; }
-  @keyframes moreDropIn { from { opacity: 0; transform: translateY(-8px) scale(0.97); } }
+    transform-origin: top right; }
 }
 
 /* Pulse Plus badge — marks anything that belongs to the paid tier */
@@ -351,17 +349,14 @@ body::before {
   background: var(--ink-900); color: var(--cream-50);
   font-weight: 600; font-size: var(--t-sm);
   box-shadow: var(--shadow-lg);
-  animation:
-    toastIn var(--dur) var(--ease-spring) both,
-    toastOut 300ms var(--ease-out) 1550ms both;
+  /* enter/exit handled by framer-motion (AnimatePresence) */
 }
 .toast .t-emoji { font-size: 1.05rem; }
 
 /* ============================ ANIMATIONS ============================ */
+@keyframes fadeIn { from { opacity: 0; } }
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes toastIn { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
-@keyframes toastOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
 @keyframes pulseGlow {
   0%, 100% { box-shadow: 0 8px 28px rgba(232, 148, 20, 0.30); }
   50% { box-shadow: 0 8px 38px rgba(232, 148, 20, 0.5); }
@@ -379,8 +374,7 @@ body::before {
 
 /* tab switch transition — quick opacity-led fade so content lands fast
    (a slow rise made data-rich panes like Insights look empty for a beat) */
-@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.tab-pane { animation: paneIn 240ms var(--ease-out) both; }
+/* tab-pane crossfade is owned by framer-motion (AnimatePresence in App.jsx) */
 
 /* shared "goal reached" badge */
 .reached { color: var(--good); font-weight: 700; font-size: var(--t-sm); margin-top: 4px; animation: popIn .4s var(--ease-spring); }

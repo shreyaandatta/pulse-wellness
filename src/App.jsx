@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { usePulse } from './hooks/usePulse.js';
 import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
@@ -91,6 +92,18 @@ function PulseApp({ auth }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const tid = useRef(0);
+
+  // Motion. Honour the OS "reduce motion" setting — fall back to plain fades.
+  const reduce = useReducedMotion();
+  const isWide = typeof window !== 'undefined' && window.matchMedia('(min-width: 760px)').matches;
+  // Tab-pane enter: the keyed motion.div remounts on every tab change, so this
+  // runs each switch. Enter-only (no exit/AnimatePresence) keeps nav snappy and
+  // immune to the rapid-tap stalls that mode="wait" can cause on a bottom nav.
+  const paneMotion = {
+    initial: reduce ? { opacity: 0 } : { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+  };
 
   // Secondary destinations tucked behind the "More" overflow so the primary
   // nav stays at 5 items (Material/HIG bottom-nav guidance). Selecting any of
@@ -251,8 +264,9 @@ function PulseApp({ auth }) {
         </div>
       </header>
 
+        <motion.div className="tab-pane" key={tab} {...paneMotion}>
       {tab === 'today' && (
-        <div className="tab-pane" key="today">
+        <>
           <InstallPrompt notify={notify} />
 
           <DaySwitcher activeDay={p.activeDay} setActiveDay={p.setActiveDay} />
@@ -325,56 +339,56 @@ function PulseApp({ auth }) {
           <div className="grid pillar-anchor" id="pillar-breath">
             <BreathingCard day={p.day} onComplete={p.logCalm} notify={notify} />
           </div>
-        </div>
+        </>
       )}
 
       {tab === 'trends' && (
-        <div className="tab-pane" key="trends">
+        <>
           <div className="section-head"><h2>Your trends</h2><span className="faint">last days at a glance</span></div>
           <TrendCharts state={p.state} units={settings.units} plus={plus} openPlus={openPlus} />
           <div style={{ marginTop: 'var(--s-5)' }}>
             <YearReview state={p.state} plus={plus} openPlus={openPlus} />
           </div>
-        </div>
+        </>
       )}
 
       {tab === 'insights' && (
-        <div className="tab-pane" key="insights">
+        <>
           <div className="section-head"><h2>Insights</h2><span className="faint">patterns from your own days</span></div>
           <Insights state={p.state} units={settings.units} />
-        </div>
+        </>
       )}
 
       {tab === 'badges' && (
-        <div className="tab-pane" key="badges">
+        <>
           <div className="section-head"><h2>Achievements</h2><span className="faint">badges you earn by showing up</span></div>
           <Badges state={p.state} user={auth.user} />
-        </div>
+        </>
       )}
 
       {tab === 'family' && (
-        <div className="tab-pane" key="family">
+        <>
           <div className="section-head"><h2>Family</h2><span className="faint">your household, at a glance</span></div>
           <Family family={family} user={auth.user} notify={notify} onLogout={auth.logout} plus={plus} openPlus={openPlus} />
-        </div>
+        </>
       )}
 
       {tab === 'friends' && (
-        <div className="tab-pane" key="friends">
+        <>
           <div className="section-head"><h2>Friends</h2><span className="faint">share check-ins · cheer each other on</span></div>
           <Friends social={social} user={auth.user} notify={notify} onLogout={auth.logout} plus={plus} openPlus={openPlus} />
-        </div>
+        </>
       )}
 
       {tab === 'data' && (
-        <div className="tab-pane" key="data">
+        <>
           <div className="section-head"><h2>Your data</h2><span className="faint">private · portable · yours</span></div>
           <DataVault state={p.state} replaceAll={p.replaceAll} markBackup={p.markBackup} setFoods={p.setFoods} notify={notify} plus={plus} openPlus={openPlus} />
-        </div>
+        </>
       )}
 
       {tab === 'settings' && (
-        <div className="tab-pane" key="settings">
+        <>
           <div className="section-head"><h2>Settings</h2></div>
           <Settings
             state={p.state}
@@ -385,8 +399,9 @@ function PulseApp({ auth }) {
             openPlus={openPlus} addTracker={p.addTracker} removeTracker={p.removeTracker}
             plus={plus} billing={entitlement} managePlan={managePlan}
           />
-        </div>
+        </>
       )}
+        </motion.div>
 
       {/* mobile bottom nav — 5 top-level items; secondary screens live in More */}
       <nav className="tabbar">
@@ -408,10 +423,21 @@ function PulseApp({ auth }) {
       </nav>
 
       {/* "More" overflow — bottom sheet on mobile, dropdown on desktop */}
-      {moreOpen && (
+      <AnimatePresence>
+        {moreOpen && (
         <>
-          <div className="more-scrim" onClick={() => setMoreOpen(false)} />
-          <div className="more-menu" role="menu" aria-label="More">
+          <motion.div
+            className="more-scrim" onClick={() => setMoreOpen(false)}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.16 }}
+          />
+          <motion.div
+            className="more-menu" role="menu" aria-label="More"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: isWide ? -8 : 14, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: isWide ? -8 : 14, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+          >
             <button role="menuitem" className={`more-item ${tab==='family'?'active':''}`} onClick={() => go('family')}>
               <span className="more-ic"><IconFamily size={20} /></span>
               <span className="more-lbl">Family</span>
@@ -430,15 +456,26 @@ function PulseApp({ auth }) {
               <span className="more-ic"><IconGear size={20} /></span>
               <span className="more-lbl">Settings</span>
             </button>
-          </div>
+          </motion.div>
         </>
-      )}
+        )}
+      </AnimatePresence>
 
       <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
       <div className="toast-wrap">
-        {toasts.map((t) => (
-          <div className="toast" key={t.id}><span className="t-emoji">{t.emoji}</span>{t.msg}</div>
-        ))}
+        <AnimatePresence initial={false}>
+          {toasts.map((t) => (
+            <motion.div
+              className="toast" key={t.id} layout
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 480, damping: 32 }}
+            >
+              <span className="t-emoji">{t.emoji}</span>{t.msg}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ export const PLUS_PERKS = [
   { emoji: '🎁', title: 'Year in review', desc: 'A beautiful look back at any year you\'ve tracked.' },
   { emoji: '🧩', title: 'Custom trackers', desc: 'Track anything — meditation, reading, screen time, you name it.' },
   { emoji: '👨‍👩‍👧', title: 'Family', desc: 'Start a household and see your kids\' steps, meals, protein, workouts and mood. Members join free.' },
+  { emoji: '🏆', title: 'Challenges', desc: 'Create shared step & wellness challenges with a live leaderboard. Friends and family join free.' },
   { emoji: '👥', title: 'Unlimited friends', desc: `Connect with everyone — free includes ${FREE_CONNECTIONS} connections.` },
   { emoji: '📊', title: 'Spreadsheet export', desc: 'Download your full history as a CSV for any spreadsheet app.' },
 ];

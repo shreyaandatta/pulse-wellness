@@ -331,3 +331,130 @@ grant execute on function public.get_family_invites()   to authenticated;
 grant execute on function public.get_family_snapshots() to authenticated;
 grant execute on function public.is_family_member(uuid) to authenticated;
 grant execute on function public.is_family_head(uuid)   to authenticated;
+
+-- ===========================================================================
+-- CHALLENGES (migration: challenges) — time-boxed shared goals across friends/
+-- family. Each member's client writes its OWN daily progress row (value + whether
+-- that day's goal was hit); the leaderboard aggregates those. The raw wellness
+-- row is never exposed. Creating needs Plus (client-gated); joining is free.
+-- ===========================================================================
+create table if not exists public.challenges (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) between 1 and 50),
+  metric text not null check (metric in ('steps','active','score','goals')),
+  goal numeric,                              -- optional daily target; null = pure ranking
+  starts date not null default (now() at time zone 'utc')::date,
+  ends date not null,
+  created_by uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  check (ends >= starts)
+);
+
+create table if not exists public.challenge_members (
+  id uuid primary key default gen_random_uuid(),
+  challenge_id uuid not null references public.challenges(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'invited' check (status in ('invited','active')),
+  invited_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (challenge_id, user_id)
+);
+create index if not exists challenge_members_user_idx on public.challenge_members(user_id);
+create index if not exists challenge_members_chal_idx on public.challenge_members(challenge_id);
+
+-- One row per (challenge, person, day): that person's own value + goal-hit flag.
+create table if not exists public.challenge_progress (
+  id uuid primary key default gen_random_uuid(),
+  challenge_id uuid not null references public.challenges(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  day date not null,
+  value numeric not null default 0,
+  hit boolean not null default false,
+  updated_at timestamptz not null default now(),
+  unique (challenge_id, user_id, day)
+);
+create index if not exists challenge_progress_chal_idx on public.challenge_progress(challenge_id);
+
+-- SECURITY DEFINER helper to break RLS recursion on challenge_members.
+create or replace function public.is_challenge_member(cid uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.challenge_members m
+    where m.challenge_id = cid and m.user_id = auth.uid() and m.status = 'active');
+$$;
+
+alter table public.challenges enable row level security;
+alter table public.challenge_members enable row level security;
+alter table public.challenge_progress enable row level security;
+
+-- challenges: members + creator read; creator makes/edits/deletes.
+drop policy if exists "ch_read" on public.challenges;
+create policy "ch_read" on public.challenges for select using (created_by = auth.uid() or public.is_challenge_member(id));
+drop policy if exists "ch_insert" on public.challenges;
+create policy "ch_insert" on public.challenges for insert with check (created_by = auth.uid());
+drop policy if exists "ch_update" on public.challenges;
+create policy "ch_update" on public.challenges for update using (created_by = auth.uid()) with check (created_by = auth.uid());
+drop policy if exists "ch_delete" on public.challenges;
+create policy "ch_delete" on public.challenges for delete using (created_by = auth.uid());
+
+-- members: own row + roster of challenges you're in; creator invites/manages,
+-- invitee accepts/leaves their own row.
+drop policy if exists "cm_read" on public.challenge_members;
+create policy "cm_read" on public.challenge_members for select using (user_id = auth.uid() or public.is_challenge_member(challenge_id));
+drop policy if exists "cm_insert" on public.challenge_members;
+create policy "cm_insert" on public.challenge_members for insert with check (exists (select 1 from public.challenges c where c.id = challenge_id and c.created_by = auth.uid()));
+drop policy if exists "cm_update" on public.challenge_members;
+create policy "cm_update" on public.challenge_members for update using (user_id = auth.uid() or exists (select 1 from public.challenges c where c.id = challenge_id and c.created_by = auth.uid())) with check (user_id = auth.uid() or exists (select 1 from public.challenges c where c.id = challenge_id and c.created_by = auth.uid()));
+drop policy if exists "cm_delete" on public.challenge_members;
+create policy "cm_delete" on public.challenge_members for delete using (user_id = auth.uid() or exists (select 1 from public.challenges c where c.id = challenge_id and c.created_by = auth.uid()));
+
+-- progress: any active member reads all rows (the leaderboard); you write only your own.
+drop policy if exists "cp_read" on public.challenge_progress;
+create policy "cp_read" on public.challenge_progress for select using (public.is_challenge_member(challenge_id));
+drop policy if exists "cp_insert" on public.challenge_progress;
+create policy "cp_insert" on public.challenge_progress for insert with check (user_id = auth.uid() and public.is_challenge_member(challenge_id));
+drop policy if exists "cp_update" on public.challenge_progress;
+create policy "cp_update" on public.challenge_progress for update using (user_id = auth.uid()) with check (user_id = auth.uid() and public.is_challenge_member(challenge_id));
+drop policy if exists "cp_delete" on public.challenge_progress;
+create policy "cp_delete" on public.challenge_progress for delete using (user_id = auth.uid());
+
+-- Read RPCs (security definer; revoked from anon, granted to authenticated).
+create or replace function public.get_my_challenges()
+returns table (id uuid, title text, metric text, goal numeric, starts date, ends date, created_by uuid, member_count bigint)
+language sql stable security definer set search_path = public as $$
+  select c.id, c.title, c.metric, c.goal, c.starts, c.ends, c.created_by,
+    (select count(*) from public.challenge_members m2 where m2.challenge_id = c.id and m2.status='active')
+  from public.challenge_members me join public.challenges c on c.id = me.challenge_id
+  where me.user_id = auth.uid() and me.status = 'active';
+$$;
+
+create or replace function public.get_challenge_invites()
+returns table (member_id uuid, challenge_id uuid, title text, metric text, ends date, invited_by_name text)
+language sql stable security definer set search_path = public as $$
+  select m.id, c.id, c.title, c.metric, c.ends, coalesce(ip.display_name, ip.username, 'A friend')
+  from public.challenge_members m join public.challenges c on c.id = m.challenge_id
+  left join public.profiles ip on ip.id = m.invited_by
+  where m.user_id = auth.uid() and m.status = 'invited';
+$$;
+
+create or replace function public.get_challenge_standings(cid uuid)
+returns table (user_id uuid, username text, display_name text, total numeric, days_hit bigint, today_value numeric)
+language sql stable security definer set search_path = public as $$
+  select m.user_id, p.username, p.display_name,
+    coalesce(sum(pr.value),0), coalesce(count(*) filter (where pr.hit),0),
+    coalesce(max(pr.value) filter (where pr.day = (now() at time zone 'utc')::date), 0)
+  from public.challenge_members m
+  left join public.profiles p on p.id = m.user_id
+  left join public.challenge_progress pr on pr.challenge_id = m.challenge_id and pr.user_id = m.user_id
+  where m.challenge_id = cid and m.status = 'active' and public.is_challenge_member(cid)
+  group by m.user_id, p.username, p.display_name;
+$$;
+
+revoke execute on function public.is_challenge_member(uuid)       from public, anon;
+revoke execute on function public.get_my_challenges()             from public, anon;
+revoke execute on function public.get_challenge_invites()         from public, anon;
+revoke execute on function public.get_challenge_standings(uuid)   from public, anon;
+grant execute on function public.is_challenge_member(uuid)        to authenticated;
+grant execute on function public.get_my_challenges()              to authenticated;
+grant execute on function public.get_challenge_invites()          to authenticated;
+grant execute on function public.get_challenge_standings(uuid)    to authenticated;

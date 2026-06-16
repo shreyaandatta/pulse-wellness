@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth.js';
 import { useCloudSync } from './hooks/useCloudSync.js';
 import { useSocial } from './hooks/useSocial.js';
 import { useFamily } from './hooks/useFamily.js';
+import { useChallenges } from './hooks/useChallenges.js';
 import { useEntitlement } from './hooks/useEntitlement.js';
 import { hasSupabase } from './lib/supabase.js';
 import { getDay } from './lib/storage.js';
@@ -43,6 +44,7 @@ import DataVault from './components/DataVault.jsx';
 import Friends from './components/Friends.jsx';
 import Family from './components/Family.jsx';
 import Journal from './components/Journal.jsx';
+import Challenges from './components/Challenges.jsx';
 import Settings from './components/Settings.jsx';
 import PlusModal from './components/PlusModal.jsx';
 import YearReview from './components/YearReview.jsx';
@@ -91,6 +93,8 @@ function PulseApp({ auth }) {
   const social = useSocial({ user: auth.user, state: p.state });
   // Family (Plus) — heads see members' daily stats. Inert for guests.
   const family = useFamily({ user: auth.user });
+  // Challenges — shared leaderboards across friends/family. Inert for guests.
+  const challenges = useChallenges({ user: auth.user, state: p.state });
   const [tab, setTab] = useState('today');
   const [moreOpen, setMoreOpen] = useState(false);
   // Bumped to open the quick-log sheet (from the FAB's own click, or a shortcut).
@@ -113,9 +117,9 @@ function PulseApp({ auth }) {
   // Secondary destinations tucked behind the "More" overflow so the primary
   // nav stays at 5 items (Material/HIG bottom-nav guidance). Selecting any of
   // these, or a primary tab, always closes the overflow.
-  const MORE_TABS = ['journal', 'family', 'friends', 'data', 'settings'];
+  const MORE_TABS = ['journal', 'challenges', 'family', 'friends', 'data', 'settings'];
   // A dot on the "More" tab when something inside needs attention.
-  const moreAlerts = social.incoming.length + (family.invites?.length || 0);
+  const moreAlerts = social.incoming.length + (family.invites?.length || 0) + (challenges.invites?.length || 0);
   const go = useCallback((t) => { setTab(t); setMoreOpen(false); }, []);
 
   useEffect(() => {
@@ -405,6 +409,13 @@ function PulseApp({ auth }) {
         </>
       )}
 
+      {tab === 'challenges' && (
+        <>
+          <div className="section-head"><h2>Challenges</h2><span className="faint">shared goals · live leaderboards</span></div>
+          <Challenges challenges={challenges} user={auth.user} notify={notify} onLogout={auth.logout} plus={plus} openPlus={openPlus} />
+        </>
+      )}
+
       {tab === 'family' && (
         <>
           <div className="section-head"><h2>Family</h2><span className="faint">your household, at a glance</span></div>
@@ -490,6 +501,11 @@ function PulseApp({ auth }) {
               <span className="more-ic"><IconUsers size={20} /></span>
               <span className="more-lbl">Friends</span>
               {social.incoming.length > 0 && <span className="more-count">{social.incoming.length}</span>}
+            </button>
+            <button role="menuitem" className={`more-item ${tab==='challenges'?'active':''}`} onClick={() => go('challenges')}>
+              <span className="more-ic"><IconTrophy size={20} /></span>
+              <span className="more-lbl">Challenges</span>
+              {(challenges.invites?.length || 0) > 0 && <span className="more-count">{challenges.invites.length}</span>}
             </button>
             <button role="menuitem" className={`more-item ${tab==='data'?'active':''}`} onClick={() => go('data')}>
               <span className="more-ic"><IconShield size={20} /></span>

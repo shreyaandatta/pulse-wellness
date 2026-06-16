@@ -206,6 +206,10 @@ body::before {
   border-radius: var(--r-md);
   background: var(--bg-elev);
   border: 1px solid var(--border);
+  /* Form controls don't inherit color by default — without this, textareas/inputs
+     (e.g. the Journal entry boxes) fall back to the UA's dark text and turn
+     unreadable on the dark theme. Pin them to the warm theme text colour. */
+  color: var(--text);
   font-size: var(--t-base);
   transition: border-color var(--dur), box-shadow var(--dur);
 }

@@ -7,6 +7,7 @@ import { useSocial } from './hooks/useSocial.js';
 import { useFamily } from './hooks/useFamily.js';
 import { useEntitlement } from './hooks/useEntitlement.js';
 import { hasSupabase } from './lib/supabase.js';
+import { getDay } from './lib/storage.js';
 import { resolveOrder } from './lib/pillars.js';
 import { isPlus } from './lib/plan.js';
 import { startSubscription, cancelSubscription } from './lib/billing.js';
@@ -47,6 +48,7 @@ import YearReview from './components/YearReview.jsx';
 import CustomCard from './components/CustomCard.jsx';
 import BreathingCard from './components/BreathingCard.jsx';
 import CycleCard from './components/CycleCard.jsx';
+import QuickLog from './components/QuickLog.jsx';
 
 export default function App() {
   const auth = useAuth();
@@ -90,6 +92,8 @@ function PulseApp({ auth }) {
   const family = useFamily({ user: auth.user });
   const [tab, setTab] = useState('today');
   const [moreOpen, setMoreOpen] = useState(false);
+  // Bumped to open the quick-log sheet (from the FAB's own click, or a shortcut).
+  const [quickSignal, setQuickSignal] = useState(0);
   const [toasts, setToasts] = useState([]);
   const tid = useRef(0);
 
@@ -136,6 +140,29 @@ function PulseApp({ auth }) {
     void card.offsetWidth; // restart the animation if it's already mid-flash
     card.classList.add('flash-card');
     setTimeout(() => card.classList.remove('flash-card'), 1400);
+  }, []);
+
+  // Quick-log "Log a meal / sleep" → land on Today, on the real today, and
+  // scroll to that card (the cards mount on the Today tab, hence the short wait).
+  const quickJump = useCallback((id) => {
+    setTab('today'); setMoreOpen(false);
+    p.setActiveDay(todayKey());
+    setTimeout(() => jumpToPillar(id), 80);
+  }, [p, jumpToPillar]);
+
+  // App-icon shortcuts (Android/desktop long-press, iOS quick actions) open the
+  // app at `?log=water|steps|mood|meal|sleep`. water/steps/mood pop the quick-log
+  // sheet; meal/sleep jump to their full cards. Runs once, then strips the param
+  // so a refresh doesn't re-fire it.
+  useEffect(() => {
+    const log = new URLSearchParams(window.location.search).get('log');
+    if (!log) return;
+    if (log === 'meal' || log === 'sleep') quickJump(log);
+    else setQuickSignal((n) => n + 1);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('log');
+    window.history.replaceState({}, '', url);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Watch for newly-earned badges app-wide so the celebration fires no matter
@@ -460,6 +487,13 @@ function PulseApp({ auth }) {
         </>
         )}
       </AnimatePresence>
+
+      <QuickLog
+        today={getDay(p.state, todayKey())}
+        goals={p.state.goals} units={settings.units}
+        onWater={p.addTodayWater} onSteps={p.addTodaySteps} onMood={p.setTodayMood}
+        onJump={quickJump} notify={notify} openSignal={quickSignal}
+      />
 
       <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
       <div className="toast-wrap">

@@ -16,9 +16,21 @@ export function usePulse() {
     saveState(state);
   }, [state]);
 
-  // apply theme to <html>
+  // apply theme to <html>. 'system' follows the OS appearance live, so a user
+  // who picks "System" flips with their phone's day/night schedule without
+  // touching the app. Explicit 'light'/'dark' override the OS.
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', state.settings.theme);
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const apply = () => {
+      const t = state.settings.theme;
+      const eff = t === 'system' ? (mq.matches ? 'dark' : 'light') : t;
+      document.documentElement.setAttribute('data-theme', eff);
+    };
+    apply();
+    if (state.settings.theme === 'system') {
+      mq.addEventListener('change', apply);
+      return () => mq.removeEventListener('change', apply);
+    }
   }, [state.settings.theme]);
 
   // If midnight passes while the app is open, roll the view onto the new day —
@@ -75,6 +87,15 @@ export function usePulse() {
 
     // breathing / calm sessions — count completed sessions for the day
     logCalm: () => mutateDay(activeDay, (d) => ({ ...d, calm: (d.calm || 0) + 1 })),
+
+    // ---- Quick-log actions (always target TODAY) ----
+    // The floating quick-log sheet and the app-icon shortcuts log "now", which
+    // is always the real today — never whichever past day the user happens to be
+    // reviewing in the Day switcher. These mirror the activeDay actions above but
+    // pin the key to todayKey(), so they're correct regardless of what's on screen.
+    addTodayWater: (ml) => mutateDay(todayKey(), (d) => ({ ...d, water: Math.max(0, d.water + ml) })),
+    addTodaySteps: (n) => mutateDay(todayKey(), (d) => ({ ...d, steps: Math.max(0, d.steps + n) })),
+    setTodayMood: (mood) => mutateDay(todayKey(), (d) => ({ ...d, mood })),
 
     // menstrual cycle (Plus). Period starts anchor predictions; per-day logs
     // hold flow + symptoms. See lib/cycle.js for the math.
@@ -147,7 +168,14 @@ export function usePulse() {
     // goals + settings
     setGoals: (patch) => setState((s) => ({ ...s, goals: { ...s.goals, ...patch } })),
     setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
-    toggleTheme: () => setState((s) => ({ ...s, settings: { ...s.settings, theme: s.settings.theme === 'dark' ? 'light' : 'dark' } })),
+    // The topbar one-tap toggle: flip to the opposite of whatever is *showing*
+    // right now (so from System it lands on an explicit light/dark). The 3-way
+    // Light/Dark/System chooser lives in Settings.
+    toggleTheme: () => setState((s) => {
+      const cur = s.settings.theme;
+      const eff = cur === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : cur;
+      return { ...s, settings: { ...s.settings, theme: eff === 'dark' ? 'light' : 'dark' } };
+    }),
     toggleUnits: () => setState((s) => ({ ...s, settings: { ...s.settings, units: s.settings.units === 'metric' ? 'imperial' : 'metric' } })),
 
     resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [], cycle: { ...(s.cycle || {}), starts: [], logs: {} }, weights: {} })),

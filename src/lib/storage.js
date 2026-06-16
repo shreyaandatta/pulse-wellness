@@ -27,7 +27,7 @@ export const DEFAULT_GOALS = {
 
 export const DEFAULT_SETTINGS = {
   units: 'metric',  // 'metric' | 'imperial'
-  theme: 'light',   // 'light' | 'dark'
+  theme: 'light',   // 'light' | 'dark' | 'system' (system follows the OS, live)
   name: '',
   haptics: true,    // vibrate on taps (where supported)
   sounds: true,     // soft chime on goal celebrations

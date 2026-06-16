@@ -130,9 +130,18 @@ export default function Settings({ state, setGoals, setSettings, toggleTheme, to
           <label>Your name</label>
           <input className="input" value={settings.name} placeholder="Add your name" onChange={(e) => setSettings({ name: e.target.value })} />
         </div>
-        <Row label="Theme">
-          <button className="btn btn-sm" onClick={toggleTheme}>{settings.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</button>
-        </Row>
+        <div className="bg-field">
+          <span className="bg-lbl">Theme</span>
+          <div className="bg-seg">
+            {[
+              { id: 'light', label: '☀️ Light' },
+              { id: 'dark', label: '🌙 Dark' },
+              { id: 'system', label: '🌗 System' },
+            ].map((t) => (
+              <button key={t.id} className={`chip ${settings.theme === t.id ? 'active' : ''}`} onClick={() => setSettings({ theme: t.id })}>{t.label}</button>
+            ))}
+          </div>
+        </div>
         <Row label="Units">
           <button className="btn btn-sm" onClick={toggleUnits}>{metric ? 'Metric (ml, km)' : 'Imperial (oz, mi)'}</button>
         </Row>

@@ -15,7 +15,7 @@ import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy, IconDots, IconFamily,
+  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy, IconDots, IconFamily, IconJournal,
 } from './components/Icons.jsx';
 import { resolveBadges, BADGES } from './lib/badges.js';
 import { celebrate } from './lib/celebrate.js';
@@ -42,6 +42,7 @@ import InstallPrompt from './components/InstallPrompt.jsx';
 import DataVault from './components/DataVault.jsx';
 import Friends from './components/Friends.jsx';
 import Family from './components/Family.jsx';
+import Journal from './components/Journal.jsx';
 import Settings from './components/Settings.jsx';
 import PlusModal from './components/PlusModal.jsx';
 import YearReview from './components/YearReview.jsx';
@@ -112,7 +113,7 @@ function PulseApp({ auth }) {
   // Secondary destinations tucked behind the "More" overflow so the primary
   // nav stays at 5 items (Material/HIG bottom-nav guidance). Selecting any of
   // these, or a primary tab, always closes the overflow.
-  const MORE_TABS = ['family', 'friends', 'data', 'settings'];
+  const MORE_TABS = ['journal', 'family', 'friends', 'data', 'settings'];
   // A dot on the "More" tab when something inside needs attention.
   const moreAlerts = social.incoming.length + (family.invites?.length || 0);
   const go = useCallback((t) => { setTab(t); setMoreOpen(false); }, []);
@@ -397,6 +398,13 @@ function PulseApp({ auth }) {
         </>
       )}
 
+      {tab === 'journal' && (
+        <>
+          <div className="section-head"><h2>Journal</h2><span className="faint">a line about today · look back anytime</span></div>
+          <Journal state={p.state} setNote={p.setNote} notify={notify} />
+        </>
+      )}
+
       {tab === 'family' && (
         <>
           <div className="section-head"><h2>Family</h2><span className="faint">your household, at a glance</span></div>
@@ -469,6 +477,10 @@ function PulseApp({ auth }) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: isWide ? -8 : 14, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 460, damping: 34 }}
           >
+            <button role="menuitem" className={`more-item ${tab==='journal'?'active':''}`} onClick={() => go('journal')}>
+              <span className="more-ic"><IconJournal size={20} /></span>
+              <span className="more-lbl">Journal</span>
+            </button>
             <button role="menuitem" className={`more-item ${tab==='family'?'active':''}`} onClick={() => go('family')}>
               <span className="more-ic"><IconFamily size={20} /></span>
               <span className="more-lbl">Family</span>

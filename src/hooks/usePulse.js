@@ -86,6 +86,11 @@ export function usePulse() {
     // mood
     setMood: (mood, note) => mutateDay(activeDay, (d) => ({ ...d, mood, moodNote: note ?? d.moodNote })),
 
+    // journal — write/edit the reflection note for ANY day (the Journal screen
+    // revisits past days). Shares day.moodNote with the Mood card, so a thought
+    // jotted in either place is the same single reflection for that day.
+    setNote: (key, note) => mutateDay(key, (d) => ({ ...d, moodNote: note })),
+
     // steps
     setSteps: (steps) => mutateDay(activeDay, (d) => ({ ...d, steps: Math.max(0, steps) })),
     addSteps: (n) => mutateDay(activeDay, (d) => ({ ...d, steps: Math.max(0, d.steps + n) })),

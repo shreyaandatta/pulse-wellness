@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { IconLeaf, IconPlus, IconTrash } from './Icons.jsx';
 import { useGoalCelebration } from '../hooks/useGoalCelebration.js';
-import { searchFoods, makeFood, foodToMeal, dayCalories, dayProtein, fmtQty } from '../lib/foods.js';
+import { searchFoods, makeFood, foodToMeal, dayCalories, dayProtein, dayMacros, fmtQty } from '../lib/foods.js';
 import { foodHealth, healthBand } from '../lib/nutrition.js';
 
 // A small colour-coded health mark for a food/meal, scored from its macros.
@@ -38,6 +38,8 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
   const pGoal = goals.protein || 0;
   const pPct = pGoal ? Math.min(100, (protein / pGoal) * 100) : 0;
   const pReached = pGoal > 0 && protein >= pGoal;
+  const pToGo = pGoal > 0 ? Math.max(0, pGoal - protein) : 0;
+  const macros = dayMacros(day); // { protein, carbs, fat } grams across the day
 
   useGoalCelebration(reached, dayKey, cardRef, () => notify('All meals logged!', '🎉'));
 
@@ -87,6 +89,16 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
               <div className="progress-fill" style={{ width: `${pPct}%`, background: pReached ? 'var(--good)' : 'linear-gradient(90deg, var(--clay), var(--honey-400))' }} />
             </div>
           )}
+          {pToGo > 0 && <div className="protein-togo">{Math.round(pToGo)} g to go</div>}
+        </div>
+      )}
+
+      {/* Macro breakdown — what the day's food actually consisted of. */}
+      {(Math.round(macros.protein) > 0 || Math.round(macros.carbs) > 0 || Math.round(macros.fat) > 0) && (
+        <div className="macro-bd">
+          <div className="macro-cell"><span className="macro-g">{Math.round(macros.protein)}g</span><span className="macro-k">Protein</span></div>
+          <div className="macro-cell"><span className="macro-g">{Math.round(macros.carbs)}g</span><span className="macro-k">Carbs</span></div>
+          <div className="macro-cell"><span className="macro-g">{Math.round(macros.fat)}g</span><span className="macro-k">Fat</span></div>
         </div>
       )}
 
@@ -196,6 +208,11 @@ export default function MealCard({ day, dayKey, goals, foods, onAdd, onAddFood, 
         .protein-val { font-size: var(--t-sm); font-weight: 700; font-variant-numeric: tabular-nums; }
         .protein-val.hit { color: var(--good); }
         .protein-val .faint { font-weight: 600; }
+        .protein-togo { font-size: var(--t-xs); font-weight: 600; color: var(--clay); margin-top: 6px; }
+        .macro-bd { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .macro-cell { text-align: center; padding: 9px 6px; border-radius: var(--r-md); background: var(--surface-soft); border: 1px solid var(--border); }
+        .macro-g { display: block; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+        .macro-k { font-size: var(--t-xs); color: var(--text-faint); font-weight: 600; }
 
         .mi-label { display: flex; align-items: center; gap: 6px; min-width: 0; }
         .cf-health { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px;

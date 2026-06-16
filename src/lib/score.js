@@ -18,9 +18,14 @@ export function pillarScores(day, goals) {
     sleep = clamp01(1 - diff / 4); // 4h off goal => 0
   }
 
-  // Movement: total active minutes vs goal.
+  // Movement: the better of two ways to move — logged workout minutes OR daily
+  // steps, each as a ratio to its own goal. Taking the max (not a sum) means a
+  // big walking day fully counts even with no "workout" logged, and a gym
+  // session counts even with few steps — without double-rewarding doing both.
   const activeMin = (day.workouts || []).reduce((s, w) => s + (w.minutes || 0), 0);
-  const movement = clamp01(activeMin / Math.max(1, goals.activeMinutes));
+  const workoutRatio = activeMin / Math.max(1, goals.activeMinutes);
+  const stepRatio = (day.steps || 0) / Math.max(1, goals.steps);
+  const movement = clamp01(Math.max(workoutRatio, stepRatio));
 
   // Nutrition: meals logged vs goal, weighted by how healthy those meals are.
   // Each meal's health is computed from its macros (see lib/nutrition.js), so

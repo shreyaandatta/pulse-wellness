@@ -75,8 +75,13 @@ export function usePulse() {
     addMeal: (m) => mutateDay(activeDay, (d) => ({ ...d, meals: [...d.meals, { id: uid(), ...m }] })),
     removeMeal: (id) => mutateDay(activeDay, (d) => ({ ...d, meals: d.meals.filter((x) => x.id !== id) })),
 
-    // sleep
-    setSleep: (hours, quality) => mutateDay(activeDay, (d) => ({ ...d, sleep: hours, sleepQuality: quality ?? d.sleepQuality })),
+    // sleep. Hours can be entered two ways: a direct number (slider), or a
+    // bedtime → wake-up pair we turn into a duration. Whichever is used wins —
+    // setting hours directly clears any stale times, and setting times derives
+    // the hours, so day.sleep (what the score reads) always matches what's shown.
+    setSleep: (hours, quality) => mutateDay(activeDay, (d) => ({ ...d, sleep: hours, sleepQuality: quality ?? d.sleepQuality, bedtime: null, waketime: null })),
+    setSleepQuality: (quality) => mutateDay(activeDay, (d) => ({ ...d, sleepQuality: quality })),
+    setSleepTimes: (bedtime, waketime, hours) => mutateDay(activeDay, (d) => ({ ...d, bedtime, waketime, sleep: hours })),
 
     // mood
     setMood: (mood, note) => mutateDay(activeDay, (d) => ({ ...d, mood, moodNote: note ?? d.moodNote })),

@@ -85,7 +85,9 @@ function freshDay() {
     water: 0,            // ml
     workouts: [],        // {id, type, minutes, intensity}
     meals: [],           // {id, label, type, quality}
-    sleep: null,         // hours (number)
+    sleep: null,         // hours (number) — canonical; the score reads this
+    bedtime: null,       // 'HH:MM' optional — when set with waketime, derives sleep
+    waketime: null,      // 'HH:MM' optional
     sleepQuality: null,  // 1..5
     mood: null,          // 1..5
     moodNote: '',

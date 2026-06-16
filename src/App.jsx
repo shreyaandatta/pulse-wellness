@@ -187,6 +187,10 @@ function PulseApp({ auth }) {
 
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
+  // What theme is actually showing (resolve 'system' against the OS) — so the
+  // topbar toggle icon offers the opposite of what's on screen.
+  const systemDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const effectiveTheme = settings.theme === 'system' ? (systemDark ? 'dark' : 'light') : settings.theme;
 
   // Pulse Plus. With real billing configured (Razorpay + cloud account) the
   // server's entitlement is the source of truth; otherwise we fall back to the
@@ -251,7 +255,7 @@ function PulseApp({ auth }) {
     water: <WaterCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} units={settings.units} onAdd={p.addWater} notify={notify} />,
     workout: <WorkoutCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onAdd={p.addWorkout} onRemove={p.removeWorkout} notify={notify} />,
     meal: <MealCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} foods={p.state.foods} onAdd={p.addMeal} onAddFood={p.addFood} onRemove={p.removeMeal} notify={notify} />,
-    sleep: <SleepCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onSet={p.setSleep} notify={notify} />,
+    sleep: <SleepCard day={p.day} dayKey={p.activeDay} goals={p.state.goals} onSet={p.setSleep} onSetQuality={p.setSleepQuality} onSetTimes={p.setSleepTimes} notify={notify} />,
     mood: <MoodCard day={p.day} dayKey={p.activeDay} onSet={p.setMood} notify={notify} />,
   };
   const visiblePillars = resolveOrder(settings.pillarOrder).filter((id) => !(settings.hiddenPillars || []).includes(id));
@@ -286,7 +290,7 @@ function PulseApp({ auth }) {
             </button>
           </nav>
           <button className="icon-btn" onClick={p.toggleTheme} aria-label="Toggle theme">
-            {settings.theme === 'dark' ? <IconSun size={19} /> : <IconMoon size={19} />}
+            {effectiveTheme === 'dark' ? <IconSun size={19} /> : <IconMoon size={19} />}
           </button>
         </div>
       </header>

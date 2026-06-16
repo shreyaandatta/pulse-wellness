@@ -211,7 +211,10 @@ export function nudges(state, goals, units, now = new Date()) {
   if (d.mood == null && h >= 18) out.push({ pri: 1, tone: 'tip', emoji: '💭', target: 'mood', text: 'How did today feel? A quick mood check rounds it off.' });
   if (!met.water && h >= 16) out.push({ pri: 2, tone: 'tip', emoji: '💧', target: 'water', text: `${waterCurrentLabel(goals.water - d.water, units)} to your water goal — a glass now keeps the day on track.` });
   if (!met.steps && d.steps > 0 && h >= 18) out.push({ pri: 2, tone: 'tip', emoji: '👟', target: 'steps', text: `${(goals.steps - d.steps).toLocaleString()} steps to your goal. A short walk closes it.` });
-  if (!met.move && active === 0 && h >= 15) out.push({ pri: 3, tone: 'tip', emoji: '🔥', target: 'workout', text: 'No movement logged yet — even 10 minutes counts.' });
+  // Only nudge to move when there's been little of *either* kind of movement —
+  // a solid step count already counts toward the movement pillar, so don't tell
+  // a 6,000-step day it logged "no movement".
+  if (!met.move && active === 0 && (d.steps || 0) < goals.steps * 0.5 && h >= 15) out.push({ pri: 3, tone: 'tip', emoji: '🔥', target: 'workout', text: 'No movement logged yet — even 10 minutes counts.' });
 
   return out.sort((a, b) => a.pri - b.pri).slice(0, 2);
 }

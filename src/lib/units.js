@@ -1,5 +1,11 @@
 // Unit conversion helpers. Internal storage is always metric (ml, kg, km).
 
+// A gentle over-hydration guardrail. Most people need ~2–3 L of water a day;
+// drinking a great deal more — especially quickly — can dilute the blood's
+// sodium (hyponatremia / "water intoxication"). Past this daily total Pulse
+// surfaces a friendly heads-up. Not medical advice, just a nudge to ease off.
+export const SAFE_WATER_MAX_ML = 4000;
+
 export function mlToDisplay(ml, units) {
   if (units === 'imperial') return { value: Math.round(ml / 29.5735), unit: 'oz' };
   return { value: ml, unit: 'ml' };

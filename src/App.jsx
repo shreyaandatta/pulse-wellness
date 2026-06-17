@@ -23,7 +23,9 @@ import { celebrate } from './lib/celebrate.js';
 import { boostActive } from './lib/economy.js';
 import { dayCounts } from './lib/streak.js';
 import { useWallet } from './hooks/useWallet.js';
+import { SAFE_WATER_MAX_ML } from './lib/units.js';
 import Shop from './components/Shop.jsx';
+import WaterWarning from './components/WaterWarning.jsx';
 
 import AuthGate from './components/AuthGate.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
@@ -221,6 +223,20 @@ function PulseApp({ auth }) {
   // ---- Sparks economy. The wallet is server-authoritative (see useWallet +
   // /api/sparks); the Shop opens here and drives the spend actions.
   const [shopOpen, setShopOpen] = useState(false);
+
+  // Over-hydration heads-up. Watch *today's* water (the day you're actually
+  // drinking on) and pop a friendly warning once, the first time it crosses the
+  // safe daily ceiling. The per-day guard stops it nagging on every extra sip.
+  const waterToday = getDay(p.state, todayKey()).water || 0;
+  const [waterWarn, setWaterWarn] = useState(false);
+  const waterWarnedOn = useRef(null);
+  useEffect(() => {
+    const tk = todayKey();
+    if (waterToday > SAFE_WATER_MAX_ML && waterWarnedOn.current !== tk) {
+      waterWarnedOn.current = tk;
+      setWaterWarn(true);
+    }
+  }, [waterToday]);
 
   // The most recent missed day a held Streak Freeze could still rescue.
   const yKey = addDays(todayKey(), -1);
@@ -578,6 +594,7 @@ function PulseApp({ auth }) {
         onBuySparks={buySparksFlow} liveMoney={hasRazorpay}
         notify={notify}
       />
+      <WaterWarning open={waterWarn} amountMl={waterToday} units={settings.units} onClose={() => setWaterWarn(false)} />
       <div className="toast-wrap">
         <AnimatePresence initial={false}>
           {toasts.map((t) => (

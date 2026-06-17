@@ -66,9 +66,12 @@ export default function PlusModal({ open, onClose, onUpgrade, live }) {
 
       <style>{`
         .plus-modal { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 20px;
-          background: color-mix(in srgb, var(--ink-900) 48%, transparent); backdrop-filter: blur(5px);
+          background: color-mix(in srgb, var(--ink-900) 64%, transparent); backdrop-filter: blur(6px);
           animation: fadeDown .2s var(--ease-out); }
-        .plus-sheet { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl);
+        /* Solid sheet — the glass layer makes var(--surface) translucent, which
+           read as see-through over a vivid accent backdrop. var(--cream-0) stays
+           opaque in every theme, so the modal is solid regardless of accent. */
+        .plus-sheet { background: var(--cream-0); border: 1px solid var(--border); border-radius: var(--r-xl);
           padding: var(--s-6); max-width: 420px; width: 100%; max-height: 90dvh; overflow-y: auto;
           box-shadow: var(--shadow-lg); text-align: center; }
         .ps-mark { width: 56px; height: 56px; border-radius: 18px; margin: 0 auto 12px; display: grid; place-items: center;

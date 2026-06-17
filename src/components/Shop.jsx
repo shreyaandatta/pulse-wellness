@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { IconShop } from './Icons.jsx';
 import {
-  ACCENTS, FRAMES, NAMEPLATES, CONSUMABLES, FREEZE_MAX, PLUS_MULT, slotOf, boostActive,
+  ACCENTS, FRAMES, NAMEPLATES, CONSUMABLES, SPARK_PACKS, FREEZE_MAX, PLUS_MULT, slotOf, boostActive,
 } from '../lib/economy.js';
 
 const fmt = (n) => Math.round(n).toLocaleString();
@@ -8,7 +9,8 @@ const fmt = (n) => Math.round(n).toLocaleString();
 // The Sparks Shop. A scrim + sheet (same family as PlusModal). Everything is
 // bought with ⚡ Sparks earned in-app; Plus members earn 1.5× and unlock a few
 // exclusive skins. Real-money Spark packs arrive in a later wave.
-export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onEquip, onApplyFreeze, freezeTarget, freezeLabel, notify }) {
+export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onEquip, onApplyFreeze, freezeTarget, freezeLabel, onBuySparks, liveMoney, notify }) {
+  const [busyPack, setBusyPack] = useState(null);
   if (!open || !wallet) return null;
   const { balance, earned, owned = [], equipped = {}, freezes = 0 } = wallet;
   const boosted = boostActive(wallet);
@@ -101,7 +103,25 @@ export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onE
           </div>
         </Shelf>
 
-        <p className="shop-foot faint">💳 Spark packs (real-money top-ups) are coming soon. For now, every Spark is earned by showing up.</p>
+        {/* —— Buy Sparks (real money) —— */}
+        <Shelf title="Buy Sparks" sub="Top up instantly">
+          <div className="shop-packs">
+            {SPARK_PACKS.map((pk) => (
+              <button key={pk.id} className={`pack ${pk.tag ? 'feat' : ''}`} disabled={busyPack != null}
+                      onClick={async () => { setBusyPack(pk.id); try { await onBuySparks(pk.id); } finally { setBusyPack(null); } }}>
+                {pk.tag && <span className="pack-tag">{pk.tag}</span>}
+                <span className="pack-emoji">{pk.emoji}</span>
+                <span className="pack-sparks">⚡ {fmt(pk.sparks)}</span>
+                <span className="pack-price">{busyPack === pk.id ? '…' : pk.price}</span>
+              </button>
+            ))}
+          </div>
+          <p className="shop-foot faint">
+            {liveMoney
+              ? <>Secure payment via <b>Razorpay</b>. Sparks are added the moment payment clears.</>
+              : <>Demo mode — taps add Sparks instantly and <b>nothing is charged</b>. Live payments turn on once Razorpay keys are set.</>}
+          </p>
+        </Shelf>
       </div>
 
       <style>{`
@@ -166,7 +186,21 @@ export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onE
           color: #fff; font-weight: 800; font-size: var(--t-sm); padding: 8px 14px; cursor: pointer; white-space: nowrap; }
         .buy-btn:disabled { background: var(--surface-soft); border-color: var(--border); color: var(--text-faint); cursor: not-allowed; }
 
-        .shop-foot { font-size: var(--t-xs); line-height: 1.5; margin-top: var(--s-4); text-align: center; }
+        .shop-packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        .pack { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px;
+          border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); padding: 14px 8px 10px;
+          cursor: pointer; transition: border-color var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
+        .pack:hover:not(:disabled) { border-color: var(--amber-400); transform: translateY(-2px); }
+        .pack:disabled { opacity: .6; cursor: progress; }
+        .pack.feat { border-color: var(--amber-500); box-shadow: var(--shadow-glow); }
+        .pack-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+          font-size: 0.58rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #fff;
+          padding: 2px 8px; border-radius: var(--r-pill); background: linear-gradient(135deg, var(--amber-400), var(--clay)); }
+        .pack-emoji { font-size: 24px; }
+        .pack-sparks { font-weight: 800; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+        .pack-price { font-family: var(--font-display); font-weight: 600; font-size: var(--t-md); color: var(--amber-700); }
+
+        .shop-foot { font-size: var(--t-xs); line-height: 1.5; margin-top: 10px; text-align: center; }
       `}</style>
     </div>
   );

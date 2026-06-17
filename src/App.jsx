@@ -11,7 +11,7 @@ import { hasSupabase } from './lib/supabase.js';
 import { getDay } from './lib/storage.js';
 import { resolveOrder } from './lib/pillars.js';
 import { isPlus } from './lib/plan.js';
-import { startSubscription, cancelSubscription } from './lib/billing.js';
+import { startSubscription, cancelSubscription, buySparks, hasRazorpay } from './lib/billing.js';
 import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
@@ -20,7 +20,7 @@ import {
 } from './components/Icons.jsx';
 import { resolveBadges, BADGES } from './lib/badges.js';
 import { celebrate } from './lib/celebrate.js';
-import { reconcileWallet, boostActive } from './lib/economy.js';
+import { reconcileWallet, boostActive, PACK_INDEX } from './lib/economy.js';
 import { dayCounts } from './lib/streak.js';
 import Shop from './components/Shop.jsx';
 
@@ -226,6 +226,25 @@ function PulseApp({ auth }) {
   // The most recent missed day a held Streak Freeze could still rescue.
   const yKey = addDays(todayKey(), -1);
   const freezeTarget = !dayCounts(p.state, yKey) ? yKey : null;
+
+  // Buy a Spark pack with money. Live path: Razorpay order → verify → credit once
+  // (deduped by payment id). Demo path (no keys): credit instantly, clearly free.
+  const buySparksFlow = useCallback(async (pack) => {
+    if (hasRazorpay) {
+      if (!auth.user?.cloud) { openPlus(); notify('Sign in to buy Spark packs', '🔒'); return; }
+      try {
+        const { sparks, paymentId } = await buySparks(pack, { email: auth.user.email, name: settings.name });
+        p.creditSparks(sparks, paymentId);
+        notify(`+${sparks} Sparks added`, '✨');
+      } catch (e) {
+        if (e?.message !== 'cancelled') notify(e?.message || 'Payment could not be completed', '⚠️');
+      }
+    } else {
+      const def = PACK_INDEX[pack];
+      p.creditSparks(def.sparks, `demo-${pack}-${Date.now()}`);
+      notify(`Demo — +${def.sparks} Sparks (nothing charged)`, '✨');
+    }
+  }, [auth.user, settings.name, p.creditSparks, openPlus, notify]);
 
   // The upgrade action: real Razorpay checkout when live, else the demo flip.
   const startPlus = useCallback(async (cycle) => {
@@ -561,6 +580,7 @@ function PulseApp({ auth }) {
         wallet={p.state.wallet} plus={plus} openPlus={openPlus}
         onBuy={p.buyItem} onEquip={p.equipItem} onApplyFreeze={p.applyFreeze}
         freezeTarget={freezeTarget} freezeLabel={freezeTarget ? prettyDate(freezeTarget) : ''}
+        onBuySparks={buySparksFlow} liveMoney={hasRazorpay}
         notify={notify}
       />
       <div className="toast-wrap">

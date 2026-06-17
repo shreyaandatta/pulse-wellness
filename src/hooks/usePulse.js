@@ -222,6 +222,19 @@ export function usePulse() {
       return { ...s, wallet: nw };
     }),
     equipItem: (slot, value) => setState((s) => ({ ...s, wallet: { ...s.wallet, equipped: { ...s.wallet.equipped, [slot]: value } } })),
+    // Credit Sparks bought with money. `paymentId` dedupes so a verified payment
+    // can never be credited twice (kept out of `earned`, which tracks activity).
+    creditSparks: (n, paymentId) => setState((s) => {
+      const w = s.wallet; const amt = Math.max(0, Math.round(n));
+      const seen = w.claims?.payments || [];
+      if (paymentId && seen.includes(paymentId)) return s; // already credited this payment
+      return { ...s, wallet: {
+        ...w,
+        balance: w.balance + amt,
+        purchased: (w.purchased || 0) + amt,
+        claims: { ...w.claims, payments: paymentId ? [...seen, paymentId] : seen },
+      } };
+    }),
     applyFreeze: (key) => setState((s) => {
       const w = s.wallet;
       if (!w || w.freezes <= 0 || (w.frozenDays || []).includes(key)) return s;

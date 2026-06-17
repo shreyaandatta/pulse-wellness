@@ -19,6 +19,26 @@ export const KEY_ID = RAZORPAY_KEY_ID;
 export const WEBHOOK_SECRET = RAZORPAY_WEBHOOK_SECRET;
 export const PLAN_IDS = { monthly: RAZORPAY_PLAN_MONTHLY, yearly: RAZORPAY_PLAN_YEARLY };
 
+// Authoritative Spark-pack pricing — paise charged + Sparks granted. The browser
+// only names a pack id; it can never set its own price or payout. Mirror of the
+// display catalogue in src/lib/economy.js (SPARK_PACKS).
+export const SPARK_PACKS = {
+  'pack-s':  { amount: 4900,  sparks: 500 },
+  'pack-m':  { amount: 9900,  sparks: 1200 },
+  'pack-l':  { amount: 19900, sparks: 2800 },
+  'pack-xl': { amount: 39900, sparks: 6500 },
+};
+
+// Verify a one-time Order payment: Razorpay signs `orderId|paymentId` with the
+// key secret. Constant-time compare, mirroring verifySignature for webhooks.
+export function verifyOrderPayment(orderId, paymentId, signature) {
+  if (!orderId || !paymentId || !signature || !RAZORPAY_KEY_SECRET) return false;
+  const expected = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET).update(`${orderId}|${paymentId}`).digest('hex');
+  const a = Buffer.from(expected);
+  const b = Buffer.from(String(signature));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 // True only when every secret needed to actually charge is present. The
 // functions return a clear 503 otherwise, and the frontend stays in demo mode.
 export const billingConfigured = Boolean(

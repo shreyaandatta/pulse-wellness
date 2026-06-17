@@ -84,6 +84,7 @@ export function reconcileWallet(state, plus) {
     badges: [...(w.claims?.badges || [])],
     streakDay: w.claims?.streakDay ?? null,
     onboard: !!w.claims?.onboard,
+    payments: [...(w.claims?.payments || [])],  // preserve credited-payment dedup list
   };
   let credit = 0;
   let changed = false;
@@ -178,6 +179,17 @@ export const CONSUMABLES = [
 export const SHOP_INDEX = Object.fromEntries(
   [...ACCENTS, ...FRAMES, ...NAMEPLATES, ...CONSUMABLES].map((i) => [i.id, i])
 );
+
+// Real-money Spark packs (Razorpay). `amount` is in paise — the *authoritative*
+// price lives server-side (api/create-spark-order.js); these are for display and
+// for the order request. Value-per-rupee rises at higher tiers, the usual ladder.
+export const SPARK_PACKS = [
+  { id: 'pack-s',  sparks: 500,  price: '₹49',  amount: 4900,  emoji: '✨', name: 'Pouch' },
+  { id: 'pack-m',  sparks: 1200, price: '₹99',  amount: 9900,  emoji: '💫', name: 'Sack',  tag: 'Popular' },
+  { id: 'pack-l',  sparks: 2800, price: '₹199', amount: 19900, emoji: '🌟', name: 'Chest', tag: 'Best value' },
+  { id: 'pack-xl', sparks: 6500, price: '₹399', amount: 39900, emoji: '🏆', name: 'Vault' },
+];
+export const PACK_INDEX = Object.fromEntries(SPARK_PACKS.map((p) => [p.id, p]));
 
 // Slot each cosmetic equips into (drives the "Equipped" state + apply effects).
 export function slotOf(item) {

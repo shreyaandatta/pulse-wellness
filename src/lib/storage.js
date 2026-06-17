@@ -77,7 +77,8 @@ export function normalizeWeights(w) {
 // everything else because it lives in the one state blob.
 export const DEFAULT_WALLET = {
   balance: 0,        // spendable Sparks
-  earned: 0,         // lifetime Sparks credited
+  earned: 0,         // lifetime Sparks credited from real activity
+  purchased: 0,      // lifetime Sparks bought with money (kept out of `earned`)
   spent: 0,          // lifetime Sparks spent
   owned: [],         // purchased cosmetic ids
   equipped: { accent: 'honey', frame: 'none', nameplate: '' },
@@ -94,6 +95,7 @@ export function normalizeWallet(w) {
   return {
     balance: Math.max(0, Number(x.balance) || 0),
     earned: Math.max(0, Number(x.earned) || 0),
+    purchased: Math.max(0, Number(x.purchased) || 0),
     spent: Math.max(0, Number(x.spent) || 0),
     owned: Array.isArray(x.owned) ? x.owned : [],
     equipped: {
@@ -109,6 +111,7 @@ export function normalizeWallet(w) {
       badges: Array.isArray(cl.badges) ? cl.badges : [],
       streakDay: cl.streakDay || null,
       onboard: !!cl.onboard,
+      payments: Array.isArray(cl.payments) ? cl.payments : [], // Razorpay payment ids already credited
     },
   };
 }

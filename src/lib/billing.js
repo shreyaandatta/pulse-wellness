@@ -65,3 +65,40 @@ export async function startSubscription(plan, { email, name } = {}) {
 export async function cancelSubscription() {
   return api('/api/cancel-subscription', {});
 }
+
+// One-time Spark-pack purchase. Creates a Razorpay Order, opens Checkout, then
+// has our server verify the payment signature. Resolves with the verified
+// { sparks, paymentId } so the caller can credit the wallet exactly once.
+export async function buySparks(pack, { email, name } = {}) {
+  const [{ orderId, amount, currency, keyId }] = await Promise.all([
+    api('/api/create-spark-order', { pack }),
+    loadCheckout(),
+  ]);
+
+  const payment = await new Promise((resolve, reject) => {
+    const rzp = new window.Razorpay({
+      key: keyId,
+      order_id: orderId,
+      amount,
+      currency: currency || 'INR',
+      name: 'Pulse — Sparks',
+      description: `${pack} Spark pack`,
+      theme: { color: '#E89414' },
+      prefill: { email: email || '', name: name || '' },
+      handler: (response) => resolve(response),
+      modal: { ondismiss: () => reject(new Error('cancelled')) },
+    });
+    rzp.on('payment.failed', (resp) => reject(new Error(resp?.error?.description || 'Payment failed.')));
+    rzp.open();
+  });
+
+  // Server is the source of truth for how many Sparks the pack is worth and that
+  // the payment is genuine; the browser only relays Razorpay's response.
+  const verified = await api('/api/verify-spark-order', {
+    pack,
+    orderId: payment.razorpay_order_id,
+    paymentId: payment.razorpay_payment_id,
+    signature: payment.razorpay_signature,
+  });
+  return { sparks: verified.sparks, paymentId: payment.razorpay_payment_id };
+}

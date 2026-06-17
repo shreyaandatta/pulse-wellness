@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { loadState, saveState, getDay, migrate, DEFAULT_GOALS, DEFAULT_WALLET } from '../lib/storage.js';
 import { todayKey } from '../lib/dates.js';
-import { FREEZE_MAX, slotOf } from '../lib/economy.js';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -200,46 +199,13 @@ export function usePulse() {
 
     resetAll: () => setState((s) => ({ days: {}, goals: { ...DEFAULT_GOALS }, settings: { ...s.settings }, foods: s.foods || [], trackers: s.trackers || [], cycle: { ...(s.cycle || {}), starts: [], logs: {} }, weights: {}, wallet: { ...DEFAULT_WALLET } })),
 
-    // ---- Sparks wallet (the engagement economy; see lib/economy.js) ----
-    // The reconcile/credit side lives in App (it needs the live Plus status);
-    // these are the spend-side mutations the Shop drives.
+    // ---- Sparks wallet (server-authoritative; see hooks/useWallet.js) ----
+    // The browser never decides a balance: the server owns earning and spending.
+    // This setter only mirrors whatever wallet the server returns into app state
+    // so the pill, accent theme, frames, nameplate and streak-freeze keep reading
+    // state.wallet. A tampered mirror is overwritten on the next sync and can't
+    // buy anything the server doesn't agree it can afford.
     setWallet: (w) => setState((s) => ({ ...s, wallet: w })),
-    buyItem: (item) => setState((s) => {
-      const w = s.wallet;
-      if (!w || w.balance < item.price) return s;
-      const slot = slotOf(item);
-      if (slot && (w.owned || []).includes(item.id)) return s;        // already own this cosmetic
-      if (item.kind === 'freeze' && w.freezes >= FREEZE_MAX) return s; // freeze inventory is full
-      const nw = { ...w, balance: w.balance - item.price, spent: w.spent + item.price };
-      if (slot) {
-        nw.owned = [...(w.owned || []), item.id];
-        nw.equipped = { ...w.equipped, [slot]: item.value };          // auto-equip on purchase
-      } else if (item.kind === 'freeze') {
-        nw.freezes = w.freezes + 1;
-      } else if (item.kind === 'boost') {
-        nw.boostUntil = Math.max(Date.now(), w.boostUntil || 0) + 24 * 3600 * 1000;
-      }
-      return { ...s, wallet: nw };
-    }),
-    equipItem: (slot, value) => setState((s) => ({ ...s, wallet: { ...s.wallet, equipped: { ...s.wallet.equipped, [slot]: value } } })),
-    // Credit Sparks bought with money. `paymentId` dedupes so a verified payment
-    // can never be credited twice (kept out of `earned`, which tracks activity).
-    creditSparks: (n, paymentId) => setState((s) => {
-      const w = s.wallet; const amt = Math.max(0, Math.round(n));
-      const seen = w.claims?.payments || [];
-      if (paymentId && seen.includes(paymentId)) return s; // already credited this payment
-      return { ...s, wallet: {
-        ...w,
-        balance: w.balance + amt,
-        purchased: (w.purchased || 0) + amt,
-        claims: { ...w.claims, payments: paymentId ? [...seen, paymentId] : seen },
-      } };
-    }),
-    applyFreeze: (key) => setState((s) => {
-      const w = s.wallet;
-      if (!w || w.freezes <= 0 || (w.frozenDays || []).includes(key)) return s;
-      return { ...s, wallet: { ...w, freezes: w.freezes - 1, frozenDays: [...(w.frozenDays || []), key] } };
-    }),
 
     // custom trackers (Plus) — definitions live in state.trackers, the day's
     // values in day.custom keyed by tracker id.

@@ -100,5 +100,6 @@ export async function buySparks(pack, { email, name } = {}) {
     paymentId: payment.razorpay_payment_id,
     signature: payment.razorpay_signature,
   });
-  return { sparks: verified.sparks, paymentId: payment.razorpay_payment_id };
+  // The server credited the wallet; it returns the fresh authoritative copy.
+  return { sparks: verified.sparks, wallet: verified.wallet, paymentId: payment.razorpay_payment_id };
 }

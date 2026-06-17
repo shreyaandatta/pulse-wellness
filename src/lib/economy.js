@@ -31,6 +31,12 @@ export const PLUS_MULT = 1.5;   // Plus is a Spark accelerator
 export const BOOST_MULT = 2;    // Double-Sparks Day, stacks on Plus
 export const FREEZE_MAX = 3;    // streak freezes you can hold at once
 
+// Anti-farm: the most *repeatable* Sparks (daily/goal/perfect/streak earns) that
+// can be credited per real UTC day. One-time payouts (badges, onboarding) are
+// exempt. Comfortably above a couple of honest days of logging/backfill, but it
+// throttles anyone who fakes a pile of history server-side to a slow trickle.
+export const EARN_CAP_PER_DAY = 400;
+
 // Core metrics that make up a "complete day". Journal is a nice-to-have extra
 // that still earns per-metric Sparks but isn't required for the bonus.
 const CORE = ['water', 'steps', 'sleep', 'mood', 'meal', 'workout'];
@@ -72,32 +78,62 @@ export function boostActive(wallet) {
 }
 
 // Reconcile the wallet against the user's real data. Idempotent: returns the
-// SAME wallet reference when nothing new was earned (so the effect can bail and
-// never loops). `credited` reports how many Sparks this pass added, for a toast.
-export function reconcileWallet(state, plus) {
+// SAME wallet reference when nothing new was earned. Repeatable earns are held
+// under a per-real-day cap (`opts.cap`) so faked history can't be cashed out in
+// one go; the overflow stays owed and credits on later days. One-time payouts
+// (badges, onboarding) are exempt. `credited` reports how much this pass added.
+// This runs on the SERVER for the authoritative wallet; the client only mirrors.
+export function reconcileWallet(state, plus, opts = {}) {
   const w = state.wallet;
   if (!w) return { wallet: state.wallet, credited: 0 };
 
   const mult = liveMultiplier(state, plus);
+  const tk = todayKey();
   const claims = {
     days: { ...(w.claims?.days || {}) },
     badges: [...(w.claims?.badges || [])],
     streakDay: w.claims?.streakDay ?? null,
     onboard: !!w.claims?.onboard,
-    payments: [...(w.claims?.payments || [])],  // preserve credited-payment dedup list
+    payments: [...(w.claims?.payments || [])],   // credited-payment dedup list
+    capDay: w.claims?.capDay ?? null,
+    capUsed: Number(w.claims?.capUsed) || 0,
   };
+  // Reset the cap window when a new (UTC) day begins.
+  if (claims.capDay !== tk) { claims.capDay = tk; claims.capUsed = 0; }
+
+  const cap = opts.cap == null ? Infinity : opts.cap;
+  let room = Math.max(0, cap - claims.capUsed); // capped Sparks still available today
   let credit = 0;
   let changed = false;
 
-  // Per-day earns — diff what each day is worth against what it has already paid.
-  const days = state.days || {};
-  for (const key of Object.keys(days)) {
+  // —— Capped: per-day repeatable earns, oldest first. Diff each day's worth
+  // against what it has already paid; stop crediting once the day's room runs out.
+  for (const key of Object.keys(state.days || {}).sort()) {
     const should = baseEarnForDay(getDay(state, key), state.goals);
     const prev = claims.days[key] || 0;
-    if (should > prev) { credit += (should - prev) * mult; claims.days[key] = should; changed = true; }
+    if (should <= prev) continue;
+    const want = (should - prev) * mult;
+    if (want <= room) {
+      credit += want; room -= want; claims.capUsed += want; claims.days[key] = should; changed = true;
+    } else if (room > 0) {
+      credit += room; claims.capUsed += room;
+      claims.days[key] = prev + room / mult;  // partial — the rest stays owed for later
+      room = 0; changed = true;
+      break;
+    } else break;
   }
 
-  // Achievement payouts — each earned badge pays once, scaled by its rarity weight.
+  // —— Capped: streak kicker, once per day (retention reward).
+  if (claims.streakDay !== tk && room > 0) {
+    const st = currentStreak(state);
+    if (st > 0) {
+      const give = Math.min(Math.min(EARN.streakCap, st) * EARN.streakPerDay * mult, room);
+      credit += give; room -= give; claims.capUsed += give;
+      claims.streakDay = tk; changed = true;
+    }
+  }
+
+  // —— Uncapped: achievement payouts, once each, scaled by rarity weight.
   const { badges } = resolveBadges(state);
   for (const b of badges) {
     if (b.earned && !claims.badges.includes(b.id)) {
@@ -107,22 +143,11 @@ export function reconcileWallet(state, plus) {
     }
   }
 
-  // One-time onboarding bonus.
+  // —— Uncapped: one-time onboarding bonus.
   if (state.settings?.onboarded && !claims.onboard) {
     credit += EARN.onboard * mult;
     claims.onboard = true;
     changed = true;
-  }
-
-  // Streak kicker — once per calendar day, rewards an active streak (retention).
-  const tk = todayKey();
-  if (claims.streakDay !== tk) {
-    const st = currentStreak(state);
-    if (st > 0) {
-      credit += Math.min(EARN.streakCap, st) * EARN.streakPerDay * mult;
-      claims.streakDay = tk;
-      changed = true;
-    }
   }
 
   if (!changed) return { wallet: w, credited: 0 };
@@ -131,6 +156,60 @@ export function reconcileWallet(state, plus) {
     wallet: { ...w, balance: w.balance + add, earned: w.earned + add, claims },
     credited: add,
   };
+}
+
+// ---- Pure spend operations. Return { wallet, ok, reason }. The SERVER runs
+// these against the authoritative wallet; each re-validates so a tampered client
+// request (bad price, unaffordable, not-owned, no Plus) is simply rejected. ----
+export function purchaseItem(wallet, item, { plus = false } = {}) {
+  if (!wallet || !item) return { wallet, ok: false, reason: 'invalid' };
+  if (item.plus && !plus) return { wallet, ok: false, reason: 'plus' };
+  if ((wallet.balance || 0) < item.price) return { wallet, ok: false, reason: 'funds' };
+  const slot = slotOf(item);
+  if (slot && (wallet.owned || []).includes(item.id)) return { wallet, ok: false, reason: 'owned' };
+  if (item.kind === 'freeze' && (wallet.freezes || 0) >= FREEZE_MAX) return { wallet, ok: false, reason: 'full' };
+  const nw = { ...wallet, balance: wallet.balance - item.price, spent: (wallet.spent || 0) + item.price };
+  if (slot) {
+    nw.owned = [...(wallet.owned || []), item.id];
+    nw.equipped = { ...wallet.equipped, [slot]: item.value };
+  } else if (item.kind === 'freeze') {
+    nw.freezes = (wallet.freezes || 0) + 1;
+  } else if (item.kind === 'boost') {
+    nw.boostUntil = Math.max(Date.now(), wallet.boostUntil || 0) + 24 * 3600 * 1000;
+  }
+  return { wallet: nw, ok: true };
+}
+
+export function equipCosmetic(wallet, item) {
+  const slot = slotOf(item);
+  if (!slot) return { wallet, ok: false, reason: 'invalid' };
+  if (!item.free && !(wallet.owned || []).includes(item.id)) return { wallet, ok: false, reason: 'owned' };
+  return { wallet: { ...wallet, equipped: { ...wallet.equipped, [slot]: item.value } }, ok: true };
+}
+
+export function freezeDay(wallet, day) {
+  if (!wallet || (wallet.freezes || 0) <= 0) return { wallet, ok: false, reason: 'none' };
+  if ((wallet.frozenDays || []).includes(day)) return { wallet, ok: false, reason: 'dup' };
+  return { wallet: { ...wallet, freezes: wallet.freezes - 1, frozenDays: [...(wallet.frozenDays || []), day] }, ok: true };
+}
+
+export function creditPurchase(wallet, sparks, paymentId) {
+  const amt = Math.max(0, Math.round(sparks));
+  const seen = wallet.claims?.payments || [];
+  if (paymentId && seen.includes(paymentId)) return { wallet, ok: false, reason: 'dup' };
+  return { wallet: {
+    ...wallet,
+    balance: (wallet.balance || 0) + amt,
+    purchased: (wallet.purchased || 0) + amt,
+    claims: { ...wallet.claims, payments: paymentId ? [...seen, paymentId] : seen },
+  }, ok: true };
+}
+
+// Look up a cosmetic by the slot+value an equip request names (for server-side
+// ownership validation). Returns the catalogue item or null.
+export function findCosmetic(slot, value) {
+  const shelf = slot === 'accent' ? ACCENTS : slot === 'frame' ? FRAMES : slot === 'nameplate' ? NAMEPLATES : [];
+  return shelf.find((i) => i.value === value) || null;
 }
 
 // ============================================================

@@ -112,6 +112,8 @@ export function normalizeWallet(w) {
       streakDay: cl.streakDay || null,
       onboard: !!cl.onboard,
       payments: Array.isArray(cl.payments) ? cl.payments : [], // Razorpay payment ids already credited
+      capDay: cl.capDay || null,                                // UTC day the per-day earn cap is tracking
+      capUsed: Math.max(0, Number(cl.capUsed) || 0),            // capped Sparks already credited that day
     },
   };
 }

@@ -9,21 +9,34 @@ const fmt = (n) => Math.round(n).toLocaleString();
 // The Sparks Shop. A scrim + sheet (same family as PlusModal). Everything is
 // bought with ⚡ Sparks earned in-app; Plus members earn 1.5× and unlock a few
 // exclusive skins. Real-money Spark packs arrive in a later wave.
-export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onEquip, onApplyFreeze, freezeTarget, freezeLabel, onBuySparks, liveMoney, notify }) {
+export default function Shop({ open, onClose, wallet, plus, openPlus, cloud, onLogout, onBuy, onEquip, onApplyFreeze, freezeTarget, freezeLabel, onBuySparks, liveMoney, notify }) {
   const [busyPack, setBusyPack] = useState(null);
+  const [busy, setBusy] = useState(false);
   if (!open || !wallet) return null;
+  if (!cloud) return <ShopGate onClose={onClose} onLogout={onLogout} />;
   const { balance, earned, owned = [], equipped = {}, freezes = 0 } = wallet;
   const boosted = boostActive(wallet);
   const boostHrs = boosted ? Math.max(1, Math.round((wallet.boostUntil - Date.now()) / 3600000)) : 0;
 
-  const buy = (item) => {
+  // Buy/equip go through the server (authoritative). Optimistic guards here are
+  // just for snappy UX — the server re-validates and is the final word.
+  const buy = async (item) => {
     if (item.plus && !plus) { onClose(); openPlus(); return; }
     if (balance < item.price) { notify(`Need ${fmt(item.price - balance)} more Sparks`, '⚡'); return; }
-    onBuy(item);
-    const verb = slotOf(item) ? 'Unlocked & equipped' : item.kind === 'freeze' ? 'Added a Streak Freeze' : 'Double Sparks is on';
-    notify(`${verb} · ${item.emoji} ${item.name}`, '✨');
+    if (busy) return; setBusy(true);
+    const ok = await onBuy(item.id);
+    setBusy(false);
+    if (ok) {
+      const verb = slotOf(item) ? 'Unlocked & equipped' : item.kind === 'freeze' ? 'Added a Streak Freeze' : 'Double Sparks is on';
+      notify(`${verb} · ${item.emoji} ${item.name}`, '✨');
+    }
   };
-  const equip = (item) => { onEquip(slotOf(item), item.value); notify(`Equipped ${item.emoji} ${item.name}`, '✅'); };
+  const equip = async (item) => {
+    if (busy) return; setBusy(true);
+    const ok = await onEquip(slotOf(item), item.value);
+    setBusy(false);
+    if (ok) notify(`Equipped ${item.emoji} ${item.name}`, '✅');
+  };
 
   return (
     <div className="shop-modal" onClick={onClose}>
@@ -50,7 +63,8 @@ export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onE
             <div className="sf-text">
               <div className="sf-held"><b>{freezes}</b> / {FREEZE_MAX} held</div>
               {freezeTarget
-                ? <button className="sf-apply" onClick={() => { onApplyFreeze(freezeTarget); notify(`Protected ${freezeLabel} 🧊`, '🛡️'); }} disabled={freezes < 1}>
+                ? <button className="sf-apply" disabled={freezes < 1 || busy}
+                    onClick={async () => { const ok = await onApplyFreeze(freezeTarget); if (ok) notify(`Protected ${freezeLabel} 🧊`, '🛡️'); }}>
                     Protect {freezeLabel}
                   </button>
                 : <span className="faint sf-none">Your recent days are safe</span>}
@@ -201,6 +215,36 @@ export default function Shop({ open, onClose, wallet, plus, openPlus, onBuy, onE
         .pack-price { font-family: var(--font-display); font-weight: 600; font-size: var(--t-md); color: var(--amber-700); }
 
         .shop-foot { font-size: var(--t-xs); line-height: 1.5; margin-top: 10px; text-align: center; }
+      `}</style>
+    </div>
+  );
+}
+
+// Guests can't have a tamper-proof wallet (no server), so Sparks are a cloud
+// feature — same as Friends/Family/Challenges. Invite them to create an account.
+function ShopGate({ onClose, onLogout }) {
+  return (
+    <div className="shop-modal" onClick={onClose}>
+      <div className="shop-sheet pop" onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center', maxWidth: 420 }}>
+        <div className="shop-mark" style={{ margin: '4px auto 14px' }}><IconShop size={22} /></div>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1.4rem' }}>The Sparks Shop</h3>
+        <p className="faint" style={{ margin: '8px 0 18px', lineHeight: 1.5, fontSize: 'var(--t-sm)' }}>
+          Earn ⚡ Sparks for logging your day and unlocking badges, then spend them on themes,
+          frames, nameplates and streak freezes. Your balance is kept safe in your account —
+          so it needs a free cloud account (guest mode stays private to this device).
+        </p>
+        <button className="buy-btn" style={{ width: '100%' }} onClick={onLogout}>Create an account or sign in</button>
+        <button className="shop-x" onClick={onClose} style={{ position: 'absolute', top: 16, right: 16 }} aria-label="Close">✕</button>
+      </div>
+      <style>{`
+        .shop-modal { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 20px;
+          background: color-mix(in srgb, var(--ink-900) 48%, transparent); backdrop-filter: blur(5px); animation: fadeDown .2s var(--ease-out); }
+        .shop-sheet { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-xl);
+          padding: var(--s-6); width: 100%; box-shadow: var(--shadow-lg); }
+        .shop-mark { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: #fff;
+          background: linear-gradient(140deg, var(--amber-400), var(--amber-600)); box-shadow: var(--shadow-glow); }
+        .buy-btn { border-radius: var(--r-pill); border: none; background: var(--amber-500); color: #fff; font-weight: 800; padding: 11px 14px; cursor: pointer; }
+        .shop-x { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-soft); cursor: pointer; }
       `}</style>
     </div>
   );

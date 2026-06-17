@@ -20,8 +20,9 @@ import {
 } from './components/Icons.jsx';
 import { resolveBadges, BADGES } from './lib/badges.js';
 import { celebrate } from './lib/celebrate.js';
-import { reconcileWallet, boostActive, PACK_INDEX } from './lib/economy.js';
+import { boostActive } from './lib/economy.js';
 import { dayCounts } from './lib/streak.js';
+import { useWallet } from './hooks/useWallet.js';
 import Shop from './components/Shop.jsx';
 
 import AuthGate from './components/AuthGate.jsx';
@@ -138,6 +139,14 @@ function PulseApp({ auth }) {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 1900);
   }, []);
 
+  // Sparks wallet — server-authoritative, cloud accounts only. Mirrors the
+  // server's wallet into state.wallet via p.setWallet; re-syncs earns after logs.
+  // (Declared here so it can use `notify` above.)
+  const sparks = useWallet({
+    cloudUserId: auth.user.cloud ? auth.user.id : null,
+    setWallet: p.setWallet, notify, earnSignature: p.state.days,
+  });
+
   // Smoothly scroll to a tracker card (from a tapped nudge) and flash it.
   const jumpToPillar = useCallback((id) => {
     const el = document.getElementById(`pillar-${id}`);
@@ -209,42 +218,27 @@ function PulseApp({ auth }) {
   const [plusOpen, setPlusOpen] = useState(false);
   const openPlus = useCallback(() => setPlusOpen(true), []);
 
-  // ---- Sparks economy. Reconcile the wallet against real data on every change
-  // (idempotent — credits only what's newly earned). The credit/earn side needs
-  // the live Plus status, so it lives here; the Shop drives the spend side.
+  // ---- Sparks economy. The wallet is server-authoritative (see useWallet +
+  // /api/sparks); the Shop opens here and drives the spend actions.
   const [shopOpen, setShopOpen] = useState(false);
-  const firstRecon = useRef(true);
-  useEffect(() => {
-    const { wallet, credited } = reconcileWallet(p.state, plus);
-    if (wallet !== p.state.wallet) {
-      p.setWallet(wallet);
-      if (!firstRecon.current && credited > 0) notify(`+${credited} Sparks`, '⚡');
-    }
-    firstRecon.current = false;
-  }, [p.state, plus]);
 
   // The most recent missed day a held Streak Freeze could still rescue.
   const yKey = addDays(todayKey(), -1);
   const freezeTarget = !dayCounts(p.state, yKey) ? yKey : null;
 
-  // Buy a Spark pack with money. Live path: Razorpay order → verify → credit once
-  // (deduped by payment id). Demo path (no keys): credit instantly, clearly free.
+  // Buy a Spark pack with money: Razorpay order → server verifies the signature
+  // and credits the wallet → we mirror the returned authoritative wallet.
   const buySparksFlow = useCallback(async (pack) => {
-    if (hasRazorpay) {
-      if (!auth.user?.cloud) { openPlus(); notify('Sign in to buy Spark packs', '🔒'); return; }
-      try {
-        const { sparks, paymentId } = await buySparks(pack, { email: auth.user.email, name: settings.name });
-        p.creditSparks(sparks, paymentId);
-        notify(`+${sparks} Sparks added`, '✨');
-      } catch (e) {
-        if (e?.message !== 'cancelled') notify(e?.message || 'Payment could not be completed', '⚠️');
-      }
-    } else {
-      const def = PACK_INDEX[pack];
-      p.creditSparks(def.sparks, `demo-${pack}-${Date.now()}`);
-      notify(`Demo — +${def.sparks} Sparks (nothing charged)`, '✨');
+    if (!auth.user?.cloud) { notify('Sign in to buy Sparks', '🔒'); return; }
+    if (!hasRazorpay) { notify('Spark packs aren’t available in this build', '💳'); return; }
+    try {
+      const { wallet: w } = await buySparks(pack, { email: auth.user.email, name: settings.name });
+      sparks.applyWallet(w);
+      notify('Sparks added', '✨');
+    } catch (e) {
+      if (e?.message !== 'cancelled') notify(e?.message || 'Payment could not be completed', '⚠️');
     }
-  }, [auth.user, settings.name, p.creditSparks, openPlus, notify]);
+  }, [auth.user, settings.name, sparks, notify]);
 
   // The upgrade action: real Razorpay checkout when live, else the demo flip.
   const startPlus = useCallback(async (cycle) => {
@@ -578,7 +572,8 @@ function PulseApp({ auth }) {
       <Shop
         open={shopOpen} onClose={() => setShopOpen(false)}
         wallet={p.state.wallet} plus={plus} openPlus={openPlus}
-        onBuy={p.buyItem} onEquip={p.equipItem} onApplyFreeze={p.applyFreeze}
+        cloud={!!auth.user.cloud} onLogout={auth.logout}
+        onBuy={sparks.buy} onEquip={sparks.equip} onApplyFreeze={sparks.freeze}
         freezeTarget={freezeTarget} freezeLabel={freezeTarget ? prettyDate(freezeTarget) : ''}
         onBuySparks={buySparksFlow} liveMoney={hasRazorpay}
         notify={notify}

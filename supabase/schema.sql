@@ -458,3 +458,25 @@ grant execute on function public.is_challenge_member(uuid)        to authenticat
 grant execute on function public.get_my_challenges()              to authenticated;
 grant execute on function public.get_challenge_invites()          to authenticated;
 grant execute on function public.get_challenge_standings(uuid)    to authenticated;
+
+-- ============================================================
+-- Sparks wallet (the engagement economy).
+-- Server-authoritative: a signed-in user may READ their own wallet, but only
+-- the service-role server functions ever WRITE it. There is deliberately no
+-- insert/update/delete policy, so a tampered client cannot change a real
+-- balance, grant itself items, or fake a purchase. Earns are recomputed
+-- server-side from the user's own data under a per-day cap (see lib/economy.js).
+-- ============================================================
+
+create table if not exists public.wallets (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  data       jsonb not null default '{}'::jsonb,   -- the wallet shape (balance, owned, equipped, claims…)
+  updated_at timestamptz not null default now()
+);
+
+alter table public.wallets enable row level security;
+
+-- READ own only. No write policy → writes are service-role (server) only.
+drop policy if exists "wallets_select_own" on public.wallets;
+create policy "wallets_select_own" on public.wallets
+  for select using (auth.uid() = user_id);

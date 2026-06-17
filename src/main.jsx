@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './styles/tokens.css'
 import './styles/global.css'
 import './styles/glass.css'
+import './styles/shop.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -13,7 +13,7 @@ export function setActiveUser(id) {
 }
 
 // Bump this whenever the saved shape changes, and add a step to migrate().
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const DEFAULT_GOALS = {
   water: 2000,      // ml (metric base unit)
@@ -70,6 +70,49 @@ export function normalizeWeights(w) {
   return out;
 }
 
+// Sparks wallet — the engagement economy (see lib/economy.js). `claims` is an
+// idempotency ledger so reconciliation never double-pays; `owned`/`equipped`
+// hold cosmetics, `freezes`/`frozenDays` the streak-freeze consumable, and
+// `boostUntil` a Double-Sparks window. Rides backup/restore + cloud sync like
+// everything else because it lives in the one state blob.
+export const DEFAULT_WALLET = {
+  balance: 0,        // spendable Sparks
+  earned: 0,         // lifetime Sparks credited
+  spent: 0,          // lifetime Sparks spent
+  owned: [],         // purchased cosmetic ids
+  equipped: { accent: 'honey', frame: 'none', nameplate: '' },
+  freezes: 0,        // streak-freeze inventory
+  frozenDays: [],    // 'YYYY-MM-DD' days a freeze is protecting
+  boostUntil: null,  // ms timestamp — Double-Sparks active until
+  claims: { days: {}, badges: [], streakDay: null, onboard: false },
+};
+
+export function normalizeWallet(w) {
+  const x = w && typeof w === 'object' ? w : {};
+  const eq = x.equipped && typeof x.equipped === 'object' ? x.equipped : {};
+  const cl = x.claims && typeof x.claims === 'object' ? x.claims : {};
+  return {
+    balance: Math.max(0, Number(x.balance) || 0),
+    earned: Math.max(0, Number(x.earned) || 0),
+    spent: Math.max(0, Number(x.spent) || 0),
+    owned: Array.isArray(x.owned) ? x.owned : [],
+    equipped: {
+      accent: eq.accent || 'honey',
+      frame: eq.frame || 'none',
+      nameplate: typeof eq.nameplate === 'string' ? eq.nameplate : '',
+    },
+    freezes: Math.max(0, Number(x.freezes) || 0),
+    frozenDays: Array.isArray(x.frozenDays) ? x.frozenDays.filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(k)) : [],
+    boostUntil: Number(x.boostUntil) || null,
+    claims: {
+      days: cl.days && typeof cl.days === 'object' ? cl.days : {},
+      badges: Array.isArray(cl.badges) ? cl.badges : [],
+      streakDay: cl.streakDay || null,
+      onboard: !!cl.onboard,
+    },
+  };
+}
+
 export function normalizeCycle(c) {
   const x = c && typeof c === 'object' ? c : {};
   return {
@@ -113,6 +156,7 @@ export function migrate(parsed) {
     trackers: Array.isArray(data.trackers) ? data.trackers : [],  // custom trackers (Plus)
     cycle: normalizeCycle(data.cycle),  // menstrual-cycle tracking (Plus)
     weights: normalizeWeights(data.weights),  // 'YYYY-MM-DD' -> kg body-weight log
+    wallet: normalizeWallet(data.wallet),  // Sparks economy (see lib/economy.js)
   };
 }
 

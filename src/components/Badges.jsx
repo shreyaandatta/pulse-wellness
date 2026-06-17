@@ -4,7 +4,7 @@ import { resolveBadges, topBadges, BADGE_CATEGORIES } from '../lib/badges.js';
 // a "next up" carrot, and the complete catalogue grouped by category. Earning
 // badges is celebrated app-wide (see App.jsx) so it fires from any tab; this
 // component is purely the trophy room.
-export default function Badges({ state, user }) {
+export default function Badges({ state, user, frame = 'none' }) {
   const { badges, earnedCount, total, next, stats } = resolveBadges(state);
   const showcase = topBadges(state, 3);
   const allDone = earnedCount === total;
@@ -74,7 +74,7 @@ export default function Badges({ state, user }) {
               <span className="ach-cat-count">{got}/{group.length}</span>
             </div>
             <div className="ach-grid">
-              {group.map((b) => <Medal key={b.id} b={b} />)}
+              {group.map((b) => <Medal key={b.id} b={b} frame={frame} />)}
             </div>
           </div>
         );
@@ -125,9 +125,9 @@ export default function Badges({ state, user }) {
 
 // One medallion. Earned = full colour + gold ring; locked = greyed with a tiny
 // progress label so the user sees how close they are.
-function Medal({ b }) {
+function Medal({ b, frame = 'none' }) {
   return (
-    <div className={`bdg-medal ${b.earned ? 'earned' : 'locked'}`} title={`${b.title} — ${b.desc}`}>
+    <div className={`bdg-medal ${b.earned ? 'earned' : 'locked'} ${b.earned && frame !== 'none' ? `frame-${frame}` : ''}`} title={`${b.title} — ${b.desc}`}>
       <div className="bm-disc">{b.emoji}</div>
       <div className="bm-name">{b.title}</div>
       <div className="bm-prog">{b.earned ? 'Unlocked' : b.progressLabel}</div>

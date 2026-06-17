@@ -1,0 +1,90 @@
+/* =========================================================
+   PULSE — Sparks economy: accent themes, badge frames, the
+   topbar Sparks pill. Additive; loaded after glass.css.
+   Accent themes re-skin the brand scale via [data-accent],
+   so every button, ring and accent surface follows along.
+   ========================================================= */
+
+:root[data-accent="ocean"] {
+  --amber-400: #3BA3DD; --amber-500: #1E88C9; --amber-600: #1567A0;
+  --honey-400: #5FB7E6; --honey-500: #2E97D2;
+  --shadow-glow: 0 8px 28px rgba(30, 136, 201, 0.30);
+}
+:root[data-accent="forest"] {
+  --amber-400: #45B872; --amber-500: #2E9E5B; --amber-600: #1F7A45;
+  --honey-400: #5FC986; --honey-500: #34A862;
+  --shadow-glow: 0 8px 28px rgba(46, 158, 91, 0.30);
+}
+:root[data-accent="sunset"] {
+  --amber-400: #F58A5E; --amber-500: #EF6C42; --amber-600: #C9512C;
+  --honey-400: #F7A077; --honey-500: #F0764B;
+  --shadow-glow: 0 8px 28px rgba(239, 108, 66, 0.30);
+}
+:root[data-accent="rose"] {
+  --amber-400: #ED7798; --amber-500: #E0567E; --amber-600: #BE3E61;
+  --honey-400: #F18CA8; --honey-500: #E36185;
+  --shadow-glow: 0 8px 28px rgba(224, 86, 126, 0.30);
+}
+:root[data-accent="grape"] {
+  --amber-400: #A57AE0; --amber-500: #8A5CD0; --amber-600: #6E43B0;
+  --honey-400: #B68FE7; --honey-500: #9265D6;
+  --shadow-glow: 0 8px 28px rgba(138, 92, 208, 0.30);
+}
+:root[data-accent="mono"] {
+  --amber-400: #79818D; --amber-500: #5C6470; --amber-600: #454C56;
+  --honey-400: #8A929E; --honey-500: #646C78;
+  --shadow-glow: 0 8px 28px rgba(92, 100, 112, 0.26);
+}
+:root[data-accent="midnight"] {
+  --amber-400: #4DF0DB; --amber-500: #00E5C7; --amber-600: #00B89F;
+  --honey-400: #6FF3E2; --honey-500: #1CE8CC;
+  --shadow-glow: 0 8px 30px rgba(0, 229, 199, 0.36);
+}
+
+/* Nameplate flair beside the brand title */
+.brand-flair { margin-left: 6px; font-size: 0.85em; vertical-align: baseline; }
+
+/* ---- Topbar Sparks pill (balance + shop entry) ---- */
+.spark-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 34px; padding: 0 12px 0 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-weight: 700; font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer; white-space: nowrap;
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur);
+}
+.spark-pill:hover { box-shadow: var(--shadow-glow); border-color: var(--amber-300); transform: translateY(-1px); }
+.spark-pill:active { transform: translateY(0) scale(0.97); }
+.spark-pill .sp-ic { font-size: 15px; line-height: 1; }
+.spark-pill.boosted { border-color: var(--amber-400); box-shadow: var(--shadow-glow); }
+.spark-pill .sp-boost { font-size: 11px; }
+
+/* A flair value can hold a number that ticks; keep it from jumping width. */
+.spark-pill .sp-num { min-width: 1ch; text-align: right; }
+
+/* ---- Badge frames (equip in the Shop, render in Badges) ---- */
+.bdg-medal.earned.frame-gold .bm-disc {
+  box-shadow: 0 0 0 2px #F6C544, 0 0 0 4px rgba(246, 197, 68, 0.35), var(--shadow-sm);
+}
+.bdg-medal.earned.frame-gold .bm-disc::after {
+  content: ''; position: absolute; inset: -6px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #F6C544, #FFF1C2, #E89414, #F6C544);
+  z-index: -1; opacity: 0.5; filter: blur(3px);
+}
+.bdg-medal.earned.frame-holo .bm-disc {
+  box-shadow: 0 0 0 2px transparent;
+}
+.bdg-medal.earned.frame-holo .bm-disc::after {
+  content: ''; position: absolute; inset: -5px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #ff8a8a, #ffd36e, #8affc1, #6ec8ff, #c79bff, #ff8a8a);
+  z-index: -1; filter: blur(2px); opacity: 0.85;
+  animation: holo-spin 6s linear infinite;
+}
+@keyframes holo-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .bdg-medal.earned.frame-holo .bm-disc::after { animation: none; } }
+/* The disc needs positioning context for the ::after halo. */
+.bdg-medal .bm-disc { position: relative; }

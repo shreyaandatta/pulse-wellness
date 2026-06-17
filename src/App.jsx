@@ -16,10 +16,13 @@ import { setFeedbackConfig, haptic } from './lib/feedback.js';
 import { greeting, prettyDate, isToday, addDays, todayKey } from './lib/dates.js';
 import {
   IconHome, IconTrends, IconGear, IconMoon, IconSun,
-  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy, IconDots, IconFamily, IconJournal,
+  IconChevronL, IconChevronR, IconShield, IconInsight, IconUsers, IconTrophy, IconDots, IconFamily, IconJournal, IconShop,
 } from './components/Icons.jsx';
 import { resolveBadges, BADGES } from './lib/badges.js';
 import { celebrate } from './lib/celebrate.js';
+import { reconcileWallet, boostActive } from './lib/economy.js';
+import { dayCounts } from './lib/streak.js';
+import Shop from './components/Shop.jsx';
 
 import AuthGate from './components/AuthGate.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
@@ -192,6 +195,7 @@ function PulseApp({ auth }) {
 
   const { settings } = p.state;
   const name = settings.name ? `, ${settings.name}` : '';
+  const flair = p.state.wallet?.equipped?.nameplate || '';
   // What theme is actually showing (resolve 'system' against the OS) — so the
   // topbar toggle icon offers the opposite of what's on screen.
   const systemDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -204,6 +208,24 @@ function PulseApp({ auth }) {
   const plus = entitlement.enabled ? entitlement.plus : isPlus(settings);
   const [plusOpen, setPlusOpen] = useState(false);
   const openPlus = useCallback(() => setPlusOpen(true), []);
+
+  // ---- Sparks economy. Reconcile the wallet against real data on every change
+  // (idempotent — credits only what's newly earned). The credit/earn side needs
+  // the live Plus status, so it lives here; the Shop drives the spend side.
+  const [shopOpen, setShopOpen] = useState(false);
+  const firstRecon = useRef(true);
+  useEffect(() => {
+    const { wallet, credited } = reconcileWallet(p.state, plus);
+    if (wallet !== p.state.wallet) {
+      p.setWallet(wallet);
+      if (!firstRecon.current && credited > 0) notify(`+${credited} Sparks`, '⚡');
+    }
+    firstRecon.current = false;
+  }, [p.state, plus]);
+
+  // The most recent missed day a held Streak Freeze could still rescue.
+  const yKey = addDays(todayKey(), -1);
+  const freezeTarget = !dayCounts(p.state, yKey) ? yKey : null;
 
   // The upgrade action: real Razorpay checkout when live, else the demo flip.
   const startPlus = useCallback(async (cycle) => {
@@ -279,12 +301,18 @@ function PulseApp({ auth }) {
             </svg>
           </div>
           <div>
-            <h1>Pulse</h1>
+            <h1>Pulse{flair && <span className="brand-flair">{flair}</span>}</h1>
             <div className="date">{greeting()}{name} · {prettyDate(p.activeDay)}</div>
           </div>
         </div>
 
         <div className="topbar-actions">
+          <button className={`spark-pill ${boostActive(p.state.wallet) ? 'boosted' : ''}`} onClick={() => setShopOpen(true)} aria-label="Open the Shop" title="Sparks & Shop">
+            <span className="sp-ic">⚡</span>
+            <span className="sp-num">{(p.state.wallet?.balance || 0).toLocaleString()}</span>
+            {boostActive(p.state.wallet) && <span className="sp-boost">2×</span>}
+            <IconShop size={16} />
+          </button>
           <nav className="toptabs">
             <button className={`tab ${tab==='today'?'active':''}`} onClick={() => go('today')}><IconHome size={17} /> Today</button>
             <button className={`tab ${tab==='trends'?'active':''}`} onClick={() => go('trends')}><IconTrends size={17} /> Trends</button>
@@ -398,7 +426,7 @@ function PulseApp({ auth }) {
       {tab === 'badges' && (
         <>
           <div className="section-head"><h2>Achievements</h2><span className="faint">badges you earn by showing up</span></div>
-          <Badges state={p.state} user={auth.user} />
+          <Badges state={p.state} user={auth.user} frame={p.state.wallet?.equipped?.frame} />
         </>
       )}
 
@@ -528,6 +556,13 @@ function PulseApp({ auth }) {
       />
 
       <PlusModal open={plusOpen} onClose={() => setPlusOpen(false)} onUpgrade={startPlus} live={entitlement.enabled} />
+      <Shop
+        open={shopOpen} onClose={() => setShopOpen(false)}
+        wallet={p.state.wallet} plus={plus} openPlus={openPlus}
+        onBuy={p.buyItem} onEquip={p.equipItem} onApplyFreeze={p.applyFreeze}
+        freezeTarget={freezeTarget} freezeLabel={freezeTarget ? prettyDate(freezeTarget) : ''}
+        notify={notify}
+      />
       <div className="toast-wrap">
         <AnimatePresence initial={false}>
           {toasts.map((t) => (

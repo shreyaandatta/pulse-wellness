@@ -8,6 +8,9 @@ import { scoreFor } from './score.js';
 const THRESHOLD = 50;
 
 export function dayCounts(state, key) {
+  // A Streak Freeze (bought with Sparks) bridges a missed day so the streak
+  // survives — the day counts even if nothing was logged or the score is low.
+  if ((state.wallet?.frozenDays || []).includes(key)) return true;
   return scoreFor(state, key) >= THRESHOLD;
 }
 

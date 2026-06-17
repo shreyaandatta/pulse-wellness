@@ -38,3 +38,4 @@ export const IconTrophy = (p) => <I {...p}><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"
 export const IconDots = (p) => <I {...p} fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></I>;
 export const IconFamily = (p) => <I {...p}><circle cx="8" cy="7" r="2.6"/><circle cx="16" cy="7.5" r="2.1"/><path d="M3.5 20v-1.5a4.5 4.5 0 0 1 9 0V20"/><path d="M14 20v-1.2a4 4 0 0 1 6.5-3.1"/><circle cx="12" cy="14.5" r="1.6"/><path d="M9.5 21v-.6a2.5 2.5 0 0 1 5 0V21"/></I>;
 export const IconJournal = (p) => <I {...p}><path d="M5 3h14v18H6a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/><path d="M8 3v18"/><path d="M11 8h5M11 12h5"/></I>;
+export const IconShop = (p) => <I {...p}><path d="M4 9h16l-1 11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1L4 9z"/><path d="M4 9l1.6-5h12.8L20 9"/><path d="M9 13a3 3 0 0 0 6 0"/></I>;
